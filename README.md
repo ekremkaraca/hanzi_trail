@@ -1,24 +1,27 @@
-# README
+# HanziTrail
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Story-based Mandarin flashcard app for learning technical vocabulary.
 
-Things you may want to cover:
+## Goal
 
-* Ruby version
+HanziTrail helps learners remember Mandarin characters through:
 
-* System dependencies
+- character stories
+- pinyin
+- meanings
+- technical usage examples
+- spaced repetition
 
-* Configuration
+## Stack
 
-* Database creation
+- Ruby on Rails
+- Hotwire
+- Bulma
+- PostgreSQL
+- Minitest
 
-* Database initialization
+## Development
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+```bash
+bin/setup
+bin/rails server
