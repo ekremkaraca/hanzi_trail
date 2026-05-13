@@ -1,0 +1,40 @@
+<section class="section">
+  <div class="container">
+    <% if notice.present? %>
+      <div class="notification is-success"><%= notice %></div>
+    <% end %>
+
+    <div class="box">
+      <p class="is-size-1 has-text-centered"><%= @flashcard.character %></p>
+
+      <h1 class="title has-text-centered"><%= @flashcard.meaning %></h1>
+      <p class="subtitle has-text-centered"><%= @flashcard.pinyin %></p>
+
+      <hr>
+
+      <div class="content">
+        <h2>Story</h2>
+        <p><%= simple_format(@flashcard.story) %></p>
+
+        <h2>Details</h2>
+        <ul>
+          <li><strong>Category:</strong> <%= @flashcard.category %></li>
+          <li><strong>Difficulty:</strong> <%= @flashcard.difficulty %></li>
+          <li><strong>Review count:</strong> <%= @flashcard.review_count %></li>
+          <li><strong>Next review:</strong> <%= @flashcard.next_review_at %></li>
+        </ul>
+      </div>
+
+      <div class="buttons">
+        <%= link_to "Edit", edit_flashcard_path(@flashcard), class: "button is-light" %>
+        <%= link_to "Back", flashcards_path, class: "button is-light" %>
+
+        <%= button_to "Delete",
+              @flashcard,
+              method: :delete,
+              class: "button is-danger",
+              form: { data: { turbo_confirm: "Delete this flashcard?" } } %>
+      </div>
+    </div>
+  </div>
+</section>

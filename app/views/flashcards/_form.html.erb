@@ -1,0 +1,57 @@
+<%= form_with model: flashcard do |form| %>
+  <% if flashcard.errors.any? %>
+    <div class="notification is-danger">
+      <p><strong>Please fix the following errors:</strong></p>
+      <ul>
+        <% flashcard.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :character, class: "label" %>
+    <div class="control">
+      <%= form.text_field :character, class: "input", autofocus: true %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :pinyin, class: "label" %>
+    <div class="control">
+      <%= form.text_field :pinyin, class: "input" %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :meaning, class: "label" %>
+    <div class="control">
+      <%= form.text_field :meaning, class: "input" %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :category, class: "label" %>
+    <div class="control">
+      <%= form.text_field :category, class: "input" %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :story, class: "label" %>
+    <div class="control">
+      <%= form.text_area :story, class: "textarea", rows: 6 %>
+    </div>
+  </div>
+
+  <div class="field is-grouped">
+    <div class="control">
+      <%= form.submit class: "button is-primary" %>
+    </div>
+
+    <div class="control">
+      <%= link_to "Cancel", flashcards_path, class: "button is-light" %>
+    </div>
+  </div>
+<% end %>

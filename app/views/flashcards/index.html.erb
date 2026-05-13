@@ -1,0 +1,47 @@
+<section class="section">
+  <div class="container">
+    <div class="level">
+      <div>
+        <h1 class="title">Flashcards</h1>
+        <p class="subtitle">Mandarin cards with stories and technical context.</p>
+      </div>
+
+      <%= link_to "New flashcard", new_flashcard_path, class: "button is-primary" %>
+    </div>
+
+    <% if notice.present? %>
+      <div class="notification is-success"><%= notice %></div>
+    <% end %>
+
+    <div class="table-container">
+      <table class="table is-fullwidth is-hoverable">
+        <thead>
+          <tr>
+            <th>Character</th>
+            <th>Pinyin</th>
+            <th>Meaning</th>
+            <th>Category</th>
+            <th>Review count</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% @flashcards.each do |flashcard| %>
+            <tr>
+              <td class="is-size-4"><%= flashcard.character %></td>
+              <td><%= flashcard.pinyin %></td>
+              <td><%= flashcard.meaning %></td>
+              <td><%= flashcard.category %></td>
+              <td><%= flashcard.review_count %></td>
+              <td>
+                <%= link_to "Show", flashcard, class: "button is-small is-light" %>
+                <%= link_to "Edit", edit_flashcard_path(flashcard), class: "button is-small is-light" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

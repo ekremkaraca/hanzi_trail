@@ -1,0 +1,9 @@
+one:
+  character: 网
+  pinyin: wǎng
+  meaning: network
+  story: Originally depicted a fishing net.
+  category: networking
+  difficulty: new
+  next_review_at: <%= Time.current %>
+  review_count: 0
