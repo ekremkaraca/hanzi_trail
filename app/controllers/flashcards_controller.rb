@@ -50,10 +50,7 @@ class FlashcardsController < ApplicationController
         :pinyin,
         :meaning,
         :story,
-        :category,
-        :difficulty,
-        :next_review_at,
-        :review_count
+        :category
       )
   end
 end

@@ -10,20 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_13_084459) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_13_164426) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "flashcards", force: :cascade do |t|
     t.string "category"
-    t.string "character"
+    t.string "character", null: false
     t.datetime "created_at", null: false
     t.string "difficulty", default: "new", null: false
-    t.string "meaning"
+    t.string "meaning", null: false
     t.datetime "next_review_at", null: false
-    t.string "pinyin"
+    t.string "pinyin", null: false
     t.integer "review_count", default: 0, null: false
     t.text "story"
     t.datetime "updated_at", null: false
+    t.index ["character"], name: "index_flashcards_on_character", unique: true
   end
 end
