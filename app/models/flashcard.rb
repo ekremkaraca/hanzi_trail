@@ -27,6 +27,8 @@ class Flashcard < ApplicationRecord
       end
 
     with_lock do
+      raise ActiveRecord::RecordNotFound unless next_review_at <= Time.current
+
       update!(
         difficulty: rating,
         review_count: review_count + 1,
