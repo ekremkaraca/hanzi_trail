@@ -1,0 +1,76 @@
+<!-- app/views/reviews/show.html.erb -->
+
+<section class="section">
+  <div class="container">
+    <% if notice.present? %>
+      <div class="notification is-success"><%= notice %></div>
+    <% end %>
+
+    <h1 class="title">Review</h1>
+
+    <% if @flashcard.present? %>
+      <div class="box has-text-centered" data-controller="review">
+        <p class="is-size-1 mb-5">
+          <%= @flashcard.character %>
+        </p>
+
+        <button
+          type="button"
+          class="button is-link mb-5"
+          data-action="review#showAnswer"
+          data-review-target="showButton">
+          Show answer
+        </button>
+
+        <div class="is-hidden" data-review-target="answer">
+          <p class="subtitle mb-2">
+            <%= @flashcard.pinyin %>
+          </p>
+
+          <h2 class="title is-4">
+            <%= @flashcard.meaning %>
+          </h2>
+
+          <% if @flashcard.story.present? %>
+            <div class="content has-text-left mt-5">
+              <h3>Story</h3>
+              <%= simple_format(@flashcard.story) %>
+            </div>
+          <% end %>
+
+          <div class="buttons is-centered mt-5">
+            <%= button_to "Again",
+                  review_flashcard_path(@flashcard),
+                  method: :patch,
+                  params: { review: { rating: "again" } },
+                  class: "button is-danger" %>
+
+            <%= button_to "Hard",
+                  review_flashcard_path(@flashcard),
+                  method: :patch,
+                  params: { review: { rating: "hard" } },
+                  class: "button is-warning" %>
+
+            <%= button_to "Good",
+                  review_flashcard_path(@flashcard),
+                  method: :patch,
+                  params: { review: { rating: "good" } },
+                  class: "button is-success" %>
+
+            <%= button_to "Easy",
+                  review_flashcard_path(@flashcard),
+                  method: :patch,
+                  params: { review: { rating: "easy" } },
+                  class: "button is-info" %>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <div class="notification is-info">
+        No flashcards are due for review right now.
+      </div>
+
+      <%= link_to "Browse flashcards", flashcards_path, class: "button is-light" %>
+    <% end %>
+  </div>
+</section>
