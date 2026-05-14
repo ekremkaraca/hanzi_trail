@@ -9,15 +9,17 @@
       <hr>
 
       <div class="content">
-        <h2>Story</h2>
-        <p><%= simple_format(@flashcard.story) %></p>
+        <% if @flashcard.story.present? %>
+          <h2>Story</h2>
+          <p><%= simple_format(@flashcard.story) %></p>
+        <% end %>
 
         <h2>Details</h2>
         <ul>
           <li><strong>Category:</strong> <%= @flashcard.category %></li>
           <li><strong>Difficulty:</strong> <%= @flashcard.difficulty %></li>
           <li><strong>Review count:</strong> <%= @flashcard.review_count %></li>
-          <li><strong>Next review:</strong> <%= time_ago_in_words(@flashcard.next_review_at) %> from now</li>
+          <li><strong>Next review:</strong> <%= distance_of_time_in_words(Time.current, @flashcard.next_review_at) %> from now</li>
         </ul>
       </div>
 

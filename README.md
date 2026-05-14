@@ -25,3 +25,13 @@ HanziTrail helps learners remember Mandarin characters through:
 ```bash
 bin/setup
 bin/rails server
+```
+
+## Data Sources
+
+Some vocabulary data is based on the excellent
+[complete-hsk-vocabulary](https://github.com/drkameleon/complete-hsk-vocabulary)
+project by drkameleon.
+
+The original dataset is used under its MIT license.
+Additional stories, categorizations, and learning content were added for HanziTrail.

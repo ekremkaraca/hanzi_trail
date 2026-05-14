@@ -7,3 +7,11 @@ FLASHCARD_SEEDS.each do |attrs|
 end
 
 puts "Seeded #{FLASHCARD_SEEDS.size} flashcards."
+puts "Importing HSK old-1 flashcards..."
+
+HskImporter.new(
+  path: Rails.root.join("vendor/datasets/hsk/old/1.json"),
+  hsk_level: "old-1"
+).call
+
+puts "HSK old-1 import completed."
