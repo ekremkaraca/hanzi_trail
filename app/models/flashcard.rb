@@ -20,21 +20,19 @@ class Flashcard < ApplicationRecord
 
     interval =
       case rating
-      when "again"
-        10.minutes
-      when "hard"
-        1.day
-      when "good"
-        3.days
-      when "easy"
-        7.days
+      when "again" then 10.minutes
+      when "hard" then 1.day
+      when "good" then 3.days
+      when "easy" then 7.days
       end
 
-    update!(
-      difficulty: rating,
-      review_count: review_count + 1,
-      next_review_at: interval.from_now
-    )
+    with_lock do
+      update!(
+        difficulty: rating,
+        review_count: review_count + 1,
+        next_review_at: interval.from_now
+      )
+    end
   end
 
   private

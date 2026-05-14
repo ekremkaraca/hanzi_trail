@@ -1,9 +1,5 @@
 <section class="section">
   <div class="container">
-    <% if notice.present? %>
-      <div class="notification is-success"><%= notice %></div>
-    <% end %>
-
     <div class="box">
       <p class="is-size-1 has-text-centered"><%= @flashcard.character %></p>
 
@@ -21,7 +17,7 @@
           <li><strong>Category:</strong> <%= @flashcard.category %></li>
           <li><strong>Difficulty:</strong> <%= @flashcard.difficulty %></li>
           <li><strong>Review count:</strong> <%= @flashcard.review_count %></li>
-          <li><strong>Next review:</strong> <%= @flashcard.next_review_at %></li>
+          <li><strong>Next review:</strong> <%= time_ago_in_words(@flashcard.next_review_at) %> from now</li>
         </ul>
       </div>
 

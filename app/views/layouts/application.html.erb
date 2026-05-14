@@ -26,6 +26,14 @@
       </div>
     </nav>
 
+    <% if notice.present? %>
+      <div class="notification is-success"><%= notice %></div>
+    <% end %>
+
+    <% if alert.present? %>
+      <div class="notification is-danger"><%= alert %></div>
+    <% end %>
+
     <%= yield %>
   </body>
 </html>
