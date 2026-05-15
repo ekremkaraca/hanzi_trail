@@ -1,6 +1,7 @@
 class ReviewsController < ApplicationController
   def show
     @flashcard = Flashcard.due_for_review.first
+    @remaining_due_count = Flashcard.due_for_review.count
   end
 
   def update
