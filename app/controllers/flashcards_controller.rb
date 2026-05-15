@@ -2,7 +2,11 @@ class FlashcardsController < ApplicationController
   before_action :set_flashcard, only: %i[show edit update destroy]
 
   def index
-    @flashcards = Flashcard.order(:character)
+    @flashcards = Flashcard
+      .by_source(params[:source])
+      .by_hsk_level(params[:hsk_level])
+      .by_category(params[:category])
+      .order(:character)
   end
 
   def show; end

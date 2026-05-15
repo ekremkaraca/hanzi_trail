@@ -1,6 +1,11 @@
 require "test_helper"
 
 class FlashcardTest < ActiveSupport::TestCase
+  setup do
+    @default_card = flashcards(:network)
+    @future_review = flashcards(:future_review)
+    @overdue_review = flashcards(:overdue_review)
+  end
   test "valid with required fields" do
     card = Flashcard.new(
     character: "新",
@@ -15,10 +20,8 @@ class FlashcardTest < ActiveSupport::TestCase
   end
 
   test "character must be unique" do
-    existing = flashcards(:one)
-
     duplicate = Flashcard.new(
-      character: existing.character,
+      character: @default_card.character,
       pinyin: "wǎng",
       meaning: "network"
     )
@@ -28,45 +31,30 @@ class FlashcardTest < ActiveSupport::TestCase
   end
 
   test "due_for_review returns cards whose next_review_at is in the past" do
-    due = Flashcard.create!(
-      character: "中国",
-      pinyin: "Zhōngguó",
-      meaning: "China",
-      next_review_at: 1.minute.ago
-    )
+    overdue_review = flashcards(:overdue_review)
+    future_review = flashcards(:future_review)
 
-    not_due = Flashcard.create!(
-      character: "北京",
-      pinyin: "Běijīng",
-      meaning: "Beijing",
-      next_review_at: 1.day.from_now
-    )
-
-    assert_includes Flashcard.due_for_review, due
-    refute_includes Flashcard.due_for_review, not_due
+    assert_includes Flashcard.due_for_review, overdue_review
+    refute_includes Flashcard.due_for_review, future_review
   end
 
   test "schedule_next_review increments review count" do
-    card = flashcards(:one)
-
-    assert_difference -> { card.reload.review_count }, 1 do
-      card.schedule_next_review!("good")
+    assert_difference -> { @default_card.reload.review_count }, 1 do
+      @default_card.schedule_next_review!("good")
     end
   end
 
   test "schedule_next_review updates difficulty" do
-    card = flashcards(:one)
+    @default_card.schedule_next_review!("hard")
 
-    card.schedule_next_review!("hard")
-
-    assert_equal "hard", card.reload.difficulty
+    assert_equal "hard", @default_card.reload.difficulty
   end
 
   test "schedule_next_review rejects invalid rating" do
-    card = flashcards(:one)
+    @default_card = flashcards(:network)
 
     assert_raises(ArgumentError) do
-      card.schedule_next_review!("perfect")
+      @default_card.schedule_next_review!("perfect")
     end
   end
 end

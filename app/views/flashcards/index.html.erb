@@ -9,6 +9,27 @@
       <%= link_to "New flashcard", new_flashcard_path, class: "button is-primary" %>
     </div>
 
+    <%= form_with url: flashcards_path, method: :get, local: true, class: "box" do |form| %>
+      <div class="columns">
+        <div class="column">
+          <%= form.label :source, "Source", class: "label" %>
+          <%= form.select :source, [["All", ""], ["HSK", "hsk"], ["Curated", "curated"]], selected: params[:source], class: "select" %>
+        </div>
+
+        <div class="column">
+          <%= form.label :hsk_level, "HSK Level", class: "label" %>
+          <%= form.select :hsk_level, [["All", ""], ["Old 1", "old-1"]], selected: params[:hsk_level], class: "select" %>
+        </div>
+
+        <div class="column">
+          <%= form.label :category, "Category", class: "label" %>
+          <%= form.text_field :category, value: params[:category], class: "input", placeholder: "e.g. radicals, verbs, etc." %>
+      </div>
+      </div>
+      <%= form.submit "Filter", class: "button is-primary" %>
+      <%= link_to "Clear", flashcards_path, class: "button is-light" %>
+    <% end %>
+
     <div class="table-container">
       <table class="table is-fullwidth is-hoverable">
         <thead>
@@ -17,23 +38,22 @@
             <th>Pinyin</th>
             <th>Meaning</th>
             <th>Category</th>
+            <th>Source</th>
+            <th>HSK Level</th>
             <th>Review count</th>
-            <th></th>
           </tr>
         </thead>
 
         <tbody>
           <% @flashcards.each do |flashcard| %>
             <tr>
-              <td class="is-size-4"><%= flashcard.character %></td>
+              <td class="is-size-4"><%= link_to flashcard.character, flashcard %></td>
               <td><%= flashcard.pinyin %></td>
               <td><%= flashcard.meaning %></td>
               <td><%= flashcard.category %></td>
+              <td><%= flashcard.source %></td>
+              <td><%= flashcard.hsk_level %></td>
               <td><%= flashcard.review_count %></td>
-              <td>
-                <%= link_to "Show", flashcard, class: "button is-small is-light" %>
-                <%= link_to "Edit", edit_flashcard_path(flashcard), class: "button is-small is-light" %>
-              </td>
             </tr>
           <% end %>
         </tbody>

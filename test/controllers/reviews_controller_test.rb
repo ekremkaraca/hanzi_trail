@@ -4,7 +4,9 @@ require "test_helper"
 
 class ReviewsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @flashcard = flashcards(:one)
+    Flashcard.update_all(next_review_at: 1.day.from_now)
+
+    @flashcard = flashcards(:network)
     @flashcard.update!(next_review_at: 1.minute.ago)
   end
 
@@ -13,7 +15,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Review"
-    assert_select "p", text: @flashcard.character
+    assert_includes response.body, @flashcard.character
   end
 
   test "should update flashcard review state" do

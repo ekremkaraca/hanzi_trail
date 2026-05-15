@@ -1,19 +1,71 @@
-one:
+network:
   character: 网
   pinyin: wǎng
-  meaning: network
-  story: Originally depicted a fishing net.
-  category: networking
+  meaning: network; web
+  story: A web connects many nodes.
+  category: technical
+  source:
+  hsk_level:
   difficulty: new
-  next_review_at: <%= 1.minute.ago %>
   review_count: 0
+  next_review_at: <%= 1.day.ago %>
 
-two:
-  character: 中
-  pinyin: zhōng
-  meaning: middle / center
-  story: Represents the idea of center or middle.
-  category: basics
+algorithm:
+  character: 算
+  pinyin: suàn
+  meaning: calculate; compute
+  story: Algorithms calculate step by step.
+  category: technical
+  source:
+  hsk_level:
   difficulty: new
-  next_review_at: <%= 1.day.from_now %>
   review_count: 0
+  next_review_at: <%= 1.day.from_now %>
+
+hsk_one:
+  character: 我
+  pinyin: wǒ
+  meaning: I; me
+  story:
+  category:
+  source: hsk
+  hsk_level: old-1
+  difficulty: new
+  review_count: 0
+  next_review_at: <%= Time.current %>
+
+hsk_two:
+  character: 你
+  pinyin: nǐ
+  meaning: you
+  story:
+  category:
+  source: hsk
+  hsk_level: old-1
+  difficulty: new
+  review_count: 0
+  next_review_at: <%= Time.current %>
+
+future_review:
+  character: 车
+  pinyin: chē
+  meaning: car; vehicle
+  story: A vehicle carries reviews into the future.
+  category: transport
+  source:
+  hsk_level:
+  difficulty: new
+  review_count: 0
+  next_review_at: <%= 3.days.from_now %>
+
+overdue_review:
+  character: 学
+  pinyin: xué
+  meaning: study; learn
+  story: Learning waits for no one.
+  category: education
+  source:
+  hsk_level:
+  difficulty: new
+  review_count: 0
+  next_review_at: <%= 3.days.ago %>

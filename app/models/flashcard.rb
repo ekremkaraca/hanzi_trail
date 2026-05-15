@@ -15,6 +15,10 @@ class Flashcard < ApplicationRecord
     where("next_review_at <= ?", Time.current).order(:next_review_at, :id)
   })
 
+  scope :by_source, ->(source) { source.present? ? where(source: source) : all }
+  scope :by_hsk_level, ->(hsk_level) { hsk_level.present? ? where(hsk_level: hsk_level) : all }
+  scope :by_category, ->(category) { category.present? ? where(category: category) : all }
+
   def schedule_next_review!(rating)
     raise ArgumentError, "Invalid rating" unless REVIEW_RATINGS.include?(rating)
 

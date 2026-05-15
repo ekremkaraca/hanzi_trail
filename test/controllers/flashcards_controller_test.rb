@@ -4,7 +4,7 @@ require "test_helper"
 
 class FlashcardsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @flashcard = flashcards(:one)
+    @flashcard = flashcards(:network)
   end
 
   test "should get index" do
@@ -60,5 +60,44 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to flashcards_url
+  end
+
+  test "index shows all flashcards by default" do
+    get flashcards_path
+
+    assert_response :success
+    assert_select "td", text: flashcards(:network).character
+    assert_select "td", text: flashcards(:algorithm).character
+  end
+
+  test "index filters by source" do
+    get flashcards_path, params: { source: "hsk" }
+
+    assert_response :success
+    assert_select "td", text: flashcards(:hsk_one).character
+    assert_select "td", text: flashcards(:network).character, count: 0
+  end
+
+  test "index filters by hsk level" do
+    get flashcards_path, params: { hsk_level: "old-1" }
+
+    assert_response :success
+    assert_select "td", text: flashcards(:hsk_one).character
+    assert_select "td", text: flashcards(:network).character, count: 0
+  end
+
+  test "index filters by category" do
+    get flashcards_path, params: { category: "technical" }
+
+    assert_response :success
+    assert_select "td", text: flashcards(:network).character
+    assert_select "td", text: flashcards(:hsk_one).character, count: 0
+  end
+
+  test "index shows clear filters link" do
+    get flashcards_path, params: { source: "hsk" }
+
+    assert_response :success
+    assert_select "a[href=?]", flashcards_path, text: "Clear"
   end
 end
