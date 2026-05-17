@@ -55,8 +55,11 @@ class Flashcard < ApplicationRecord
   end
 
   def set_default_story_status
-    self.story_status = "missing" if story.blank?
-    self.story_status ||= "curated"
+    if story.blank?
+      self.story_status = "missing"
+    elsif story_status.blank? || (story_status == "missing" && !will_save_change_to_story_status?)
+      self.story_status = "curated"
+    end
   end
 
   def set_default_source

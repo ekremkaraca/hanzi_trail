@@ -66,39 +66,39 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     get flashcards_path
 
     assert_response :success
-    assert_select "td", text: flashcards(:network).character
-    assert_select "td", text: flashcards(:algorithm).character
+    assert_select ".flashcard-character-link", text: flashcards(:network).character
+    assert_select ".flashcard-character-link", text: flashcards(:algorithm).character
   end
 
   test "index filters by source" do
     get flashcards_path, params: { source: "hsk" }
 
     assert_response :success
-    assert_select "td", text: flashcards(:hsk_one).character
-    assert_select "td", text: flashcards(:network).character, count: 0
+    assert_select ".flashcard-character-link", text: flashcards(:hsk_one).character
+    assert_select ".flashcard-character-link", text: flashcards(:network).character, count: 0
   end
 
   test "index filters by hsk level" do
     get flashcards_path, params: { hsk_level: "old-1" }
 
     assert_response :success
-    assert_select "td", text: flashcards(:hsk_one).character
-    assert_select "td", text: flashcards(:network).character, count: 0
+    assert_select ".flashcard-character-link", text: flashcards(:hsk_one).character
+    assert_select ".flashcard-character-link", text: flashcards(:network).character, count: 0
   end
 
   test "index filters by category" do
     get flashcards_path, params: { category: "technical" }
 
     assert_response :success
-    assert_select "td", text: flashcards(:network).character
-    assert_select "td", text: flashcards(:hsk_one).character, count: 0
+    assert_select ".flashcard-character-link", text: flashcards(:network).character
+    assert_select ".flashcard-character-link", text: flashcards(:hsk_one).character, count: 0
   end
 
   test "index shows clear filters link" do
     get flashcards_path, params: { source: "hsk" }
 
     assert_response :success
-    assert_select "a[href=?]", flashcards_path(source: "", hsk_level: "", category: "", story_status: "", commit: "Filter"), text: "Clear"
+    assert_select "a[href=?]", flashcards_path, text: "Clear"
   end
 
   test "index all-empty filter query shows all flashcards" do
@@ -111,9 +111,9 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_response :success
-    assert_select "td", text: flashcards(:network).character
-    assert_select "td", text: flashcards(:algorithm).character
-    assert_select "td", text: flashcards(:hsk_one).character
+    assert_select ".flashcard-character-link", text: flashcards(:network).character
+    assert_select ".flashcard-character-link", text: flashcards(:algorithm).character
+    assert_select ".flashcard-character-link", text: flashcards(:hsk_one).character
   end
 
   test "index filters by story status" do
@@ -123,8 +123,8 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     get flashcards_path, params: { story_status: "missing" }
 
     assert_response :success
-    assert_includes response.body, flashcards(:hsk_one).character
-    assert_not_includes response.body, flashcards(:network).character
+    assert_select ".flashcard-character-link", text: flashcards(:hsk_one).character
+    assert_select ".flashcard-character-link", text: flashcards(:network).character, count: 0
   end
 
   test "index shows story status badge" do
