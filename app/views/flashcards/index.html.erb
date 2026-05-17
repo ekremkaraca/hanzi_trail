@@ -1,81 +1,109 @@
-<section class="section">
-  <div class="container">
-    <div class="level">
+<section class="section flashcards-page">
+  <div class="container is-max-widescreen">
+    <div class="flashcards-header">
       <div>
-        <h1 class="title">Flashcards</h1>
-        <p class="subtitle">Mandarin cards with stories and technical context.</p>
+        <h1 class="title is-2">Flashcards</h1>
+        <p class="subtitle is-6 has-text-grey-light">
+          Mandarin cards with stories, structure, and technical context.
+        </p>
       </div>
 
       <%= link_to "New flashcard", new_flashcard_path, class: "button is-primary" %>
     </div>
 
-    <%= form_with url: flashcards_path, method: :get, local: true, class: "box" do |form| %>
-      <div class="columns is-align-items-flex-end">
-        <div class="column">
-          <%= form.label :source, "Source", class: "label" %>
-          <%= form.select :source, [["All", ""], ["HSK", "hsk"], ["Curated", "curated"]], selected: params[:source], class: "select" %>
-        </div>
-
-        <div class="column">
-          <%= form.label :hsk_level, "HSK Level", class: "label" %>
-          <%= form.select :hsk_level, [["All", ""], ["Old 1", "old-1"]], selected: params[:hsk_level], class: "select" %>
-        </div>
-
-        <div class="column">
-          <%= form.label :category, "Category", class: "label" %>
-          <%= form.text_field :category, value: params[:category], class: "input", placeholder: "e.g. radicals, verbs, etc." %>
-        </div>
-
-        <div class="column">
-          <%= form.label :story_status, "Story", class: "label" %>
-          <%= form.select :story_status, [["All", ""], ["Missing", "missing"], ["Draft", "draft"], ["Curated", "curated"]], selected: params[:story_status], class: "select" %>
-        </div>
-
-        <div class="column is-narrow">
-          <div class="field is-grouped">
-            <div class="control">
-              <%= form.submit "Filter", class: "button is-primary" %>
-            </div>
-            <div class="control">
-              <%= link_to "Clear", flashcards_path(source: "", hsk_level: "", category: "", story_status: "", commit: "Filter"), class: "button is-light" %>
+    <div class="flashcard-filters box">
+      <%= form_with url: flashcards_path, method: :get, local: true do |form| %>
+        <div class="columns is-vcentered">
+          <div class="column">
+            <%= form.label :source, class: "label" %>
+            <div class="select is-fullwidth">
+              <%= form.select :source,
+                    [["All", ""], ["HSK", "hsk"], ["Curated", "curated"]],
+                    selected: params[:source] %>
             </div>
           </div>
-        </div>
-      </div>
-    <% end %>
 
-    <div class="table-container">
-      <table class="table is-fullwidth is-hoverable">
+          <div class="column">
+            <%= form.label :hsk_level, "HSK Level", class: "label" %>
+            <div class="select is-fullwidth">
+              <%= form.select :hsk_level,
+                    [["All", ""], ["Old 1", "old-1"]],
+                    selected: params[:hsk_level] %>
+            </div>
+          </div>
+
+          <div class="column is-3">
+            <%= form.label :category, class: "label" %>
+            <%= form.text_field :category,
+                  value: params[:category],
+                  placeholder: "e.g. technical",
+                  class: "input" %>
+          </div>
+
+          <div class="column">
+            <%= form.label :story_status, "Story", class: "label" %>
+            <div class="select is-fullwidth">
+              <%= form.select :story_status,
+                    [["All", ""], ["Missing", "missing"], ["Draft", "draft"], ["Curated", "curated"]],
+                    selected: params[:story_status] %>
+            </div>
+          </div>
+
+          <div class="column is-narrow flashcard-filter-actions">
+            <%= form.submit "Filter", class: "button is-primary" %>
+            <%= link_to "Clear", flashcards_path, class: "button is-light" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="flashcards-table-card">
+      <table class="table is-fullwidth flashcards-table">
         <thead>
           <tr>
-            <th>Character</th>
-            <th>Pinyin</th>
+            <th>Card</th>
             <th>Meaning</th>
-            <th>Category</th>
-            <th>Source</th>
-            <th>HSK Level</th>
-            <th>Story</th>
-            <th>Review count</th>
+            <th>Meta</th>
+            <th>Review</th>
           </tr>
         </thead>
 
         <tbody>
           <% @flashcards.each do |flashcard| %>
             <tr>
-              <td class="is-size-4"><%= link_to flashcard.character, flashcard %></td>
-              <td><%= flashcard.pinyin %></td>
-              <td><%= flashcard.meaning %></td>
-              <td><%= flashcard.category %></td>
-              <td><%= flashcard.source %></td>
-              <td><%= flashcard.hsk_level %></td>
-              <td>
-                <% if flashcard.story_status == "curated" %>
-                  <span class="tag is-success">Curated story</span>
-                <% else %>
-                  <span class="tag"><%= flashcard.story_status.to_s.humanize %></span>
-                <% end %>
+              <td class="flashcard-card-cell">
+                <%= link_to flashcard.character, flashcard_path(flashcard), class: "flashcard-character-link" %>
+                <span class="flashcard-pinyin"><%= flashcard.pinyin %></span>
               </td>
-              <td><%= flashcard.review_count %></td>
+
+              <td class="flashcard-meaning-cell">
+                <%= truncate(flashcard.meaning, length: 120) %>
+              </td>
+
+              <td>
+                <div class="tags are-small">
+                  <% if flashcard.category.present? %>
+                    <span class="tag is-dark"><%= flashcard.category %></span>
+                  <% end %>
+
+                  <span class="tag is-link is-light">
+                    <%= flashcard.source.presence || "curated" %>
+                  </span>
+
+                  <% if flashcard.hsk_level.present? %>
+                    <span class="tag is-info is-light"><%= flashcard.hsk_level %></span>
+                  <% end %>
+
+                  <span class="tag is-warning is-light">
+                    <%= flashcard.story_status.humanize %>
+                  </span>
+                </div>
+              </td>
+
+              <td class="flashcard-review-cell">
+                <strong><%= flashcard.review_count %></strong>
+                <span class="has-text-grey-light">reviews</span>
+              </td>
             </tr>
           <% end %>
         </tbody>

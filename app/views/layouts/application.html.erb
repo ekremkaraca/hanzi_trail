@@ -3,22 +3,24 @@
   <head>
     <title>HanziTrail</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body>
-    <nav class="navbar is-light">
+    <nav class="navbar is-white hanzi-navbar" role="navigation">
       <div class="navbar-brand">
-        <%= link_to "HanziTrail", root_path, class: "navbar-item has-text-weight-bold" %>
+        <%= link_to root_path, class: "navbar-item hanzi-brand" do %>
+          <span class="hanzi-logo">网</span>
+          <strong>HanziTrail</strong>
+        <% end %>
       </div>
 
-      <div class="navbar-menu">
+      <div class="navbar-menu is-active">
         <div class="navbar-start">
           <%= link_to "Cards", flashcards_path, class: "navbar-item" %>
           <%= link_to "Review", review_path, class: "navbar-item" %>
@@ -26,14 +28,10 @@
       </div>
     </nav>
 
-    <% if notice.present? %>
-      <div class="notification is-success"><%= notice %></div>
-    <% end %>
+    <%= render "shared/flash" %>
 
-    <% if alert.present? %>
-      <div class="notification is-danger"><%= alert %></div>
-    <% end %>
-
-    <%= yield %>
+    <main>
+      <%= yield %>
+    </main>
   </body>
 </html>

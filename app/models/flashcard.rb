@@ -11,8 +11,11 @@ class Flashcard < ApplicationRecord
   validates :story_status, presence: true, inclusion: { in: STORY_STATUSES }
   validates :review_count, numericality: { greater_than_or_equal_to: 0 }
 
-  before_validation :set_initial_review_time, on: :create
-  before_validation :set_default_story_status
+  with_options on: :create do
+    before_validation :set_initial_review_time
+    before_validation :set_default_story_status
+    before_validation :set_default_source
+  end
 
   scope(:due_for_review, -> {
     where("next_review_at <= ?", Time.current).order(:next_review_at, :id)
@@ -52,7 +55,11 @@ class Flashcard < ApplicationRecord
   end
 
   def set_default_story_status
-    self.story_status = "curated" if story.present? && story_status == "missing"
-    self.story_status ||= "missing"
+    self.story_status = "missing" if story.blank?
+    self.story_status ||= "curated"
+  end
+
+  def set_default_source
+    self.source ||= "curated"
   end
 end

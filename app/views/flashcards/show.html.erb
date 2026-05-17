@@ -1,39 +1,75 @@
-<section class="section">
-  <div class="container">
-    <div class="box">
-      <p class="is-size-1 has-text-centered"><%= @flashcard.character %></p>
+<section class="section flashcard-show-page">
+  <div class="container is-max-widescreen">
+    <div class="flashcard-show-card box">
+      <div class="flashcard-show-main">
+        <div class="flashcard-show-character">
+          <h1><%= @flashcard.character %></h1>
+          <p><%= @flashcard.pinyin %></p>
+        </div>
 
-      <h1 class="title has-text-centered"><%= @flashcard.meaning %></h1>
-      <p class="subtitle has-text-centered"><%= @flashcard.pinyin %></p>
-
-      <hr>
-
-      <div class="content">
-        <% if @flashcard.story.present? %>
-          <h2>Story</h2>
-          <p><%= simple_format(@flashcard.story) %></p>
-        <% end %>
-
-        <h2>Details</h2>
-        <ul>
-          <li><strong>Category:</strong> <%= @flashcard.category %></li>
-          <li><strong>Difficulty:</strong> <%= @flashcard.difficulty %></li>
-          <li><strong>Review count:</strong> <%= @flashcard.review_count %></li>
-          <li><strong>Next review:</strong><% if @flashcard.next_review_at.past? %>
-            Overdue by <%= distance_of_time_in_words(@flashcard.next_review_at, Time.current) %>
-          <% else %>
-            Due in <%= distance_of_time_in_words(Time.current, @flashcard.next_review_at) %>
-          <% end %>
-          </li>
-        </ul>
+        <div class="flashcard-show-meaning">
+          <span class="eyebrow">Meaning</span>
+          <h2><%= @flashcard.meaning %></h2>
+        </div>
       </div>
 
-      <div class="buttons">
-        <%= link_to "Edit", edit_flashcard_path(@flashcard), class: "button is-light" %>
-        <%= link_to "Back", flashcards_path, class: "button is-light" %>
+      <% if @flashcard.story.present? %>
+        <div class="flashcard-story-panel">
+          <span class="eyebrow">Story</span>
+          <div class="content">
+            <%= simple_format(@flashcard.story) %>
+          </div>
+        </div>
+      <% end %>
 
+      <div class="flashcard-detail-grid">
+        <div>
+          <span>Category</span>
+          <strong><%= @flashcard.category.presence || "—" %></strong>
+        </div>
+
+        <div>
+          <span>Source</span>
+          <strong><%= @flashcard.source.presence || "curated" %></strong>
+        </div>
+
+        <div>
+          <span>HSK Level</span>
+          <strong><%= @flashcard.hsk_level.presence || "—" %></strong>
+        </div>
+
+        <div>
+          <span>Story</span>
+          <strong><%= @flashcard.story_status.humanize %></strong>
+        </div>
+
+        <div>
+          <span>Difficulty</span>
+          <strong><%= @flashcard.difficulty %></strong>
+        </div>
+
+        <div>
+          <span>Review count</span>
+          <strong><%= @flashcard.review_count %></strong>
+        </div>
+
+        <div class="is-col-span-2">
+          <span>Next review</span>
+          <strong>
+            <% if @flashcard.next_review_at.past? %>
+              Overdue by <%= distance_of_time_in_words(@flashcard.next_review_at, Time.current) %>
+            <% else %>
+              Due in <%= distance_of_time_in_words(Time.current, @flashcard.next_review_at) %>
+            <% end %>
+          </strong>
+        </div>
+      </div>
+
+      <div class="buttons mt-5">
+        <%= link_to "Edit", edit_flashcard_path(@flashcard), class: "button is-light" %>
+        <%= link_to "Back", flashcards_path, class: "button is-dark" %>
         <%= button_to "Delete",
-              @flashcard,
+              flashcard_path(@flashcard),
               method: :delete,
               class: "button is-danger",
               form: { data: { turbo_confirm: "Delete this flashcard?" } } %>
