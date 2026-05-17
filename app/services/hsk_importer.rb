@@ -34,6 +34,7 @@ class HskImporter
       pinyin: form.fetch("transcriptions").fetch("pinyin"),
       meaning: form.fetch("meanings").join("; "),
       story: nil,
+      story_status: "missing",
       source: SOURCE,
       hsk_level: hsk_level,
       next_review_at: Time.current

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_14_101136) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_17_103310) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -26,6 +26,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_101136) do
     t.integer "review_count", default: 0, null: false
     t.string "source"
     t.text "story"
+    t.string "story_status", default: "missing", null: false
     t.datetime "updated_at", null: false
     t.index ["character"], name: "index_flashcards_on_character", unique: true
     t.index ["hsk_level"], name: "index_flashcards_on_hsk_level"

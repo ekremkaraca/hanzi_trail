@@ -1,15 +1,18 @@
 class Flashcard < ApplicationRecord
   DIFFICULTY_LEVELS = %w[new again easy good hard].freeze
   REVIEW_RATINGS = %w[again easy good hard].freeze
+  STORY_STATUSES = %w[missing draft curated].freeze
 
   validates :character, presence: true, uniqueness: true
   validates :pinyin, presence: true
   validates :meaning, presence: true
   validates :next_review_at, presence: true
   validates :difficulty, presence: true, inclusion: { in: DIFFICULTY_LEVELS }
+  validates :story_status, presence: true, inclusion: { in: STORY_STATUSES }
   validates :review_count, numericality: { greater_than_or_equal_to: 0 }
 
   before_validation :set_initial_review_time, on: :create
+  before_validation :set_default_story_status
 
   scope(:due_for_review, -> {
     where("next_review_at <= ?", Time.current).order(:next_review_at, :id)
@@ -18,6 +21,7 @@ class Flashcard < ApplicationRecord
   scope :by_source, ->(source) { source.present? ? where(source: source) : all }
   scope :by_hsk_level, ->(hsk_level) { hsk_level.present? ? where(hsk_level: hsk_level) : all }
   scope :by_category, ->(category) { category.present? ? where(category: category) : all }
+  scope :by_story_status, ->(story_status) { story_status.present? ? where(story_status: story_status) : all }
 
   def schedule_next_review!(rating)
     raise ArgumentError, "Invalid rating" unless REVIEW_RATINGS.include?(rating)
@@ -45,5 +49,10 @@ class Flashcard < ApplicationRecord
 
   def set_initial_review_time
     self.next_review_at ||= Time.current
+  end
+
+  def set_default_story_status
+    self.story_status = "curated" if story.present? && story_status == "missing"
+    self.story_status ||= "missing"
   end
 end

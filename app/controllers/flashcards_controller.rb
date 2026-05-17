@@ -6,6 +6,7 @@ class FlashcardsController < ApplicationController
       .by_source(params[:source])
       .by_hsk_level(params[:hsk_level])
       .by_category(params[:category])
+      .by_story_status(params[:story_status])
       .order(:character)
   end
 

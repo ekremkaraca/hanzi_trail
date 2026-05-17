@@ -57,4 +57,52 @@ class FlashcardTest < ActiveSupport::TestCase
       @default_card.schedule_next_review!("perfect")
     end
   end
+
+  test "defaults story status to missing when story is blank" do
+    flashcard = Flashcard.new(
+      character: "新",
+      pinyin: "xīn",
+      meaning: "new",
+      category: "general",
+      difficulty: "new",
+      review_count: 0,
+      next_review_at: Time.current
+    )
+
+    assert flashcard.valid?
+    assert_equal "missing", flashcard.story_status
+  end
+
+  test "defaults story status to curated when story is present" do
+    flashcard = Flashcard.new(
+      character: "文",
+      pinyin: "wén",
+      meaning: "text; writing",
+      story: "A written mark becomes meaning.",
+      category: "general",
+      difficulty: "new",
+      review_count: 0,
+      next_review_at: Time.current
+    )
+
+    assert flashcard.valid?
+    assert_equal "curated", flashcard.story_status
+  end
+
+  test "allows draft story status" do
+    flashcard = flashcards(:network)
+
+    flashcard.story_status = "draft"
+
+    assert flashcard.valid?
+  end
+
+  test "rejects invalid story status" do
+    flashcard = flashcards(:network)
+
+    flashcard.story_status = "published"
+
+    assert_not flashcard.valid?
+    assert_includes flashcard.errors[:story_status], "is not included in the list"
+  end
 end

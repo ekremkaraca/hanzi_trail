@@ -98,6 +98,41 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     get flashcards_path, params: { source: "hsk" }
 
     assert_response :success
-    assert_select "a[href=?]", flashcards_path, text: "Clear"
+    assert_select "a[href=?]", flashcards_path(source: "", hsk_level: "", category: "", story_status: "", commit: "Filter"), text: "Clear"
+  end
+
+  test "index all-empty filter query shows all flashcards" do
+    get flashcards_path, params: {
+      source: "",
+      hsk_level: "",
+      category: "",
+      story_status: "",
+      commit: "Filter"
+    }
+
+    assert_response :success
+    assert_select "td", text: flashcards(:network).character
+    assert_select "td", text: flashcards(:algorithm).character
+    assert_select "td", text: flashcards(:hsk_one).character
+  end
+
+  test "index filters by story status" do
+    flashcards(:network).update!(story_status: "curated")
+    flashcards(:hsk_one).update!(story_status: "missing")
+
+    get flashcards_path, params: { story_status: "missing" }
+
+    assert_response :success
+    assert_includes response.body, flashcards(:hsk_one).character
+    assert_not_includes response.body, flashcards(:network).character
+  end
+
+  test "index shows story status badge" do
+    flashcards(:network).update!(story_status: "curated")
+
+    get flashcards_path
+
+    assert_response :success
+    assert_includes response.body, "Curated story"
   end
 end
