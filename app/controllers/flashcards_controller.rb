@@ -3,11 +3,12 @@ class FlashcardsController < ApplicationController
 
   def index
     @flashcards = Flashcard
+      .search(params[:query])
       .by_source(params[:source])
       .by_hsk_level(params[:hsk_level])
       .by_category(params[:category])
       .by_story_status(params[:story_status])
-      .order(:character)
+      .order(:next_review_at, :id)
   end
 
   def show; end

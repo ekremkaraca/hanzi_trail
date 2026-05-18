@@ -8,12 +8,32 @@
         </p>
       </div>
 
-      <%= link_to "New flashcard", new_flashcard_path, class: "button is-primary" %>
+      <button class="button is-primary" disabled title="Disabled until authentication is added">
+        New flashcard
+      </button>
     </div>
 
     <div class="flashcard-filters box">
+      <div class="flashcard-filters-header">
+        <div>
+          <h2 class="title is-5">Browse cards</h2>
+          <p class="has-text-grey-light">Filter imported and curated flashcards.</p>
+        </div>
+
+        <%= link_to "Missing stories",
+              flashcards_path(story_status: "missing"),
+              class: "button is-warning is-light" %>
+      </div>
       <%= form_with url: flashcards_path, method: :get, local: true do |form| %>
         <div class="columns is-vcentered">
+          <div class="column is-4">
+            <%= form.label :query, "Search", class: "label" %>
+
+            <%= form.search_field :query,
+                  value: params[:query],
+                  placeholder: "Search character, pinyin, meaning...",
+                  class: "input" %>
+          </div>
           <div class="column">
             <%= form.label :source, class: "label" %>
             <div class="select is-fullwidth">
@@ -58,56 +78,68 @@
     </div>
 
     <div class="flashcards-table-card">
-      <table class="table is-fullwidth flashcards-table">
-        <thead>
-          <tr>
-            <th>Card</th>
-            <th>Meaning</th>
-            <th>Meta</th>
-            <th>Review</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <% @flashcards.each do |flashcard| %>
+      <% if @flashcards.any? %>
+        <table class="table is-fullwidth flashcards-table">
+          <thead>
             <tr>
-              <td class="flashcard-card-cell">
-                <%= link_to flashcard.character, flashcard_path(flashcard), class: "flashcard-character-link" %>
-                <span class="flashcard-pinyin"><%= flashcard.pinyin %></span>
-              </td>
-
-              <td class="flashcard-meaning-cell">
-                <%= truncate(flashcard.meaning, length: 120) %>
-              </td>
-
-              <td>
-                <div class="tags are-small">
-                  <% if flashcard.category.present? %>
-                    <span class="tag is-dark"><%= flashcard.category %></span>
-                  <% end %>
-
-                  <span class="tag is-link is-light">
-                    <%= flashcard.source.presence || "curated" %>
-                  </span>
-
-                  <% if flashcard.hsk_level.present? %>
-                    <span class="tag is-info is-light"><%= flashcard.hsk_level %></span>
-                  <% end %>
-
-                  <span class="tag is-warning is-light">
-                    <%= "#{flashcard.story_status.humanize} story" %>
-                  </span>
-                </div>
-              </td>
-
-              <td class="flashcard-review-cell">
-                <strong><%= flashcard.review_count %></strong>
-                <span class="has-text-grey-light">reviews</span>
-              </td>
+              <th>Card</th>
+              <th>Meaning</th>
+              <th>Meta</th>
+              <th>Review</th>
             </tr>
-          <% end %>
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            <% @flashcards.each do |flashcard| %>
+              <tr>
+                <td class="flashcard-card-cell">
+                  <%= link_to flashcard.character, flashcard_path(flashcard), class: "flashcard-character-link" %>
+                  <span class="flashcard-pinyin"><%= flashcard.pinyin %></span>
+                </td>
+
+                <td class="flashcard-meaning-cell">
+                  <%= truncate(flashcard.meaning, length: 120) %>
+                </td>
+
+                <td>
+                  <div class="tags are-small">
+                    <% if flashcard.category.present? %>
+                      <span class="tag is-dark"><%= flashcard.category %></span>
+                    <% end %>
+
+                    <span class="tag is-link is-light">
+                      <%= flashcard.source.presence || "curated" %>
+                    </span>
+
+                    <% if flashcard.hsk_level.present? %>
+                      <span class="tag is-info is-light"><%= flashcard.hsk_level %></span>
+                    <% end %>
+
+                    <span class="tag is-warning is-light">
+                      <%= "#{flashcard.story_status.humanize} story" %>
+                    </span>
+                  </div>
+                </td>
+
+                <td class="flashcard-review-cell">
+                  <strong><%= flashcard.review_count %></strong>
+                  <span class="has-text-grey-light">reviews</span>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <div class="flashcards-empty-state">
+          <h2 class="title is-4">No flashcards matched your filters.</h2>
+
+          <p class="has-text-grey-light">
+            Try changing your search or clearing active filters.
+          </p>
+
+          <%= link_to "Clear filters", flashcards_path, class: "button is-light mt-4" %>
+        </div>
+      <% end %>
     </div>
   </div>
 </section>

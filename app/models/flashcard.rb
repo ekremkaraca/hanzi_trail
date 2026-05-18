@@ -26,6 +26,24 @@ class Flashcard < ApplicationRecord
   scope :by_category, ->(category) { category.present? ? where(category: category) : all }
   scope :by_story_status, ->(story_status) { story_status.present? ? where(story_status: story_status) : all }
 
+  scope :search, ->(query) {
+    if query.present?
+      where(
+        "character ILIKE :query
+        OR pinyin ILIKE :query
+        OR meaning ILIKE :query
+        OR category ILIKE :query",
+        query: "%#{sanitize_sql_like(query)}%"
+      )
+    else
+      all
+    end
+  }
+
+  scope :missing_story, -> {
+    where(story_status: "missing")
+  }
+
   def schedule_next_review!(rating)
     raise ArgumentError, "Invalid rating" unless REVIEW_RATINGS.include?(rating)
 

@@ -105,4 +105,38 @@ class FlashcardTest < ActiveSupport::TestCase
     assert_not flashcard.valid?
     assert_includes flashcard.errors[:story_status], "is not included in the list"
   end
+
+  test "search returns all flashcards when query is blank" do
+    assert_equal Flashcard.count, Flashcard.search("").count
+  end
+
+  test "search finds flashcard by character" do
+    results = Flashcard.search("网")
+
+    assert_includes results, @default_card
+  end
+
+  test "search finds flashcard by pinyin" do
+    results = Flashcard.search("wǎng")
+
+    assert_includes results, @default_card
+  end
+
+  test "search finds flashcard by meaning" do
+    results = Flashcard.search("network")
+
+    assert_includes results, @default_card
+  end
+
+  test "search finds flashcard by category" do
+    results = Flashcard.search("technical")
+
+    assert_includes results, @default_card
+  end
+
+  test "search safely handles wildcard characters" do
+    result = Flashcard.search("%")
+
+    assert_empty result
+  end
 end

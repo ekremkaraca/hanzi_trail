@@ -465,3 +465,30 @@ body {
     transform: translateY(-0.5rem);
   }
 }
+
+.flashcard-filters-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 700px) {
+  .flashcard-filters-header {
+    display: block;
+
+    .button {
+      margin-top: 1rem;
+      width: 100%;
+    }
+  }
+}
+
+.button[disabled]:hover {
+  transform: none;
+}
+
+.missing-stories-button {
+  width: fit-content;
+}

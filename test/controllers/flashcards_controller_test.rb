@@ -135,4 +135,51 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Curated story"
   end
+
+  test "index filters by search query" do
+    get flashcards_path, params: { query: "network" }
+    assert_response :success
+    assert_select ".flashcard-character-link", text: flashcards(:network).character
+    assert_select ".flashcard-character-link", text: flashcards(:hsk_one).character, count: 0
+  end
+
+  test "index combines search query and source filter" do
+    flashcards(:network).update!(source: "curated")
+    flashcards(:hsk_one).update!(source: "hsk", meaning: "network practice")
+
+    get flashcards_path, params: {
+      query: "network",
+      source: "hsk"
+    }
+
+    assert_response :success
+    assert_select ".flashcard-character-link", text: flashcards(:hsk_one).character
+    assert_select ".flashcard-character-link", text: flashcards(:network).character, count: 0
+  end
+
+  test "index shows missing stories shortcut" do
+    get flashcards_path
+
+    assert_response :success
+    assert_select "a[href=?]", flashcards_path(story_status: "missing"), text: "Missing stories"
+  end
+
+  test "index filters by missing story status" do
+    flashcards(:network).update!(story_status: "curated")
+    flashcards(:hsk_one).update!(story_status: "missing")
+
+    get flashcards_path, params: { story_status: "missing" }
+
+    assert_response :success
+    assert_select ".flashcard-character-link", text: flashcards(:hsk_one).character
+    assert_select ".flashcard-character-link", text: flashcards(:network).character, count: 0
+  end
+
+  test "index shows empty state when filters match no flashcards" do
+    get flashcards_path, params: { query: "nonexistent-query" }
+
+    assert_response :success
+    assert_includes response.body, "No flashcards matched your filters"
+    assert_select "a[href=?]", flashcards_path, text: "Clear filters"
+  end
 end
