@@ -23,7 +23,15 @@
         data-action="keydown@window->review#handleKeydown"
       >
         <div class="has-text-centered">
+          <div class="review-mode-bar">
+            <%= link_to "All", review_path, class: "button is-small #{'is-active' if params[:source].blank? && params[:story_status].blank?}" %>
 
+            <%= link_to "HSK", review_path(source: "hsk"), class: "button is-small #{'is-active' if params[:source] == 'hsk'}" %>
+
+            <%= link_to "Curated", review_path(source: "curated"), class: "button is-small #{'is-active' if params[:source] == 'curated'}" %>
+
+            <%= link_to "Missing stories", review_path(story_status: "missing"), class: "button is-small #{'is-active' if params[:story_status] == 'missing'}" %>
+          </div>
           <h2 class="review-character">
             <%= @flashcard.character %>
           </h2>
@@ -63,28 +71,28 @@
             <%= button_to "Again [1]",
                   review_flashcard_path(@flashcard),
                   method: :patch,
-                  params: { review: { rating: "again" } },
+                  params: { review: { rating: "again" }, source: params[:source], category: params[:category], story_status: params[:story_status] },
                   class: "button is-danger is-medium",
                   data: { review_rating: "1" } %>
 
             <%= button_to "Hard [2]",
                   review_flashcard_path(@flashcard),
                   method: :patch,
-                  params: { review: { rating: "hard" } },
+                  params: { review: { rating: "hard" }, source: params[:source], category: params[:category], story_status: params[:story_status] },
                   class: "button is-warning is-medium",
                   data: { review_rating: "2" } %>
 
             <%= button_to "Good [3]",
                   review_flashcard_path(@flashcard),
                   method: :patch,
-                  params: { review: { rating: "good" } },
+                  params: { review: { rating: "good" }, source: params[:source], category: params[:category], story_status: params[:story_status] },
                   class: "button is-success is-medium",
                   data: { review_rating: "3" } %>
 
             <%= button_to "Easy [4]",
                   review_flashcard_path(@flashcard),
                   method: :patch,
-                  params: { review: { rating: "easy" } },
+                  params: { review: { rating: "easy" }, source: params[:source], category: params[:category], story_status: params[:story_status] },
                   class: "button is-info is-medium",
                   data: { review_rating: "4" } %>
           </div>
@@ -96,7 +104,7 @@
       </div>
     <% else %>
       <div class="box review-card has-text-centered">
-        <h2 class="title is-4">No cards due right now.</h2>
+        <h2 class="title is-4"><%= @empty_state_title %></h2>
         <p class="has-text-grey-light mb-5">
           Review your flashcards later or browse all cards.
         </p>

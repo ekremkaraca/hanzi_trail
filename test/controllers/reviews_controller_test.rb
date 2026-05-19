@@ -18,14 +18,36 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, @flashcard.character
   end
 
+  test "show filters by source" do
+    flashcards(:hsk_one).update!(next_review_at: 1.minute.ago)
+
+    get review_url(source: "hsk")
+
+    assert_response :success
+    assert_includes response.body, flashcards(:hsk_one).character
+    assert_select ".review-character", text: @flashcard.character, count: 0
+  end
+
+  test "show filters by category" do
+    flashcards(:algorithm).update!(next_review_at: 1.minute.ago)
+
+    get review_url(category: "technical")
+
+    assert_response :success
+    assert_includes response.body, @flashcard.character
+    assert_select ".review-character", text: flashcards(:hsk_one).character, count: 0
+  end
+
   test "should update flashcard review state" do
     assert_difference -> { @flashcard.reload.review_count }, 1 do
       patch review_flashcard_url(@flashcard), params: {
-        review: { rating: "good" }
+        review: { rating: "good" },
+        source: "hsk",
+        category: "technical"
       }
     end
 
-    assert_redirected_to review_url
+    assert_redirected_to review_url(source: "hsk", category: "technical")
     assert_equal "good", @flashcard.reload.difficulty
     assert_operator @flashcard.next_review_at, :>, Time.current
   end
@@ -92,5 +114,23 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "No cards due right now"
     assert_select "a[href=?]", flashcards_path, text: "Browse flashcards"
+  end
+
+  test "show displays empty state for hsk queue when no hsk cards are due" do
+    Flashcard.update_all(next_review_at: 1.day.from_now)
+
+    get review_url(source: "hsk")
+
+    assert_response :success
+    assert_includes response.body, "No HSK cards are due right now"
+  end
+
+  test "show displays empty state for technical queue when no technical cards are due" do
+    Flashcard.update_all(next_review_at: 1.day.from_now)
+
+    get review_url(category: "technical")
+
+    assert_response :success
+    assert_includes response.body, "No technical cards are due right now"
   end
 end
