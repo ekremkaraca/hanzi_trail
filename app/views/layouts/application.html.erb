@@ -12,22 +12,7 @@
   </head>
 
   <body>
-    <nav class="navbar is-white hanzi-navbar" role="navigation">
-      <div class="navbar-brand">
-        <%= link_to root_path, class: "navbar-item hanzi-brand" do %>
-          <span class="hanzi-logo">网</span>
-          <strong>HanziTrail</strong>
-        <% end %>
-      </div>
-
-      <div class="navbar-menu is-active">
-        <div class="navbar-start">
-          <%= link_to "Cards", flashcards_path, class: "navbar-item" %>
-          <%= link_to "Review", review_path, class: "navbar-item" %>
-        </div>
-      </div>
-    </nav>
-
+    <%= render "shared/navbar" %>
     <%= render "shared/flash" %>
 
     <main>

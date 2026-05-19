@@ -1,0 +1,13 @@
+<nav class="hanzi-navbar" role="navigation" aria-label="main navigation">
+  <div class="hanzi-navbar-inner">
+    <%= link_to root_path, class: "hanzi-brand" do %>
+      <span class="hanzi-logo">网</span>
+      <strong>HanziTrail</strong>
+    <% end %>
+
+    <div class="hanzi-nav-links">
+      <%= link_to "Cards", flashcards_path %>
+      <%= link_to "Review", review_path %>
+    </div>
+  </div>
+</nav>

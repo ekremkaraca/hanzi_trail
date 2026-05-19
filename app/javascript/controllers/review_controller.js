@@ -5,10 +5,9 @@ export default class extends Controller {
   static targets = ["answer", "showButton"]
 
   showAnswer() {
-    if (!this.answerTarget.hidden) return
-
     this.answerTarget.hidden = false
-    if (this.hasShowButtonTarget) this.showButtonTarget.hidden = true
+    this.showButtonTarget.hidden = true
+    this.element.classList.add("is-answer-visible")
   }
 
   handleKeydown(event) {
