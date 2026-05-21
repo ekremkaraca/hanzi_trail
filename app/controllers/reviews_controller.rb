@@ -34,15 +34,15 @@ class ReviewsController < ApplicationController
   end
 
   def empty_state_title
-    case
-    when params[:source] == "hsk"
-      "No HSK cards are due right now."
-    when params[:source] == "curated"
-      "No curated cards are due right now."
-    when params[:category] == "technical"
-      "No technical cards are due right now."
-    else
-      "No cards due right now."
-    end
+    return "No HSK cards are due right now." if params[:source] == "hsk"
+    return "No curated cards are due right now." if params[:source] == "curated"
+    return "No missing-story cards are due right now." if params[:story_status] == "missing"
+    return "No #{category_label} cards are due right now." if params[:category].present?
+
+    "No cards due right now."
+  end
+
+  def category_label
+    params[:category].to_s.humanize.downcase
   end
 end
