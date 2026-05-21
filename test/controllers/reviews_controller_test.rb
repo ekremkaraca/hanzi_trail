@@ -39,6 +39,8 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update flashcard review state" do
+    @flashcard.update!(source: "hsk")
+
     assert_difference -> { @flashcard.reload.review_count }, 1 do
       patch review_flashcard_url(@flashcard), params: {
         review: { rating: "good" },
@@ -132,5 +134,68 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "No technical cards are due right now"
+  end
+
+  test "show displays review progress" do
+    Flashcard.update_all(next_review_at: 1.day.from_now)
+    flashcards(:network).update!(next_review_at: 1.minute.ago)
+
+    get review_path
+
+    assert_response :success
+    assert_includes response.body, "0 reviewed"
+    assert_includes response.body, "1 remaining"
+  end
+
+  test "review update increments reviewed count" do
+    Flashcard.update_all(next_review_at: 1.day.from_now)
+
+    flashcard = flashcards(:network)
+    flashcard.update!(next_review_at: 1.minute.ago)
+    flashcards(:algorithm).update!(next_review_at: 1.minute.ago)
+
+    patch review_flashcard_path(flashcard),
+      params: { review: { rating: "good" } }
+
+    follow_redirect!
+
+    assert_response :success
+    assert_includes response.body, "1 reviewed"
+  end
+
+  test "reviewed count is separated by review filters" do
+    Flashcard.update_all(next_review_at: 1.day.from_now)
+
+    hsk_card = flashcards(:hsk_one)
+    curated_card = flashcards(:network)
+
+    hsk_card.update!(source: "hsk", next_review_at: 1.minute.ago)
+    flashcards(:hsk_two).update!(source: "hsk", next_review_at: 1.minute.ago)
+    curated_card.update!(source: "curated", next_review_at: 1.minute.ago)
+
+    patch review_flashcard_path(hsk_card, source: "hsk"),
+      params: { review: { rating: "good" } }
+
+    get review_path(source: "hsk")
+    assert_includes response.body, "1 reviewed"
+
+    get review_path(source: "curated")
+    assert_includes response.body, "0 reviewed"
+  end
+
+  test "show displays completion state after reviewing final card" do
+    Flashcard.update_all(next_review_at: 1.day.from_now)
+
+    flashcard = flashcards(:network)
+    flashcard.update!(next_review_at: 1.minute.ago)
+
+    patch review_flashcard_path(flashcard),
+      params: { review: { rating: "good" } }
+
+    follow_redirect!
+
+    assert_response :success
+    assert_includes response.body, "Review session complete"
+    assert_includes response.body, "You reviewed 1 card"
   end
 end

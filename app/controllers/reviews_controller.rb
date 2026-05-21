@@ -1,20 +1,24 @@
 class ReviewsController < ApplicationController
   def show
-    queue = ReviewQueue.new(
-      scope: Flashcard
-        .by_source(params[:source])
-        .by_category(params[:category])
-        .by_story_status(params[:story_status])
-    )
+    reset_reviewed_count if params[:reset_session] == "1"
+
+    queue = ReviewQueue.new(scope: review_scope)
 
     @flashcard = queue.next_card
     @remaining_due_count = queue.remaining_count
     @empty_state_title = empty_state_title
+    @reviewed_count = reviewed_count
+    @review_filter_params = review_params_for_redirect
   end
 
   def update
-    flashcard = Flashcard.due_for_review.find(params[:flashcard_id])
+    flashcard = review_scope
+      .due_for_review
+      .find(params[:flashcard_id])
+
     flashcard.schedule_next_review!(review_params[:rating])
+
+    increment_reviewed_count
 
     redirect_to review_path(review_params_for_redirect), notice: "Review saved."
   rescue ActiveRecord::RecordNotFound
@@ -45,5 +49,45 @@ class ReviewsController < ApplicationController
 
   def category_label
     params[:category].to_s.humanize.downcase
+  end
+
+  def review_scope
+    Flashcard
+        .by_source(params[:source])
+        .by_category(params[:category])
+        .by_story_status(params[:story_status])
+  end
+
+  def reset_review_session
+    reset_reviewed_count
+  end
+
+  def review_session_key
+    # [
+    #   params[:source],
+    #   params[:category],
+    #   params[:story_status]
+    # ].compact_blank.join(":").presence || "all"
+    review_params_for_redirect
+      .to_h
+      .values
+      .compact_blank
+      .join(":")
+      .presence || "all"
+  end
+
+  def reviewed_count
+    session[:review_sessions] ||= {}
+    session[:review_sessions][review_session_key].to_i
+  end
+
+  def increment_reviewed_count
+    session[:review_sessions] ||= {}
+    session[:review_sessions][review_session_key] = reviewed_count + 1
+  end
+
+  def reset_reviewed_count
+    session[:review_sessions] ||= {}
+    session[:review_sessions][review_session_key] = 0
   end
 end

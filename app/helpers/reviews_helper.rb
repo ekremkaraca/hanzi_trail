@@ -18,6 +18,10 @@ module ReviewsHelper
     )
   end
 
+  def review_progress_text(reviewed_count, remaining_count)
+    "#{reviewed_count} reviewed · #{remaining_count} remaining"
+  end
+
   private
 
   def review_filter_params

@@ -32,6 +32,11 @@
 
             <%= link_to "Missing stories", review_path(story_status: "missing"), class: review_mode_button_class(:missing_stories) %>
           </div>
+
+          <p class="review-progress-text">
+            <%= review_progress_text(@reviewed_count, @remaining_due_count) %>
+          </p>
+
           <h2 class="review-character">
             <%= @flashcard.character %>
           </h2>
@@ -40,7 +45,7 @@
             type="button"
             class="button is-link is-medium mt-5"
             data-review-target="showButton"
-            data-action="click->review#showAnswer"
+            data-action="click->review#toggleAnswer"
           >
             Show answer
           </button>
@@ -104,13 +109,22 @@
       </div>
     <% else %>
       <div class="box review-card has-text-centered">
-        <h2 class="title is-4"><%= @empty_state_title %></h2>
-        <p class="has-text-grey-light mb-5">
-          Review your flashcards later or browse all cards.
-        </p>
+        <% if @reviewed_count.positive? %>
+          <h2 class="title is-4">Review session complete.</h2>
+          <p class="has-text-grey-light mb-5">
+            You reviewed <%= pluralize(@reviewed_count, "card") %>.
+          </p>
+        <% else %>
+          <h2 class="title is-4"><%= @empty_state_title %></h2>
+          <p class="has-text-grey-light mb-5">
+            Review your flashcards later or browse all cards.
+          </p>
+        <% end %>
 
         <%= link_to "Browse flashcards", flashcards_path, class: "button is-link" %>
-      </div>
+        <%= link_to "Start new session",
+              review_path(@review_filter_params.merge(reset_session: "1")),
+              class: "button is-light" %>
     <% end %>
   </div>
 </section>
