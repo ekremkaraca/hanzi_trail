@@ -30,7 +30,8 @@ class ReviewsController < ApplicationController
   end
 
   def review_params_for_redirect
-    params.slice(:source, :category, :story_status).permit!
+    params.slice(:source, :category, :story_status)
+          .permit(:source, :category, :story_status)
   end
 
   def empty_state_title
