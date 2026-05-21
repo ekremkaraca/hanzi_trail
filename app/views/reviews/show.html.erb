@@ -24,13 +24,13 @@
       >
         <div class="has-text-centered">
           <div class="review-mode-bar">
-            <%= link_to "All", review_path, class: "button is-small #{'is-active' if params[:source].blank? && params[:story_status].blank?}" %>
+            <%= link_to "All", review_path, class: review_mode_button_class(:all) %>
 
-            <%= link_to "HSK", review_path(source: "hsk"), class: "button is-small #{'is-active' if params[:source] == 'hsk'}" %>
+            <%= link_to "HSK", review_path(source: "hsk"), class: review_mode_button_class(:hsk) %>
 
-            <%= link_to "Curated", review_path(source: "curated"), class: "button is-small #{'is-active' if params[:source] == 'curated'}" %>
+            <%= link_to "Curated", review_path(source: "curated"), class: review_mode_button_class(:curated) %>
 
-            <%= link_to "Missing stories", review_path(story_status: "missing"), class: "button is-small #{'is-active' if params[:story_status] == 'missing'}" %>
+            <%= link_to "Missing stories", review_path(story_status: "missing"), class: review_mode_button_class(:missing_stories) %>
           </div>
           <h2 class="review-character">
             <%= @flashcard.character %>
