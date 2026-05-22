@@ -4,7 +4,7 @@ network:
   meaning: network; web
   story: A web connects many nodes.
   category: technical
-  source:
+  source: curated
   hsk_level:
   difficulty: new
   review_count: 0
@@ -16,7 +16,7 @@ algorithm:
   meaning: calculate; compute
   story: Algorithms calculate step by step.
   category: technical
-  source:
+  source: curated
   hsk_level:
   difficulty: new
   review_count: 0
@@ -52,7 +52,7 @@ future_review:
   meaning: car; vehicle
   story: A vehicle carries reviews into the future.
   category: transport
-  source:
+  source: curated
   hsk_level:
   difficulty: new
   review_count: 0
@@ -64,7 +64,7 @@ overdue_review:
   meaning: study; learn
   story: Learning waits for no one.
   category: education
-  source:
+  source: curated
   hsk_level:
   difficulty: new
   review_count: 0

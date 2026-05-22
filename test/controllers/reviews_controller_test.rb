@@ -207,16 +207,16 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
 
   test "reviewed count does not collide between source and story_status with same value" do
     card = flashcards(:hsk_one)
-    card.update!(next_review_at: 1.minute.ago, source: "missing")
-    flashcards(:hsk_two).update!(next_review_at: 1.minute.ago, source: "missing")
+    card.update!(next_review_at: 1.minute.ago, source: "curated", story_status: "curated")
+    flashcards(:hsk_two).update!(next_review_at: 1.minute.ago, source: "curated", story_status: "curated")
 
-    patch review_flashcard_path(card, source: "missing"),
+    patch review_flashcard_path(card, source: "curated"),
       params: { review: { rating: "good" } }
 
-    get review_path(source: "missing")
+    get review_path(source: "curated")
     assert_includes response.body, "1 reviewed"
 
-    get review_path(story_status: "missing")
+    get review_path(story_status: "curated")
     assert_includes response.body, "0 reviewed"
   end
 
@@ -235,33 +235,26 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "0 reviewed"
   end
 
-  test "reviewed count does not collide when multi-param values concatenate to match a single value" do
+  test "reviewed count does not collide when multi-param combination differs from single param" do
     combined_card = flashcards(:network)
     combined_card.update!(
       next_review_at: 1.minute.ago,
-      source: "curated:technical",
-      category: nil
+      source: "curated",
+      category: "hsk"
     )
     flashcards(:algorithm).update!(
       next_review_at: 1.minute.ago,
-      source: "curated:technical",
-      category: nil
-    )
-
-    scoped_card = flashcards(:hsk_one)
-    scoped_card.update!(
-      next_review_at: 1.minute.ago,
       source: "curated",
-      category: "technical"
+      category: "hsk"
     )
 
-    patch review_flashcard_path(combined_card, source: "curated:technical"),
+    patch review_flashcard_path(combined_card, source: "curated", category: "hsk"),
       params: { review: { rating: "good" } }
 
-    get review_path(source: "curated:technical")
+    get review_path(source: "curated", category: "hsk")
     assert_includes response.body, "1 reviewed"
 
-    get review_path(source: "curated", category: "technical")
+    get review_path(source: "curated")
     assert_includes response.body, "0 reviewed"
   end
 
@@ -290,31 +283,31 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     card = flashcards(:network)
     card.update!(
       next_review_at: 1.minute.ago,
-      source: "missing",
-      category: "missing",
-      story_status: "missing"
+      source: "curated",
+      category: "curated",
+      story_status: "curated"
     )
     flashcards(:algorithm).update!(
       next_review_at: 1.minute.ago,
-      source: "missing",
-      category: "missing",
-      story_status: "missing"
+      source: "curated",
+      category: "curated",
+      story_status: "curated"
     )
     flashcards(:overdue_review).update!(
       next_review_at: 1.minute.ago,
-      story_status: "missing"
+      story_status: "curated"
     )
 
-    patch review_flashcard_path(card, source: "missing"),
+    patch review_flashcard_path(card, source: "curated"),
       params: { review: { rating: "good" } }
 
-    get review_path(source: "missing")
+    get review_path(source: "curated")
     assert_includes response.body, "1 reviewed"
 
-    get review_path(category: "missing")
+    get review_path(category: "curated")
     assert_includes response.body, "0 reviewed"
 
-    get review_path(story_status: "missing")
+    get review_path(story_status: "curated")
     assert_includes response.body, "0 reviewed"
   end
 end

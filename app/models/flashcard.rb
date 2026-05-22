@@ -1,12 +1,14 @@
 class Flashcard < ApplicationRecord
   DIFFICULTY_LEVELS = %w[new again easy good hard].freeze
   REVIEW_RATINGS = %w[again easy good hard].freeze
+  SOURCES = %w[curated hsk].freeze
   STORY_STATUSES = %w[missing draft curated].freeze
 
   validates :character, presence: true, uniqueness: true
   validates :pinyin, presence: true
   validates :meaning, presence: true
   validates :next_review_at, presence: true
+  validates :source, presence: true, inclusion: { in: SOURCES }
   validates :difficulty, presence: true, inclusion: { in: DIFFICULTY_LEVELS }
   validates :story_status, presence: true, inclusion: { in: STORY_STATUSES }
   validates :review_count, numericality: { greater_than_or_equal_to: 0 }
@@ -14,7 +16,6 @@ class Flashcard < ApplicationRecord
   with_options on: :create do
     before_validation :set_initial_review_time
     before_validation :set_default_story_status
-    before_validation :set_default_source
   end
 
   scope(:due_for_review, -> {
@@ -78,9 +79,5 @@ class Flashcard < ApplicationRecord
     elsif story_status.blank? || (story_status == "missing" && !will_save_change_to_story_status?)
       self.story_status = "curated"
     end
-  end
-
-  def set_default_source
-    self.source ||= "curated"
   end
 end
