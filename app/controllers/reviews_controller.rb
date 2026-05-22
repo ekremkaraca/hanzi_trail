@@ -63,17 +63,16 @@ class ReviewsController < ApplicationController
   end
 
   def review_session_key
-    # [
-    #   params[:source],
-    #   params[:category],
-    #   params[:story_status]
-    # ].compact_blank.join(":").presence || "all"
-    review_params_for_redirect
+    name_value_pairs = review_params_for_redirect
       .to_h
-      .values
-      .compact_blank
-      .join(":")
-      .presence || "all"
+      .select { |_, v| v.present? }
+      .sort_by { |k, _| k }
+      .map { |k, v| "#{k}=#{v}" }
+
+    return "all" if name_value_pairs.empty?
+
+    joined = name_value_pairs.join("&")
+    Digest::SHA256.hexdigest(joined)
   end
 
   def reviewed_count

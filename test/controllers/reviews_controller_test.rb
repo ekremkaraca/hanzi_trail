@@ -62,7 +62,6 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to review_url
   end
   test "show displays remaining due count" do
-    Flashcard.update_all(next_review_at: 1.day.from_now)
     flashcards(:network).update!(next_review_at: 1.minute.ago)
     flashcards(:hsk_one).update!(next_review_at: 2.minutes.ago)
 
@@ -72,7 +71,6 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Cards remaining: 2"
   end
   test "show displays shortcut hints" do
-    Flashcard.update_all(next_review_at: 1.day.from_now)
     flashcards(:network).update!(next_review_at: 1.minute.ago)
 
     get review_url
@@ -93,7 +91,6 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "show renders review buttons that submit ratings to due card" do
-    Flashcard.update_all(next_review_at: 1.day.from_now)
     flashcards(:network).update!(next_review_at: 1.minute.ago)
 
     get review_url
@@ -137,7 +134,6 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "show displays review progress" do
-    Flashcard.update_all(next_review_at: 1.day.from_now)
     flashcards(:network).update!(next_review_at: 1.minute.ago)
 
     get review_path
@@ -148,8 +144,6 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "review update increments reviewed count" do
-    Flashcard.update_all(next_review_at: 1.day.from_now)
-
     flashcard = flashcards(:network)
     flashcard.update!(next_review_at: 1.minute.ago)
     flashcards(:algorithm).update!(next_review_at: 1.minute.ago)
@@ -164,8 +158,6 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "reviewed count is separated by review filters" do
-    Flashcard.update_all(next_review_at: 1.day.from_now)
-
     hsk_card = flashcards(:hsk_one)
     curated_card = flashcards(:network)
 
@@ -184,8 +176,6 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "show displays completion state after reviewing final card" do
-    Flashcard.update_all(next_review_at: 1.day.from_now)
-
     flashcard = flashcards(:network)
     flashcard.update!(next_review_at: 1.minute.ago)
 
@@ -197,5 +187,134 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Review session complete"
     assert_includes response.body, "You reviewed 1 card"
+  end
+
+  test "reviewed count does not collide between source and category with same value" do
+    hsk_card = flashcards(:hsk_one)
+    hsk_card.update!(next_review_at: 1.minute.ago)
+    flashcards(:hsk_two).update!(next_review_at: 1.minute.ago)
+    flashcards(:overdue_review).update!(category: "hsk", next_review_at: 1.minute.ago)
+
+    patch review_flashcard_path(hsk_card, source: "hsk"),
+      params: { review: { rating: "good" } }
+
+    get review_path(source: "hsk")
+    assert_includes response.body, "1 reviewed"
+
+    get review_path(category: "hsk")
+    assert_includes response.body, "0 reviewed"
+  end
+
+  test "reviewed count does not collide between source and story_status with same value" do
+    card = flashcards(:hsk_one)
+    card.update!(next_review_at: 1.minute.ago, source: "missing")
+    flashcards(:hsk_two).update!(next_review_at: 1.minute.ago, source: "missing")
+
+    patch review_flashcard_path(card, source: "missing"),
+      params: { review: { rating: "good" } }
+
+    get review_path(source: "missing")
+    assert_includes response.body, "1 reviewed"
+
+    get review_path(story_status: "missing")
+    assert_includes response.body, "0 reviewed"
+  end
+
+  test "reviewed count does not collide between category and story_status with same value" do
+    card = flashcards(:network)
+    card.update!(next_review_at: 1.minute.ago, category: "missing")
+    flashcards(:algorithm).update!(next_review_at: 1.minute.ago, category: "missing")
+
+    patch review_flashcard_path(card, category: "missing"),
+      params: { review: { rating: "good" } }
+
+    get review_path(category: "missing")
+    assert_includes response.body, "1 reviewed"
+
+    get review_path(story_status: "missing")
+    assert_includes response.body, "0 reviewed"
+  end
+
+  test "reviewed count does not collide when multi-param values concatenate to match a single value" do
+    combined_card = flashcards(:network)
+    combined_card.update!(
+      next_review_at: 1.minute.ago,
+      source: "curated:technical",
+      category: nil
+    )
+    flashcards(:algorithm).update!(
+      next_review_at: 1.minute.ago,
+      source: "curated:technical",
+      category: nil
+    )
+
+    scoped_card = flashcards(:hsk_one)
+    scoped_card.update!(
+      next_review_at: 1.minute.ago,
+      source: "curated",
+      category: "technical"
+    )
+
+    patch review_flashcard_path(combined_card, source: "curated:technical"),
+      params: { review: { rating: "good" } }
+
+    get review_path(source: "curated:technical")
+    assert_includes response.body, "1 reviewed"
+
+    get review_path(source: "curated", category: "technical")
+    assert_includes response.body, "0 reviewed"
+  end
+
+  test "blank parameter values share the unfiltered session" do
+    card = flashcards(:network)
+    card.update!(next_review_at: 1.minute.ago)
+    flashcards(:algorithm).update!(next_review_at: 1.minute.ago)
+
+    patch review_flashcard_path(card),
+      params: { review: { rating: "good" } }
+
+    get review_path
+    assert_includes response.body, "1 reviewed"
+
+    get review_path(source: "")
+    assert_includes response.body, "1 reviewed"
+
+    get review_path(category: "")
+    assert_includes response.body, "1 reviewed"
+
+    get review_path(source: "", category: "", story_status: "")
+    assert_includes response.body, "1 reviewed"
+  end
+
+  test "all three filter params produce distinct session keys from each other" do
+    card = flashcards(:network)
+    card.update!(
+      next_review_at: 1.minute.ago,
+      source: "missing",
+      category: "missing",
+      story_status: "missing"
+    )
+    flashcards(:algorithm).update!(
+      next_review_at: 1.minute.ago,
+      source: "missing",
+      category: "missing",
+      story_status: "missing"
+    )
+    flashcards(:overdue_review).update!(
+      next_review_at: 1.minute.ago,
+      story_status: "missing"
+    )
+
+    patch review_flashcard_path(card, source: "missing"),
+      params: { review: { rating: "good" } }
+
+    get review_path(source: "missing")
+    assert_includes response.body, "1 reviewed"
+
+    get review_path(category: "missing")
+    assert_includes response.body, "0 reviewed"
+
+    get review_path(story_status: "missing")
+    assert_includes response.body, "0 reviewed"
   end
 end
