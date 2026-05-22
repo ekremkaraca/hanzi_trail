@@ -6,21 +6,14 @@
     aria-live="polite">
     <div class="flash-message-content">
       <span class="flash-message-icon">
-        <% case type.to_sym %>
-          <% when :notice %>
-            <i class="fas fa-check-circle" aria-hidden="true"></i>
-          <% when :alert %>
-            <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
-          <% when :error %>
-            <i class="fas fa-times-circle" aria-hidden="true"></i>
-        <% end %>
+        <%= type.to_s == "notice" ? "✓" : "!" %>
       </span>
       <span class="flash-message-text"><%= message %></span>
     </div>
     <button class="flash-message-close"
             data-action="click->flash#close"
             aria-label="Close">
-            <i class="fas fa-times" aria-hidden="true"></i>
+            x
     </button>
   </div>
 <% end %>
