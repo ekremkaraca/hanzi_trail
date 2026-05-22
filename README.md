@@ -35,3 +35,10 @@ project by drkameleon.
 
 The original dataset is used under its MIT license.
 Additional stories, categorizations, and learning content were added for HanziTrail.
+
+## Warning
+
+Current security boundary:
+- Flashcard CRUD is disabled at controller level until authentication is added.
+- Review actions remain enabled for MVP study flow.
+- Imported and seeded cards are the current source of content.

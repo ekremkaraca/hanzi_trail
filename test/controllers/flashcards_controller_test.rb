@@ -14,11 +14,12 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
 
   test "should get new" do
     get new_flashcard_url
-    assert_response :success
+    assert_redirected_to flashcards_path
+    assert_equal "Editing is disabled until authentication is added", flash[:alert]
   end
 
   test "should create flashcard" do
-    assert_difference("Flashcard.count", 1) do
+    assert_no_difference("Flashcard.count") do
       post flashcards_url, params: {
         flashcard: {
           character: "北京",
@@ -30,7 +31,8 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_redirected_to flashcard_url(Flashcard.last)
+    assert_redirected_to flashcards_path
+    assert_equal "Editing is disabled until authentication is added", flash[:alert]
   end
 
   test "should show flashcard" do
@@ -40,7 +42,8 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
 
   test "should get edit" do
     get edit_flashcard_url(@flashcard)
-    assert_response :success
+    assert_redirected_to flashcards_path
+    assert_equal "Editing is disabled until authentication is added", flash[:alert]
   end
 
   test "should update flashcard" do
@@ -50,16 +53,18 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    assert_redirected_to flashcard_url(@flashcard)
-    assert_equal "network / web", @flashcard.reload.meaning
+    assert_redirected_to flashcards_path
+    assert_equal "Editing is disabled until authentication is added", flash[:alert]
+    assert_not_equal "network / web", @flashcard.reload.meaning
   end
 
   test "should destroy flashcard" do
-    assert_difference("Flashcard.count", -1) do
+    assert_no_difference("Flashcard.count") do
       delete flashcard_url(@flashcard)
     end
 
     assert_redirected_to flashcards_url
+    assert_equal "Editing is disabled until authentication is added", flash[:alert]
   end
 
   test "index shows all flashcards by default" do
@@ -181,5 +186,32 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "No flashcards matched your filters"
     assert_select "a[href=?]", flashcards_path, text: "Clear filters"
+  end
+
+  test "create is disabled without authentication" do
+    assert_no_difference "Flashcard.count" do
+      post flashcards_path, params: {
+        flashcard: {
+          character: "测",
+          pinyin: "cè",
+          meaning: "test"
+        }
+      }
+    end
+
+    assert_redirected_to flashcards_path
+    assert_equal "Editing is disabled until authentication is added", flash[:alert]
+  end
+
+  test "update is disabled without authentication" do
+    patch flashcard_path(@flashcard), params: {
+      flashcard: {
+        meaning: "updated meaning"
+      }
+    }
+
+    assert_redirected_to flashcards_path
+    assert_equal "Editing is disabled until authentication is added", flash[:alert]
+    assert_not_equal "updated meaning", @flashcard.reload.meaning
   end
 end

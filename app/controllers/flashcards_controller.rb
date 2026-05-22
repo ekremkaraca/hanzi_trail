@@ -1,4 +1,7 @@
 class FlashcardsController < ApplicationController
+  # Review updates remain enabled for the local MVP because review is the core flow.
+  # Flashcard CRUD is disabled until authentication exists.
+  before_action :require_write_access, only: %i[new edit create update destroy]
   before_action :set_flashcard, only: %i[show edit update destroy]
 
   def index
