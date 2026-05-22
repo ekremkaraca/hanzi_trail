@@ -73,33 +73,9 @@
           </div>
 
           <div class="review-buttons buttons is-centered mt-6">
-            <%= button_to "Again [1]",
-                  review_flashcard_path(@flashcard),
-                  method: :patch,
-                  params: { review: { rating: "again" }, source: params[:source], category: params[:category], story_status: params[:story_status] },
-                  class: "button is-danger is-medium",
-                  data: { review_rating: "1" } %>
-
-            <%= button_to "Hard [2]",
-                  review_flashcard_path(@flashcard),
-                  method: :patch,
-                  params: { review: { rating: "hard" }, source: params[:source], category: params[:category], story_status: params[:story_status] },
-                  class: "button is-warning is-medium",
-                  data: { review_rating: "2" } %>
-
-            <%= button_to "Good [3]",
-                  review_flashcard_path(@flashcard),
-                  method: :patch,
-                  params: { review: { rating: "good" }, source: params[:source], category: params[:category], story_status: params[:story_status] },
-                  class: "button is-success is-medium",
-                  data: { review_rating: "3" } %>
-
-            <%= button_to "Easy [4]",
-                  review_flashcard_path(@flashcard),
-                  method: :patch,
-                  params: { review: { rating: "easy" }, source: params[:source], category: params[:category], story_status: params[:story_status] },
-                  class: "button is-info is-medium",
-                  data: { review_rating: "4" } %>
+            <% ReviewsHelper::REVIEW_BUTTONS.each_key do |rating| %>
+              <%= review_button(@flashcard, rating) %>
+            <% end %>
           </div>
 
           <p class="has-text-centered has-text-grey-light is-size-7 mt-4">
@@ -125,6 +101,7 @@
         <%= link_to "Start new session",
               review_path(@review_filter_params.merge(reset_session: "1")),
               class: "button is-light" %>
+      </div>
     <% end %>
   </div>
 </section>
