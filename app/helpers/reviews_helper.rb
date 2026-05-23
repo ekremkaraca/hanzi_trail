@@ -49,15 +49,27 @@ module ReviewsHelper
     config = REVIEW_BUTTONS.fetch(rating)
 
     button_to(
-      "#{config[:label]} [#{config[:key]}]",
+      "#{config.fetch(:label)} · #{config.fetch(:key)}",
       review_flashcard_path(flashcard),
       method: :patch,
       params: review_button_params(rating),
-      class: "button #{config[:class]} is-medium",
+      class: "button #{config.fetch(:class)} is-medium",
       data: {
-        review_rating: config[:key]
+        review_rating: config.fetch(:key)
       }
     )
+  end
+
+  def review_buttons_for(flashcard)
+    safe_join(
+      REVIEW_BUTTONS.keys.map { |rating| review_button(flashcard, rating) }
+    )
+  end
+
+  def review_progress_percentage(reviewed_count, total_count)
+    return 0 if total_count.zero?
+
+    ((reviewed_count.to_f / total_count) * 100).round
   end
 
   private

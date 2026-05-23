@@ -76,10 +76,10 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     get review_url
 
     assert_response :success
-    assert_includes response.body, "Again [1]"
-    assert_includes response.body, "Hard [2]"
-    assert_includes response.body, "Good [3]"
-    assert_includes response.body, "Easy [4]"
+    assert_includes response.body, "Again · 1"
+    assert_includes response.body, "Hard · 2"
+    assert_includes response.body, "Good · 3"
+    assert_includes response.body, "Easy · 4"
   end
 
   test "show wires keyboard shortcut handler" do
@@ -309,5 +309,37 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
 
     get review_path(story_status: "curated")
     assert_includes response.body, "0 reviewed"
+  end
+
+  test "show displays review progress text" do
+    Flashcard.update_all(next_review_at: 1.day.from_now)
+
+    flashcards(:network).update!(next_review_at: 1.minute.ago)
+
+    get review_path
+
+    assert_response :success
+    assert_includes response.body, "0 reviewed"
+    assert_includes response.body, "1 remaining"
+  end
+
+  test "show displays review compaetion after final card is reviewed" do
+    Flashcard.update_all(next_review_at: 1.day.from_now)
+
+    flashcard = flashcards(:network)
+    flashcard.update!(next_review_at: 1.minute.ago)
+
+    patch review_flashcard_path(flashcard),
+      params: {
+        review: {
+          rating: "good"
+        }
+      }
+
+    follow_redirect!
+
+    assert_response :success
+    assert_includes response.body, "Review session complete"
+    assert_includes response.body, "You reviewed 1 card"
   end
 end

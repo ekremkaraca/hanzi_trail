@@ -9,6 +9,7 @@ class ReviewsController < ApplicationController
     @empty_state_title = empty_state_title
     @reviewed_count = reviewed_count
     @review_filter_params = review_params_for_redirect
+    @total_review_count = @reviewed_count + @remaining_due_count
   end
 
   def update

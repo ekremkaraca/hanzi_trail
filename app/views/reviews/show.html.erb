@@ -37,6 +37,15 @@
             <%= review_progress_text(@reviewed_count, @remaining_due_count) %>
           </p>
 
+          <% progress = review_progress_percentage(@reviewed_count, @total_review_count) %>
+
+          <div class="review-progress" aria-label="Review progress: <%= progress %>%">
+            <div
+              class="review-progress-bar"
+              style="width: <%= progress %>%"
+            ></div>
+          </div>
+
           <h2 class="review-character">
             <%= @flashcard.character %>
           </h2>
@@ -73,9 +82,7 @@
           </div>
 
           <div class="review-buttons buttons is-centered mt-6">
-            <% ReviewsHelper::REVIEW_BUTTONS.each_key do |rating| %>
-              <%= review_button(@flashcard, rating) %>
-            <% end %>
+            <%= review_buttons_for(@flashcard) %>
           </div>
 
           <p class="has-text-centered has-text-grey-light is-size-7 mt-4">
@@ -84,23 +91,26 @@
         </div>
       </div>
     <% else %>
-      <div class="box review-card has-text-centered">
+      <div class="review-empty-state">
+        <div class="review-empty-icon" aria-hidden="true">✓</div>
+
         <% if @reviewed_count.positive? %>
-          <h2 class="title is-4">Review session complete.</h2>
-          <p class="has-text-grey-light mb-5">
-            You reviewed <%= pluralize(@reviewed_count, "card") %>.
-          </p>
+          <h2>Review session complete.</h2>
+          <p>You reviewed <%= pluralize(@reviewed_count, "card") %>.</p>
         <% else %>
-          <h2 class="title is-4"><%= @empty_state_title %></h2>
-          <p class="has-text-grey-light mb-5">
-            Review your flashcards later or browse all cards.
-          </p>
+          <h2><%= @empty_state_title %></h2>
+          <p>Review your flashcards later or browse all cards.</p>
         <% end %>
 
-        <%= link_to "Browse flashcards", flashcards_path, class: "button is-link" %>
-        <%= link_to "Start new session",
-              review_path(@review_filter_params.merge(reset_session: "1")),
-              class: "button is-light" %>
+        <div class="buttons is-centered mt-5">
+          <%= link_to "Browse flashcards", flashcards_path, class: "button is-light" %>
+
+          <% if @reviewed_count.positive? %>
+            <%= link_to "Start new session",
+                  review_path(@review_filter_params.merge(reset_session: "1")),
+                  class: "button is-link" %>
+          <% end %>
+        </div>
       </div>
     <% end %>
   </div>

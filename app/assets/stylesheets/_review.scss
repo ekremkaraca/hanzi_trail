@@ -153,6 +153,55 @@
   }
 }
 
+.review-progress {
+  overflow: hidden;
+  width: 100%;
+  height: 0.45rem;
+  margin: 0.75rem 0 1.25rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.review-progress-bar {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #4f7cff, #67e8f9);
+  transition: width 180ms ease;
+}
+
+.review-empty-state {
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.review-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 4rem;
+  height: 4rem;
+  margin-bottom: 1.25rem;
+
+  border-radius: 999px;
+  background: rgba(72, 199, 142, 0.12);
+  color: #48c78e;
+
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.review-empty-state h2 {
+  color: #f8fafc;
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.review-empty-state p {
+  margin-top: 0.75rem;
+  color: var(--hanzi-text-soft);
+}
+
 @media (max-width: 900px) {
   .review-page {
     padding: 1rem;

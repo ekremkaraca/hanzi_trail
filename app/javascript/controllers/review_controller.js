@@ -6,14 +6,20 @@ export default class extends Controller {
 
   showAnswer() {
     this.answerTarget.hidden = false
-    this.showButtonTarget.hidden = true
     this.element.classList.add("is-answer-visible")
+
+    if (this.hasShowButtonTarget) {
+      this.showButtonTarget.textContent = "Hide answer"
+    }
   }
 
   hideAnswer() {
     this.answerTarget.hidden = true
-    this.showButtonTarget.hidden = false
     this.element.classList.remove("is-answer-visible")
+
+    if (this.hasShowButtonTarget) {
+      this.showButtonTarget.textContent = "Show answer"
+    }
   }
 
   toggleAnswer() {
@@ -25,7 +31,7 @@ export default class extends Controller {
   }
 
   handleKeydown(event) {
-    if (event.target.matches("input, textarea, select")) return
+    if (this.shouldIgnoreKeydown(event)) return
 
     if (event.key === " " || event.key === "Enter") {
       event.preventDefault()
@@ -41,7 +47,12 @@ export default class extends Controller {
     const button = this.element.querySelector(`[data-review-rating="${event.key}"]`)
 
     if (button && !this.answerTarget.hidden) {
+      event.preventDefault()
       button.click()
     }
+  }
+
+  shouldIgnoreKeydown(event) {
+    return event.target.matches("input, textarea, select, button")
   }
 }
