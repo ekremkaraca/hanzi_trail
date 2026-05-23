@@ -25,6 +25,8 @@ class ReviewsController < ApplicationController
     redirect_to review_path(review_params_for_redirect), alert: "This card is not due for review."
   rescue ArgumentError
     redirect_to review_path(review_params_for_redirect), alert: "Invalid review rating."
+  rescue ActionController::ParameterMissing
+    redirect_to review_path(review_params_for_redirect), alert: "Missing review parameters."
   end
 
   private
@@ -56,10 +58,6 @@ class ReviewsController < ApplicationController
         .by_source(params[:source])
         .by_category(params[:category])
         .by_story_status(params[:story_status])
-  end
-
-  def reset_review_session
-    reset_reviewed_count
   end
 
   def review_session_key
