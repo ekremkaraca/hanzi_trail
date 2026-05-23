@@ -62,16 +62,15 @@ class ReviewsController < ApplicationController
   end
 
   def review_session_key
-    name_value_pairs = review_params_for_redirect
+    sorted = review_params_for_redirect
       .to_h
       .select { |_, v| v.present? }
-      .sort_by { |k, _| k }
+      .sort
       .map { |k, v| "#{k}=#{v}" }
 
-    return "all" if name_value_pairs.empty?
+    return "all" if sorted.empty?
 
-    joined = name_value_pairs.join("&")
-    Digest::SHA256.hexdigest(joined)
+    sorted.join("&")
   end
 
   def reviewed_count
