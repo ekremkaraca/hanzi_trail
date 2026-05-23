@@ -1,8 +1,10 @@
+@use "sass:meta";
+@use "base";
+
 @import url("https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css");
 
-@import "base";
-@import "navbar";
-@import "flash_messages";
-@import "review";
-@import "flashcards";
-@import "flashcard_show";
+@include meta.load-css("navbar");
+@include meta.load-css("flash_messages");
+@include meta.load-css("review");
+@include meta.load-css("flashcards");
+@include meta.load-css("flashcard_show");
