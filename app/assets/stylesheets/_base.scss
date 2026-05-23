@@ -1,0 +1,62 @@
+:root {
+  --hanzi-bg: #0f1724;
+  --hanzi-panel: #141d2b;
+  --hanzi-panel-soft: #192437;
+  --hanzi-border: rgba(255, 255, 255, 0.1);
+  --hanzi-text-soft: #aeb8c7;
+  --hanzi-blue: #4f7cff;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(79, 124, 255, 0.12), transparent 30%),
+    var(--hanzi-bg);
+  color: #f8fafc;
+}
+
+.button[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+
+  &:hover {
+    transform: none;
+  }
+}
+
+@keyframes flash-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes flash-slide-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+}
+
+@keyframes answer-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.25rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

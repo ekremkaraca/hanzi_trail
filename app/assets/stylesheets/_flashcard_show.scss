@@ -1,0 +1,212 @@
+.flashcard-show-page {
+  min-height: calc(100vh - 3.25rem);
+}
+
+.flashcard-show-card {
+  padding: 2rem;
+  border: 1px solid var(--hanzi-border);
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
+    var(--hanzi-panel);
+}
+
+.flashcard-show-main {
+  display: grid;
+  grid-template-columns: minmax(12rem, 18rem) 1fr;
+  gap: 2rem;
+  align-items: center;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--hanzi-border);
+}
+
+.flashcard-show-character {
+  text-align: center;
+
+  h1 {
+    margin: 0;
+    color: #ffffff;
+    font-size: clamp(4rem, 8vw, 7rem);
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  p {
+    margin-top: 0.75rem;
+    color: var(--hanzi-text-soft);
+    font-size: 1.25rem;
+  }
+}
+
+.flashcard-show-meaning {
+  h2 {
+    max-width: 54rem;
+    margin-top: 0.5rem;
+    color: #f8fafc;
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    line-height: 1.15;
+  }
+}
+
+.eyebrow {
+  color: var(--hanzi-text-soft);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.flashcard-story-panel {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  border: 1px solid var(--hanzi-border);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.035);
+
+  .content {
+    margin-top: 0.75rem;
+    color: #d7deea;
+  }
+}
+
+.flashcard-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+
+  > div {
+    padding: 1rem;
+    border: 1px solid var(--hanzi-border);
+    border-radius: 0.85rem;
+    background: rgba(255, 255, 255, 0.035);
+  }
+
+  span,
+  strong {
+    display: block;
+  }
+
+  span {
+    color: var(--hanzi-text-soft);
+    font-size: 0.8rem;
+  }
+
+  strong {
+    margin-top: 0.25rem;
+    color: #ffffff;
+  }
+}
+
+.is-col-span-2 {
+  grid-column: span 2;
+}
+
+.flashcards-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  padding: 4rem 2rem;
+  margin-top: 1.5rem;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.25rem;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.03),
+      rgba(255, 255, 255, 0.01)
+    );
+
+  backdrop-filter: blur(10px);
+}
+
+.flashcards-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 5rem;
+  height: 5rem;
+
+  margin-bottom: 1.5rem;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.04);
+
+  font-size: 2rem;
+  font-weight: 700;
+
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.flashcards-empty-title {
+  margin-bottom: 0.75rem;
+
+  font-size: 1.8rem;
+  font-weight: 700;
+
+  color: #f8fafc;
+}
+
+.flashcards-empty-text {
+  max-width: 42rem;
+
+  margin-bottom: 2rem;
+
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.flashcards-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+@media (max-width: 900px) {
+  .flashcard-show-main {
+    display: block;
+  }
+
+  .flashcard-show-meaning {
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  .flashcard-detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .flashcard-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .is-col-span-2 {
+    grid-column: span 1;
+  }
+
+  .flashcards-empty-state {
+    padding: 2.5rem 1.25rem;
+  }
+
+  .flashcards-empty-title {
+    font-size: 1.5rem;
+  }
+
+  .flashcards-empty-actions {
+    width: 100%;
+
+    .button {
+      width: 100%;
+    }
+  }
+}

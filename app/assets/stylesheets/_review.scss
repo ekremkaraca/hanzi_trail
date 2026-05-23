@@ -1,0 +1,258 @@
+.review-page {
+  min-height: calc(100vh - 3.25rem);
+  padding-top: 1.5rem;
+}
+
+.review-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.review-count-box {
+  min-width: 11rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--hanzi-border);
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.04);
+  text-align: center;
+
+  span,
+  strong {
+    display: block;
+  }
+
+  strong {
+    color: #ffffff;
+    font-size: 1.35rem;
+    line-height: 1.2;
+  }
+}
+
+.review-card {
+  padding: 2rem;
+  border: 1px solid var(--hanzi-border);
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
+    var(--hanzi-panel);
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.35);
+}
+
+.review-card-compact {
+  padding: 1.5rem 2rem;
+
+  &.is-answer-visible {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+
+    .review-mode-bar {
+      margin-bottom: 0.75rem;
+    }
+
+    .review-character-compact {
+      margin-bottom: 0.75rem;
+      font-size: clamp(3rem, 12vw, 4.75rem);
+    }
+
+    .review-divider {
+      margin: 1.25rem 0;
+    }
+
+    .review-answer {
+      line-height: 1.35;
+    }
+
+    .review-story-compact {
+      max-width: 52rem;
+      margin-top: 0.75rem;
+
+      p {
+        margin-bottom: 0;
+      }
+    }
+
+    .review-buttons-compact {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(8rem, 1fr));
+      gap: 1rem;
+
+      .button_to,
+      .button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.review-mode-bar {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+
+  .button {
+    border: 1px solid var(--hanzi-border);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--hanzi-text-soft);
+    font-weight: 700;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    &.is-active {
+      border-color: var(--hanzi-blue);
+      background: rgba(79, 124, 255, 0.18);
+      color: #ffffff;
+    }
+  }
+}
+
+.review-character {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(4rem, 8vw, 7rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.review-character-compact {
+  margin-top: 0.5rem;
+}
+
+.review-divider {
+  margin: 2rem 0;
+  background-color: var(--hanzi-border);
+}
+
+.review-answer {
+  max-width: 56rem;
+  margin: 0 auto;
+  color: #f8fafc;
+  animation: answer-fade-in 0.18s ease-out;
+}
+
+.review-story {
+  max-width: 48rem;
+  margin: 1rem auto 0;
+  color: var(--hanzi-text-soft);
+}
+
+.review-buttons {
+  gap: 1rem;
+
+  .button {
+    min-width: 9.5rem;
+    font-weight: 700;
+  }
+}
+
+@media (max-width: 900px) {
+  .review-page {
+    padding: 1rem;
+  }
+
+  .review-header {
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .review-count-box {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .review-card,
+  .review-card-compact {
+    padding: 1rem;
+  }
+
+  .review-mode-bar {
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+
+    .button {
+      padding: 0.35rem 0.65rem;
+      font-size: 0.75rem;
+    }
+  }
+
+  .review-character-compact {
+    margin-bottom: 0.75rem;
+    font-size: clamp(3.25rem, 18vw, 5rem);
+  }
+
+  .review-show-answer-button {
+    margin-top: 0.5rem;
+  }
+
+  .review-divider {
+    margin: 1rem 0;
+  }
+
+  .review-answer {
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+
+  .review-story-compact {
+    max-width: 100%;
+    margin-top: 0.75rem;
+
+    p {
+      margin-bottom: 0;
+    }
+  }
+
+  .review-buttons,
+  .review-buttons-compact {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+
+    .button_to,
+    .button {
+      width: 100%;
+    }
+
+    .button {
+      min-height: 2.75rem;
+      font-size: 0.95rem;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .review-page {
+    padding: 0.75rem;
+  }
+
+  .review-card,
+  .review-card-compact {
+    padding: 0.85rem;
+  }
+
+  .review-mode-bar {
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 0.25rem;
+  }
+
+  .review-character-compact {
+    font-size: clamp(3rem, 22vw, 4.5rem);
+  }
+
+  .review-buttons,
+  .review-buttons-compact {
+    grid-template-columns: 1fr;
+  }
+}
