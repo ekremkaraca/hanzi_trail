@@ -138,7 +138,7 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     get flashcards_path
 
     assert_response :success
-    assert_includes response.body, "Curated story"
+    assert_includes response.body, "Curated Story"
   end
 
   test "index filters by search query" do
@@ -184,8 +184,8 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     get flashcards_path, params: { query: "nonexistent-query" }
 
     assert_response :success
-    assert_includes response.body, "No flashcards matched your filters"
-    assert_select "a[href=?]", flashcards_path, text: "Clear filters"
+    assert_includes response.body, "No flashcards matched your filter"
+    assert_select "a[href=?]", flashcards_path, text: "Browse all flashcards"
   end
 
   test "create is disabled without authentication" do
@@ -213,5 +213,31 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to flashcards_path
     assert_equal "Editing is disabled until authentication is added", flash[:alert]
     assert_not_equal "updated meaning", @flashcard.reload.meaning
+  end
+
+  test "index shows draft stories shortcut" do
+    get flashcards_path
+
+    assert_response :success
+    assert_select "a[href=?]", flashcards_path(story_status: "draft"), text: "Draft stories"
+  end
+
+  test "index filters short stories" do
+    short_story_card = flashcards(:network)
+    long_story_card = flashcards(:algorithm)
+
+    short_story_card.update!(
+      story: "A network of connections."
+    )
+
+    long_story_card.update!(
+      story: "This is a longer story that should not be considered short because it has enough explanatory detail."
+    )
+
+    get flashcards_path, params: { story_status: "short" }
+
+    assert_response :success
+    assert_select ".flashcard-character-link", text: short_story_card.character
+    assert_select ".flashcard-character-link", text: long_story_card.character, count: 0
   end
 end

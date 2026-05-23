@@ -18,26 +18,31 @@
 
     <div class="flashcard-filters box">
       <div class="flashcard-filters-header">
-        <div>
+        <div class="flashcard-filters-copy">
           <h2 class="title is-5">Browse cards</h2>
-          <p class="has-text-grey-light">Filter imported and curated flashcards.</p>
+          <p class="has-text-grey-light">
+            Filter imported and curated flashcards.
+          </p>
         </div>
 
-        <%= link_to "Missing stories",
-              flashcards_path(story_status: "missing"),
-              class: "button is-warning is-light" %>
+        <div class="curation-shortcuts">
+          <%= link_to "Missing stories", flashcards_path(story_status: "missing"), class: "button is-warning is-light" %>
+          <%= link_to "Draft stories", flashcards_path(story_status: "draft"), class: "button is-info is-light" %>
+          <%= link_to "Curated stories", flashcards_path(story_status: "curated"), class: "button is-success is-light" %>
+          <%= link_to "Short stories", flashcards_path(short_story: "1"), class: "button is-light" %>
+        </div>
       </div>
       <%= form_with url: flashcards_path, method: :get, local: true do |form| %>
-        <div class="columns is-vcentered">
-          <div class="column is-4">
+        <div class="flashcard-filter-grid">
+          <div class="field filter-search-field">
             <%= form.label :query, "Search", class: "label" %>
-
             <%= form.search_field :query,
                   value: params[:query],
                   placeholder: "Search character, pinyin, meaning...",
                   class: "input" %>
           </div>
-          <div class="column">
+
+          <div class="field">
             <%= form.label :source, class: "label" %>
             <div class="select is-fullwidth">
               <%= form.select :source,
@@ -46,8 +51,8 @@
             </div>
           </div>
 
-          <div class="column">
-            <%= form.label :hsk_level, "HSK Level", class: "label" %>
+          <div class="field">
+            <%= form.label :hsk_level, "HSK", class: "label" %>
             <div class="select is-fullwidth">
               <%= form.select :hsk_level,
                     [["All", ""], ["Old 1", "old-1"]],
@@ -55,15 +60,15 @@
             </div>
           </div>
 
-          <div class="column is-3">
+          <div class="field">
             <%= form.label :category, class: "label" %>
             <%= form.text_field :category,
                   value: params[:category],
-                  placeholder: "e.g. technical",
+                  placeholder: "technical",
                   class: "input" %>
           </div>
 
-          <div class="column">
+          <div class="field">
             <%= form.label :story_status, "Story", class: "label" %>
             <div class="select is-fullwidth">
               <%= form.select :story_status,
@@ -72,7 +77,7 @@
             </div>
           </div>
 
-          <div class="column is-narrow flashcard-filter-actions">
+          <div class="filter-actions">
             <%= form.submit "Filter", class: "button is-primary" %>
             <%= link_to "Clear", flashcards_path, class: "button is-light" %>
           </div>
@@ -118,9 +123,8 @@
                       <span class="tag is-info is-light"><%= flashcard.hsk_level %></span>
                     <% end %>
 
-                    <span class="tag is-warning is-light">
-                      <%= "#{flashcard.story_status.humanize} story" %>
-                    </span>
+                    <%= story_status_tag(flashcard) %>
+                    <%= story_quality_tag(flashcard) %>
                   </div>
                 </td>
 
@@ -134,13 +138,27 @@
         </table>
       <% else %>
         <div class="flashcards-empty-state">
-          <h2 class="title is-4">No flashcards matched your filters.</h2>
+          <div class="flashcards-empty-icon">
+            ◈
+          </div>
 
-          <p class="has-text-grey-light">
-            Try changing your search or clearing active filters.
+          <h2 class="flashcards-empty-title">
+            <%= flashcards_empty_title %>
+          </h2>
+
+          <p class="flashcards-empty-text">
+            Draft stories will appear here once imported or curated flashcards gain initial story content.
           </p>
 
-          <%= link_to "Clear filters", flashcards_path, class: "button is-light mt-4" %>
+          <div class="flashcards-empty-actions">
+            <%= link_to "View missing stories",
+                  flashcards_path(story_status: "missing"),
+                  class: "button is-warning is-light" %>
+
+            <%= link_to "Browse all flashcards",
+                  flashcards_path,
+                  class: "button is-light" %>
+          </div>
         </div>
       <% end %>
     </div>

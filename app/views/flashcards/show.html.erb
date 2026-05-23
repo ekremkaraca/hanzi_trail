@@ -39,8 +39,11 @@
         </div>
 
         <div>
-          <span>Story</span>
-          <strong><%= @flashcard.story_status.humanize %></strong>
+          <span>Story status</span>
+          <div class="tags mt-2">
+            <%= story_status_tag(@flashcard) %>
+            <%= story_quality_tag(@flashcard) %>
+          </div>
         </div>
 
         <div>

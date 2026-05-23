@@ -139,4 +139,45 @@ class FlashcardTest < ActiveSupport::TestCase
 
     assert_empty result
   end
+
+  test "story_missing? returns true for missing story status" do
+    flashcard = flashcards(:hsk_one)
+    flashcard.story_status = "missing"
+
+    assert flashcard.story_missing?
+    assert_not flashcard.story_curated?
+    assert_not flashcard.story_draft?
+  end
+
+  test "story_draft? returns true for draft story status" do
+    flashcard = flashcards(:network)
+    flashcard.story_status = "draft"
+
+    assert flashcard.story_draft?
+    assert_not flashcard.story_curated?
+    assert_not flashcard.story_missing?
+  end
+
+  test "story_curated? returns true for curated story status" do
+    flashcard = flashcards(:network)
+    flashcard.story_status = "curated"
+
+    assert flashcard.story_curated?
+    assert_not flashcard.story_draft?
+    assert_not flashcard.story_missing?
+  end
+
+  test "short_story returns true for short non-blank story" do
+    flashcard = flashcards(:network)
+    flashcard.story = "A network of connections."
+
+    assert flashcard.short_story?
+  end
+
+  test "short_story returns false for blank story" do
+    flashcard = flashcards(:hsk_one)
+    flashcard.story = nil
+
+    assert_not flashcard.short_story?
+  end
 end

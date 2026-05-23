@@ -45,6 +45,18 @@ class Flashcard < ApplicationRecord
     where(story_status: "missing")
   }
 
+  scope :draft_story, -> {
+    where(story_status: "draft")
+  }
+
+  scope :curated_story, -> {
+    where(story_status: "curated")
+  }
+
+  scope :short_story, -> {
+    where.not(story: [ nil, "" ]).where("LENGTH(story) < ?", 80)
+  }
+
   def schedule_next_review!(rating)
     raise ArgumentError, "Invalid rating" unless REVIEW_RATINGS.include?(rating)
 
@@ -65,6 +77,23 @@ class Flashcard < ApplicationRecord
         next_review_at: interval.from_now
       )
     end
+  end
+
+  def story_missing?
+    story_status == "missing"
+  end
+
+  def story_draft?
+    story_status == "draft"
+  end
+
+  def story_curated?
+    story_status == "curated"
+  end
+
+  def short_story?
+    # Under 80 chars is probably too short to be a useful mnemonic/story.
+    story.to_s.length.positive? && story.to_s.length < 80
   end
 
   private

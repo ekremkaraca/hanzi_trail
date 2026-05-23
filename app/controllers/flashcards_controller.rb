@@ -10,8 +10,14 @@ class FlashcardsController < ApplicationController
       .by_source(params[:source])
       .by_hsk_level(params[:hsk_level])
       .by_category(params[:category])
-      .by_story_status(params[:story_status])
-      .order(:next_review_at, :id)
+
+    if params[:story_status] == "short"
+      @flashcards = @flashcards.short_story
+    else
+      @flashcards = @flashcards.by_story_status(params[:story_status])
+    end
+
+    @flashcards = @flashcards.order(:character)
   end
 
   def show; end
