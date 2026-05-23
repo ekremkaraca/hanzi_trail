@@ -2,6 +2,44 @@
   min-height: calc(100vh - 3.25rem);
 }
 
+.flashcard-show-hero {
+  display: grid;
+  grid-template-columns: minmax(14rem, 19rem) minmax(0, 1fr);
+  gap: 2rem;
+  align-items: stretch;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--hanzi-border);
+}
+
+.flashcard-show-symbol,
+.flashcard-show-summary {
+  min-width: 0;
+  padding: 1.25rem;
+  border: 1px solid var(--hanzi-border);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.flashcard-show-symbol {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.flashcard-show-summary {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.flashcard-show-summary p {
+  margin-top: 0.75rem;
+  color: #f8fafc;
+  font-size: clamp(1.35rem, 2.8vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
 .flashcard-show-card {
   padding: 2rem;
   border: 1px solid var(--hanzi-border);
@@ -170,7 +208,85 @@
   gap: 0.75rem;
 }
 
+.flashcard-show-card {
+  padding: 2rem;
+  border: 1px solid var(--hanzi-border);
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
+    var(--hanzi-panel);
+}
+
+.flashcard-show-symbol {
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  h1 {
+    max-width: 100%;
+    margin: 0;
+    color: #ffffff;
+    font-size: clamp(4rem, 8vw, 7rem);
+    font-weight: 900;
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  p {
+    margin-top: 0.75rem;
+  }
+
+  &.is-long-character h1 {
+    font-size: clamp(3rem, 6vw, 5rem);
+  }
+
+  &.is-phrase-character h1 {
+    font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+    line-height: 1.18;
+  }
+}
+
+.flashcard-show-summary {
+  padding: 1.25rem;
+  border: 1px solid var(--hanzi-border);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.025);
+  max-width: 44rem;
+  min-width: 0;
+  align-self: center;
+  width: max(100%, 44rem);
+
+  p {
+    margin-top: 0.75rem;
+    color: #f8fafc;
+    font-size: clamp(1.15rem, 2.2vw, 1.8rem);
+    font-weight: 650;
+    line-height: 1.35;
+  }
+}
+
+.flashcard-meaning-text {
+  max-width: 42rem;
+}
+
+.flashcard-context-note {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(250, 204, 21, 0.25);
+  border-radius: 0.75rem;
+  background: rgba(250, 204, 21, 0.08);
+  color: #fde68a;
+  font-size: 0.9rem;
+}
+
 @media (max-width: 900px) {
+  .flashcard-show-hero {
+    grid-template-columns: 1fr;
+  }
+
   .flashcard-show-main {
     display: block;
   }
@@ -183,30 +299,50 @@
   .flashcard-detail-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .flashcard-show-card {
+    padding: 1.25rem;
+  }
+
+  .flashcard-show-summary {
+    max-width: none;
+
+    p {
+      font-size: clamp(1.35rem, 6vw, 2rem);
+    }
+  }
 }
 
 @media (max-width: 600px) {
   .flashcard-detail-grid {
     grid-template-columns: 1fr;
   }
-
+  
   .is-col-span-2 {
     grid-column: span 1;
   }
-
+  
   .flashcards-empty-state {
     padding: 2.5rem 1.25rem;
   }
-
+  
   .flashcards-empty-title {
     font-size: 1.5rem;
   }
-
+  
   .flashcards-empty-actions {
     width: 100%;
-
+    
     .button {
       width: 100%;
     }
+  }
+  
+  .flashcard-show-symbol h1 {
+    font-size: clamp(3.5rem, 20vw, 5rem);
+  }
+  
+  .flashcard-show-summary p {
+    font-size: 1.25rem;
   }
 }

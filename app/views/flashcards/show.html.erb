@@ -1,15 +1,29 @@
 <section class="section flashcard-show-page">
   <div class="container is-max-widescreen">
-    <div class="flashcard-show-card box">
-      <div class="flashcard-show-main">
-        <div class="flashcard-show-character">
+    <div class="flashcard-show-card">
+      <div class="flashcard-show-hero">
+        <div class="flashcard-show-symbol <%= flashcard_character_size_class(@flashcard) %>">
+          <div class="flashcard-show-badges">
+            <%= story_status_tag(@flashcard) %>
+
+            <% if @flashcard.source.present? %>
+              <span class="tag is-link is-light"><%= @flashcard.source %></span>
+            <% end %>
+          </div>
+
           <h1><%= @flashcard.character %></h1>
           <p><%= @flashcard.pinyin %></p>
         </div>
 
-        <div class="flashcard-show-meaning">
+        <div class="flashcard-show-summary">
           <span class="eyebrow">Meaning</span>
-          <h2><%= @flashcard.meaning %></h2>
+          <p class="flashcard-meaning-text"><%= @flashcard.meaning %></p>
+
+          <% if @flashcard.category == "history" %>
+            <div class="flashcard-context-note">
+              Historical term — meaning and usage may depend on time period and political context.
+            </div>
+          <% end %>
         </div>
       </div>
 
@@ -29,26 +43,8 @@
         </div>
 
         <div>
-          <span>Source</span>
-          <strong><%= @flashcard.source.presence || "curated" %></strong>
-        </div>
-
-        <div>
-          <span>HSK Level</span>
+          <span>HSK</span>
           <strong><%= @flashcard.hsk_level.presence || "—" %></strong>
-        </div>
-
-        <div>
-          <span>Story status</span>
-          <div class="tags mt-2">
-            <%= story_status_tag(@flashcard) %>
-            <%= story_quality_tag(@flashcard) %>
-          </div>
-        </div>
-
-        <div>
-          <span>Difficulty</span>
-          <strong><%= @flashcard.difficulty %></strong>
         </div>
 
         <div>
@@ -56,7 +52,7 @@
           <strong><%= @flashcard.review_count %></strong>
         </div>
 
-        <div class="is-col-span-2">
+        <div>
           <span>Next review</span>
           <strong>
             <% if @flashcard.next_review_at.past? %>
@@ -69,13 +65,7 @@
       </div>
 
       <div class="buttons mt-5">
-        <%= link_to "Edit", edit_flashcard_path(@flashcard), class: "button is-light" %>
-        <%= link_to "Back", flashcards_path, class: "button is-dark" %>
-        <%= button_to "Delete",
-              flashcard_path(@flashcard),
-              method: :delete,
-              class: "button is-danger",
-              form: { data: { turbo_confirm: "Delete this flashcard?" } } %>
+        <%= link_to "Back", flashcards_path, class: "button is-light" %>
       </div>
     </div>
   </div>

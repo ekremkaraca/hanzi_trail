@@ -29,4 +29,16 @@ module FlashcardsHelper
 
     "No flashcards matched your filter."
   end
+
+  def flashcard_character_size_class(flashcard)
+    length = flashcard.character.length
+
+    if length >= 4
+      "is-phrase-character"
+    elsif length >= 3
+      "is-long-character"
+    else
+      ""
+    end
+  end
 end
