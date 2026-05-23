@@ -1,4 +1,6 @@
 class Flashcard < ApplicationRecord
+  class CardNotDueError < StandardError; end
+
   DIFFICULTY_LEVELS = %w[new again easy good hard].freeze
   REVIEW_RATINGS = %w[again easy good hard].freeze
   SOURCES = %w[curated hsk].freeze
@@ -60,21 +62,15 @@ class Flashcard < ApplicationRecord
   def schedule_next_review!(rating)
     raise ArgumentError, "Invalid rating" unless REVIEW_RATINGS.include?(rating)
 
-    interval =
-      case rating
-      when "again" then 10.minutes
-      when "hard" then 1.day
-      when "good" then 3.days
-      when "easy" then 7.days
-      end
+    intervals = { "again" => 1.minute, "hard" => 1.day, "good" => 3.days, "easy" => 7.days }
 
     with_lock do
-      raise ActiveRecord::RecordNotFound unless next_review_at <= Time.current
+      raise CardNotDueError unless next_review_at <= Time.current
 
       update!(
         difficulty: rating,
         review_count: review_count + 1,
-        next_review_at: interval.from_now
+        next_review_at: intervals.fetch(rating).from_now
       )
     end
   end

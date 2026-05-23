@@ -21,7 +21,7 @@ class ReviewsController < ApplicationController
     increment_reviewed_count
 
     redirect_to review_path(review_params_for_redirect), notice: "Review saved."
-  rescue ActiveRecord::RecordNotFound
+  rescue Flashcard::CardNotDueError
     redirect_to review_path(review_params_for_redirect), alert: "This card is not due for review."
   rescue ArgumentError
     redirect_to review_path(review_params_for_redirect), alert: "Invalid review rating."
