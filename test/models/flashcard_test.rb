@@ -58,6 +58,29 @@ class FlashcardTest < ActiveSupport::TestCase
     end
   end
 
+  test "schedule_next_review raises CardNotDueError when next_review_at is in the future" do
+    future_card = flashcards(:future_review)
+
+    assert_raises(Flashcard::CardNotDueError) do
+      future_card.schedule_next_review!("good")
+    end
+  end
+
+  test "schedule_next_review does not change card when not due" do
+    future_card = flashcards(:future_review)
+    original_review_at = future_card.next_review_at
+    original_review_count = future_card.review_count
+
+    begin
+      future_card.schedule_next_review!("good")
+    rescue Flashcard::CardNotDueError
+      # expected
+    end
+
+    assert_equal original_review_at, future_card.reload.next_review_at
+    assert_equal original_review_count, future_card.review_count
+  end
+
   test "defaults story status to missing when story is blank" do
     flashcard = Flashcard.new(
       character: "新",

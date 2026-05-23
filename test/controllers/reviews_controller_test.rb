@@ -61,6 +61,12 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to review_url
   end
+
+  test "should redirect when review param is missing" do
+    patch review_flashcard_url(@flashcard)
+
+    assert_redirected_to review_url
+  end
   test "show displays remaining due count" do
     flashcards(:network).update!(next_review_at: 1.minute.ago)
     flashcards(:hsk_one).update!(next_review_at: 2.minutes.ago)
@@ -323,23 +329,17 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "1 remaining"
   end
 
-  test "show displays review compaetion after final card is reviewed" do
-    Flashcard.update_all(next_review_at: 1.day.from_now)
+  test "rejects rating for card with next_review_at in the future" do
+    future_card = flashcards(:future_review)
 
-    flashcard = flashcards(:network)
-    flashcard.update!(next_review_at: 1.minute.ago)
-
-    patch review_flashcard_path(flashcard),
-      params: {
-        review: {
-          rating: "good"
-        }
+    assert_no_difference -> { future_card.reload.review_count } do
+      patch review_flashcard_url(future_card), params: {
+        review: { rating: "good" }
       }
+    end
 
-    follow_redirect!
-
-    assert_response :success
-    assert_includes response.body, "Review session complete"
-    assert_includes response.body, "You reviewed 1 card"
+    assert_response :not_found
+    assert future_card.reload.next_review_at > Time.current
+    assert_equal "new", future_card.reload.difficulty
   end
 end
