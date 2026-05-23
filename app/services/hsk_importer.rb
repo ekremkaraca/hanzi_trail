@@ -7,7 +7,7 @@ class HskImporter
   end
 
   def call
-    records.each { |entry| import_entry(entry) }
+    Flashcard.transaction { records.each { |entry| import_entry(entry) } }
   end
 
   private
