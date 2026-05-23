@@ -16,8 +16,6 @@ class ReviewQueue
   attr_reader :scope
 
   def due_cards
-    scope
-      .due_for_review
-      .order(:next_review_at, :id)
+    scope.due_for_review
   end
 end
