@@ -42,3 +42,5 @@ Current security boundary:
 - Flashcard CRUD is disabled at controller level until authentication is added.
 - Review actions remain enabled for MVP study flow.
 - Imported and seeded cards are the current source of content.
+
+Speech synthesis quality depends on the browser and installed system voices.

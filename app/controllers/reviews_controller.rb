@@ -30,6 +30,12 @@ class ReviewsController < ApplicationController
     redirect_to review_path(review_params_for_redirect), alert: "Missing review parameters."
   end
 
+  def preferences
+    session[:show_pinyin] = params[:show_pinyin] == "1"
+
+    redirect_to review_path
+  end
+
   private
 
   def review_params

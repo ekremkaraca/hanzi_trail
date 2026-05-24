@@ -96,6 +96,14 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "data-review-target=\"showButton\""
   end
 
+  test "show wires speak button to review character" do
+    get review_url
+
+    assert_response :success
+    assert_includes response.body, "data-review-target=\"character\""
+    assert_includes response.body, "data-action=\"click->review#speak\""
+  end
+
   test "show renders review buttons that submit ratings to due card" do
     flashcards(:network).update!(next_review_at: 1.minute.ago)
 

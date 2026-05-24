@@ -16,23 +16,20 @@
       <% end %>
     </div>
 
+    <div class="review-mode-bar">
+      <%= link_to "All", review_path, class: review_mode_button_class(:all) %>
+      <%= link_to "HSK", review_path(source: "hsk"), class: review_mode_button_class(:hsk) %>
+      <%= link_to "Curated", review_path(source: "curated"), class: review_mode_button_class(:curated) %>
+      <%= link_to "Missing stories", review_path(story_status: "missing"), class: review_mode_button_class(:missing_stories) %>
+    </div>
+
     <% if @flashcard.present? %>
       <div
         class="review-card box"
         data-controller="review"
         data-action="keydown@window->review#handleKeydown"
       >
-        <div class="has-text-centered">
-          <div class="review-mode-bar">
-            <%= link_to "All", review_path, class: review_mode_button_class(:all) %>
-
-            <%= link_to "HSK", review_path(source: "hsk"), class: review_mode_button_class(:hsk) %>
-
-            <%= link_to "Curated", review_path(source: "curated"), class: review_mode_button_class(:curated) %>
-
-            <%= link_to "Missing stories", review_path(story_status: "missing"), class: review_mode_button_class(:missing_stories) %>
-          </div>
-
+        <div class="review-progress-area has-text-centered">
           <p class="review-progress-text">
             <%= review_progress_text(@reviewed_count, @remaining_due_count) %>
           </p>
@@ -40,48 +37,70 @@
           <% progress = review_progress_percentage(@reviewed_count, @total_review_count) %>
 
           <div class="review-progress" aria-label="Review progress: <%= progress %>%">
-            <div
-              class="review-progress-bar"
-              style="width: <%= progress %>%"
-            ></div>
+            <div class="review-progress-bar" style="width: <%= progress %>%"></div>
           </div>
+        </div>
 
-          <h2 class="review-character">
-            <%= @flashcard.character %>
-          </h2>
-
-          <button
-            type="button"
-            class="button is-link is-medium mt-5"
-            data-review-target="showButton"
-            data-action="click->review#toggleAnswer"
+        <div class="review-prompt has-text-centered">
+          <p
+            class="review-character has-text-weight-semibold"
+            data-review-target="character"
           >
-            Show answer
-          </button>
+            <%= @flashcard.character %>
+          </p>
+
+          <% if session[:show_pinyin] %>
+            <p class="review-question-pinyin has-text-grey-light">
+              <%= @flashcard.pinyin %>
+            </p>
+          <% end %>
+
+          <div class="review-primary-actions buttons is-centered mt-5">
+            <button
+              type="button"
+              class="button is-link is-medium"
+              data-review-target="showButton"
+              data-action="click->review#toggleAnswer"
+            >
+              Show answer
+            </button>
+
+            <button
+              type="button"
+              class="button is-dark"
+              data-action="click->review#speak"
+            >
+              🔊 Speak
+            </button>
+          </div>
         </div>
 
         <div data-review-target="answer" hidden>
           <hr class="review-divider">
 
-          <div class="review-answer has-text-centered">
-            <p>
-              <strong>Pinyin:</strong>
-              <span class="has-text-grey-light"><%= @flashcard.pinyin %></span>
-            </p>
+          <div class="review-answer">
+            <div class="review-answer-summary has-text-centered">
+              <p class="subtitle mb-2">
+                <%= @flashcard.pinyin %>
+              </p>
 
-            <p>
-              <strong>Meaning:</strong>
-              <span class="has-text-grey-light"><%= @flashcard.meaning %></span>
-            </p>
+              <p>
+                <strong>Meaning:</strong>
+                <span class="has-text-grey-light"><%= @flashcard.meaning %></span>
+              </p>
+            </div>
 
             <% if @flashcard.story.present? %>
-              <div class="content review-story">
+              <div class="content review-story mt-5">
                 <%= simple_format(@flashcard.story) %>
               </div>
             <% end %>
           </div>
 
-          <div class="review-buttons buttons is-centered mt-6">
+          <div
+            class="review-buttons buttons is-centered mt-6"
+            data-review-target="actions"
+          >
             <%= review_buttons_for(@flashcard) %>
           </div>
 
@@ -89,6 +108,17 @@
             Use 1 · 2 · 3 · 4 keys for quick review
           </p>
         </div>
+      </div>
+
+      <div class="review-options box">
+        <%= form_with url: "/review/preferences", method: :patch, class: "review-preferences-form" do |form| %>
+          <label class="checkbox">
+            <%= form.check_box :show_pinyin, checked: session[:show_pinyin] %>
+            Show pinyin before answer
+          </label>
+
+          <%= form.submit "Save", class: "button is-small is-light" %>
+        <% end %>
       </div>
     <% else %>
       <div class="review-empty-state">
