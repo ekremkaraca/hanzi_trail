@@ -87,18 +87,13 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: hanzi_trail_production
-    username: hanzi_trail
-    password: <%= ENV["HANZI_TRAIL_DATABASE_PASSWORD"] %>
+    url: <%= ENV["DATABASE_URL"] %>
   cache:
     <<: *primary_production
-    database: hanzi_trail_production_cache
     migrations_paths: db/cache_migrate
   queue:
     <<: *primary_production
-    database: hanzi_trail_production_queue
     migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
-    database: hanzi_trail_production_cable
     migrations_paths: db/cable_migrate

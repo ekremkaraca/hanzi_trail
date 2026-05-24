@@ -1,7 +1,5 @@
 source "https://rubygems.org"
 
-ruby File.read(".ruby-version").strip
-
 gem "rails", "~> 8.1.3"
 gem "propshaft"
 gem "pg", "~> 1.1"
@@ -28,6 +26,7 @@ end
 
 group :development do
   gem "web-console"
+  gem "dockerfile-rails"
 end
 
 group :test do
