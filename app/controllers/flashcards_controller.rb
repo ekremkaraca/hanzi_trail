@@ -65,7 +65,11 @@ class FlashcardsController < ApplicationController
         :pinyin,
         :meaning,
         :story,
-        :category
+        :category,
+        :components,
+        :literal_meaning,
+        :mnemonic,
+        :usage_note
       )
   end
 end

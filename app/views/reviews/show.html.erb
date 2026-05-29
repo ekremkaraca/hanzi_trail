@@ -79,20 +79,64 @@
           <hr class="review-divider">
 
           <div class="review-answer">
-            <div class="review-answer-summary has-text-centered">
-              <p class="subtitle mb-2">
-                <%= @flashcard.pinyin %>
-              </p>
+            <div class="review-hero">
+              <div class="review-hero-character">
+                <h2 data-review-target="character"><%= @flashcard.character %></h2>
+                <p class="review-hero-pinyin"><%= @flashcard.pinyin %></p>
+              </div>
 
-              <p>
-                <strong>Meaning:</strong>
-                <span class="has-text-grey-light"><%= @flashcard.meaning %></span>
-              </p>
+              <div class="review-hero-meaning">
+                <span class="eyebrow">Meaning</span>
+                <p class="review-meaning-text"><%= @flashcard.meaning %></p>
+              </div>
             </div>
 
             <% if @flashcard.story.present? %>
-              <div class="content review-story mt-5">
-                <%= simple_format(@flashcard.story) %>
+              <div class="review-story-panel">
+                <span class="eyebrow">Story</span>
+                <div class="content">
+                  <%= simple_format(@flashcard.story) %>
+                </div>
+              </div>
+            <% end %>
+
+            <% if @flashcard.components.present?
+                || @flashcard.literal_meaning.present?
+                || @flashcard.mnemonic.present?
+                || @flashcard.usage_note.present?
+                 %>
+              <div class="review-understanding">
+                <h3>Character understanding</h3>
+
+                <div class="review-understanding-grid">
+                  <% if @flashcard.components.present? %>
+                    <div class="review-understanding-note">
+                      <h4>Components</h4>
+                      <%= simple_format(@flashcard.components) %>
+                    </div>
+                  <% end %>
+
+                  <% if @flashcard.literal_meaning.present? %>
+                    <div class="review-understanding-note">
+                      <h4>Literal meaning</h4>
+                      <%= simple_format(@flashcard.literal_meaning) %>
+                    </div>
+                  <% end %>
+
+                  <% if @flashcard.mnemonic.present? %>
+                    <div class="review-understanding-note">
+                      <h4>Memory hook</h4>
+                      <%= simple_format(@flashcard.mnemonic) %>
+                    </div>
+                  <% end %>
+
+                  <% if @flashcard.usage_note.present? %>
+                    <div class="review-understanding-note">
+                      <h4>Usage note</h4>
+                      <%= simple_format(@flashcard.usage_note) %>
+                    </div>
+                  <% end %>
+                </div>
               </div>
             <% end %>
           </div>

@@ -45,6 +45,46 @@
     </div>
   </div>
 
+  <div class="field">
+    <%= form.label :components, class: "label" %>
+    <div class="control">
+      <%= form.text_area :components,
+            class: "textarea",
+            rows: 3,
+            placeholder: "网 = net; 络 = connection/thread"  %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :literal_meaning, class: "label" %>
+    <div class="control">
+      <%= form.text_area :literal_meaning,
+            class: "textarea",
+            rows: 2,
+            placeholder: "net + connection"  %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :mnemonic, class: "label" %>
+    <div class="control">
+      <%= form.text_area :mnemonic,
+            class: "textarea",
+            rows: 3,
+            placeholder: "Imagine cables forming a giant net." %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :usage_note, class: "label" %>
+    <div class="control">
+      <%= form.text_area :usage_note,
+            class: "textarea",
+            rows: 3,
+            placeholder: "Used in words related to internet, networking, and infrastructure." %>
+    </div>
+  </div>
+
   <div class="field is-grouped">
     <div class="control">
       <%= form.submit class: "button is-primary" %>

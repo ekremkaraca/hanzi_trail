@@ -64,6 +64,46 @@
         </div>
       </div>
 
+      <% if @flashcard.components.present?
+          || @flashcard.literal_meaning.present?
+          || @flashcard.mnemonic.present?
+          || @flashcard.usage_note.present? %>
+
+        <section class="flashcard-understanding">
+          <h2>Character understanding</h2>
+
+          <div class="flashcard-understanding-grid">
+            <% if @flashcard.components.present? %>
+              <div class="flashcard-note">
+                <h3>Components</h3>
+                <%= simple_format(@flashcard.components) %>
+              </div>
+            <% end %>
+
+            <% if @flashcard.literal_meaning.present? %>
+              <div class="flashcard-note">
+                <h3>Literal meaning</h3>
+                <%= simple_format(@flashcard.literal_meaning) %>
+              </div>
+            <% end %>
+
+            <% if @flashcard.mnemonic.present? %>
+              <div class="flashcard-note">
+                <h3>Memory hook</h3>
+                <%= simple_format(@flashcard.mnemonic) %>
+              </div>
+            <% end %>
+
+            <% if @flashcard.usage_note.present? %>
+              <div class="flashcard-note">
+                <h3>Usage note</h3>
+                <%= simple_format(@flashcard.usage_note) %>
+              </div>
+            <% end %>
+          </div>
+        </section>
+      <% end %>
+
       <div class="buttons mt-5">
         <%= link_to "Back", flashcards_path, class: "button is-light" %>
       </div>
