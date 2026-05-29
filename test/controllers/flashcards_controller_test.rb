@@ -240,4 +240,17 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".flashcard-character-link", text: short_story_card.character
     assert_select ".flashcard-character-link", text: long_story_card.character, count: 0
   end
+
+  test "index shows empty state when no short stories exist" do
+    flashcards(:network).update!(story: "A" * 81)
+    flashcards(:algorithm).update!(story: "A" * 81)
+    flashcards(:future_review).update!(story: "A" * 81)
+    flashcards(:overdue_review).update!(story: "A" * 81)
+
+    get flashcards_path, params: { story_status: "1" }
+
+    assert_response :success
+    assert_includes response.body, "No short stories found."
+    assert_select "a[href=?]", flashcards_path, text: "Browse all flashcards"
+  end
 end
