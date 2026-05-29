@@ -29,6 +29,7 @@ class HskImporter
     return if flashcard.persisted?
 
     form = entry.fetch("forms").first
+    raise "Entry '#{character}' has an empty forms array" if form.nil?
 
     flashcard.assign_attributes(
       pinyin: form.fetch("transcriptions").fetch("pinyin"),

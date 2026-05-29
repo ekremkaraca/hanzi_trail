@@ -93,6 +93,16 @@ class HskImporterTest < ActiveSupport::TestCase
     assert_raises(KeyError) { importer.call }
   end
 
+  test "raises descriptively when entry has an empty forms array" do
+    importer = HskImporter.new(
+      path: Rails.root.join("test/fixtures/files/hsk_empty_forms.json"),
+      hsk_level: "old-1"
+    )
+
+    error = assert_raises(RuntimeError) { importer.call }
+    assert_match(/empty forms array/, error.message)
+  end
+
   test "does not create partial records on import failure" do
     importer = HskImporter.new(
       path: Rails.root.join("test/fixtures/files/hsk_missing_keys.json"),
