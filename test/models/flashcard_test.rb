@@ -203,4 +203,18 @@ class FlashcardTest < ActiveSupport::TestCase
 
     assert_not flashcard.short_story?
   end
+
+  test "schedule_next_review creates review attempt" do
+    card = flashcards(:network)
+    card.update!(next_review_at: 1.minute.ago)
+
+    assert_difference("ReviewAttempt.count", 1) do
+      card.schedule_next_review!("good")
+    end
+
+    attempt = ReviewAttempt.last
+
+    assert_equal card, attempt.flashcard
+    assert_equal "good", attempt.rating
+  end
 end

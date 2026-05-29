@@ -10,6 +10,7 @@ class ReviewsController < ApplicationController
     @reviewed_count = reviewed_count
     @review_filter_params = review_params_for_redirect
     @total_review_count = @reviewed_count + @remaining_due_count
+    @reviewed_today_count = ReviewAttempt.today.count
   end
 
   def update

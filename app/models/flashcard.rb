@@ -6,6 +6,8 @@ class Flashcard < ApplicationRecord
   SOURCES = %w[curated hsk].freeze
   STORY_STATUSES = %w[missing draft curated].freeze
 
+  has_many :review_attempts, dependent: :destroy
+
   validates :character, presence: true, uniqueness: true
   validates :pinyin, presence: true
   validates :meaning, presence: true
@@ -71,6 +73,11 @@ class Flashcard < ApplicationRecord
         difficulty: rating,
         review_count: review_count + 1,
         next_review_at: intervals.fetch(rating).from_now
+      )
+
+      review_attempts.create!(
+        rating: rating,
+        reviewed_at: Time.current
       )
     end
   end

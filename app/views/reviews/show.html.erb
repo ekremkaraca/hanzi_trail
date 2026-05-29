@@ -32,6 +32,8 @@
         <div class="review-progress-area has-text-centered">
           <p class="review-progress-text">
             <%= review_progress_text(@reviewed_count, @remaining_due_count) %>
+            <span class="has-text-grey-light">Reviewed today</span>
+            <strong><%= @reviewed_today_count %></strong>
           </p>
 
           <% progress = review_progress_percentage(@reviewed_count, @total_review_count) %>
