@@ -1,0 +1,4 @@
+one:
+  flashcard: network
+  rating: good
+  reviewed_at: <%= 1.minute.ago %>

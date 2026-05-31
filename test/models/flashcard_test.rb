@@ -217,4 +217,232 @@ class FlashcardTest < ActiveSupport::TestCase
     assert_equal card, attempt.flashcard
     assert_equal "good", attempt.rating
   end
+
+  test "rejects overly long story" do
+    card = flashcards(:network)
+    card.story = "x" * 2_001
+
+    assert_not card.valid?
+    assert_includes card.errors[:story], "is too long (maximum is 2000 characters)"
+  end
+
+  test "schedule_next_review with again sets 1 minute interval" do
+    freeze_time do
+      @default_card.update!(next_review_at: 1.minute.ago)
+      @default_card.schedule_next_review!("again")
+      assert_in_delta 1.minute.from_now, @default_card.reload.next_review_at, 1.second
+    end
+  end
+
+  test "schedule_next_review with hard sets 1 day interval" do
+    freeze_time do
+      @default_card.update!(next_review_at: 1.minute.ago)
+      @default_card.schedule_next_review!("hard")
+      assert_in_delta 1.day.from_now, @default_card.reload.next_review_at, 1.second
+    end
+  end
+
+  test "schedule_next_review with good sets 3 day interval" do
+    freeze_time do
+      @default_card.update!(next_review_at: 1.minute.ago)
+      @default_card.schedule_next_review!("good")
+      assert_in_delta 3.days.from_now, @default_card.reload.next_review_at, 1.second
+    end
+  end
+
+  test "schedule_next_review with easy sets 7 day interval" do
+    freeze_time do
+      @default_card.update!(next_review_at: 1.minute.ago)
+      @default_card.schedule_next_review!("easy")
+      assert_in_delta 7.days.from_now, @default_card.reload.next_review_at, 1.second
+    end
+  end
+
+  test "by_source scope filters by source" do
+    curated = flashcards(:network)
+    hsk = flashcards(:hsk_one)
+
+    assert_includes Flashcard.by_source("curated"), curated
+    refute_includes Flashcard.by_source("curated"), hsk
+  end
+
+  test "by_source scope returns all when blank" do
+    assert_equal Flashcard.count, Flashcard.by_source("").count
+  end
+
+  test "by_hsk_level scope filters by hsk level" do
+    hsk_one = flashcards(:hsk_one)
+    curated = flashcards(:network)
+
+    assert_includes Flashcard.by_hsk_level("old-1"), hsk_one
+    refute_includes Flashcard.by_hsk_level("old-1"), curated
+  end
+
+  test "by_hsk_level scope returns all when blank" do
+    assert_equal Flashcard.count, Flashcard.by_hsk_level("").count
+  end
+
+  test "by_category scope filters by category" do
+    technical = flashcards(:network)
+    education = flashcards(:overdue_review)
+
+    assert_includes Flashcard.by_category("technical"), technical
+    refute_includes Flashcard.by_category("technical"), education
+  end
+
+  test "by_category scope returns all when blank" do
+    assert_equal Flashcard.count, Flashcard.by_category("").count
+  end
+
+  test "by_story_status scope filters by story status" do
+    @default_card.update!(story_status: "curated")
+    hsk = flashcards(:hsk_one)
+    hsk.update!(story_status: "missing")
+
+    assert_includes Flashcard.by_story_status("curated"), @default_card
+    refute_includes Flashcard.by_story_status("curated"), hsk
+  end
+
+  test "by_story_status scope returns all when blank" do
+    assert_equal Flashcard.count, Flashcard.by_story_status("").count
+  end
+
+  test "missing_story scope returns cards with missing story" do
+    @default_card.update!(story_status: "curated")
+    hsk = flashcards(:hsk_one)
+    hsk.update!(story_status: "missing")
+
+    assert_includes Flashcard.missing_story, hsk
+    refute_includes Flashcard.missing_story, @default_card
+  end
+
+  test "draft_story scope returns cards with draft story" do
+    @default_card.update!(story_status: "draft")
+    hsk = flashcards(:hsk_one)
+    hsk.update!(story_status: "missing")
+
+    assert_includes Flashcard.draft_story, @default_card
+    refute_includes Flashcard.draft_story, hsk
+  end
+
+  test "curated_story scope returns cards with curated story" do
+    @default_card.update!(story_status: "curated")
+    hsk = flashcards(:hsk_one)
+    hsk.update!(story_status: "missing")
+
+    assert_includes Flashcard.curated_story, @default_card
+    refute_includes Flashcard.curated_story, hsk
+  end
+
+  test "short_story scope returns cards with short non-blank stories" do
+    @default_card.update!(story: "Short story.")
+    long = flashcards(:algorithm)
+    long.update!(story: "x" * 80)
+
+    assert_includes Flashcard.short_story, @default_card
+    refute_includes Flashcard.short_story, long
+  end
+
+  test "short_story scope excludes blank and nil stories" do
+    flashcards(:hsk_one).update!(story: "")
+    flashcards(:hsk_two).update!(story: nil)
+    flashcards(:network).update!(story: "x" * 80)
+    flashcards(:algorithm).update!(story: "x" * 80)
+    flashcards(:future_review).update!(story: "x" * 80)
+    flashcards(:overdue_review).update!(story: "x" * 80)
+
+    assert_empty Flashcard.short_story
+  end
+
+  test "rejects invalid source" do
+    card = flashcards(:network)
+    card.source = "invalid"
+
+    assert_not card.valid?
+    assert_includes card.errors[:source], "is not included in the list"
+  end
+
+  test "rejects invalid difficulty" do
+    card = flashcards(:network)
+    card.difficulty = "impossible"
+
+    assert_not card.valid?
+    assert_includes card.errors[:difficulty], "is not included in the list"
+  end
+
+  test "rejects negative review count" do
+    card = flashcards(:network)
+    card.review_count = -1
+
+    assert_not card.valid?
+    assert_includes card.errors[:review_count], "must be greater than or equal to 0"
+  end
+
+  test "set_story_status_from_story sets curated when story present" do
+    card = flashcards(:hsk_one)
+    card.assign_attributes(story: "A new story.", story_status: nil)
+
+    card.send(:set_story_status_from_story)
+
+    assert_equal "curated", card.story_status
+  end
+
+  test "set_story_status_from_story sets missing when story blank" do
+    card = flashcards(:network)
+    card.assign_attributes(story: nil, story_status: nil)
+
+    card.send(:set_story_status_from_story)
+
+    assert_equal "missing", card.story_status
+  end
+
+  test "set_story_status_from_story does not override existing status when story unchanged" do
+    card = flashcards(:network)
+    existing_story = card.story
+    card.assign_attributes(story: existing_story, story_status: "draft")
+
+    card.send(:set_story_status_from_story)
+
+    assert_equal "draft", card.story_status
+  end
+
+  test "rejects overly long components" do
+    card = flashcards(:network)
+    card.components = "x" * 1_001
+
+    assert_not card.valid?
+    assert_includes card.errors[:components], "is too long (maximum is 1000 characters)"
+  end
+
+  test "rejects overly long literal meaning" do
+    card = flashcards(:network)
+    card.literal_meaning = "x" * 501
+
+    assert_not card.valid?
+    assert_includes card.errors[:literal_meaning], "is too long (maximum is 500 characters)"
+  end
+
+  test "rejects overly long mnemonic" do
+    card = flashcards(:network)
+    card.mnemonic = "x" * 1_001
+
+    assert_not card.valid?
+    assert_includes card.errors[:mnemonic], "is too long (maximum is 1000 characters)"
+  end
+
+  test "rejects overly long usage note" do
+    card = flashcards(:network)
+    card.usage_note = "x" * 1_001
+
+    assert_not card.valid?
+    assert_includes card.errors[:usage_note], "is too long (maximum is 1000 characters)"
+  end
+
+  test "rejects overly long meaning" do
+    card = flashcards(:network)
+    card.meaning = "x" * 501
+
+    assert_not card.valid?
+    assert_includes card.errors[:meaning], "is too long (maximum is 500 characters)"
+  end
 end

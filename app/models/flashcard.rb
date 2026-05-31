@@ -16,10 +16,18 @@ class Flashcard < ApplicationRecord
   validates :difficulty, presence: true, inclusion: { in: DIFFICULTY_LEVELS }
   validates :story_status, presence: true, inclusion: { in: STORY_STATUSES }
   validates :review_count, numericality: { greater_than_or_equal_to: 0 }
+  validates :meaning, length: { maximum: 500 }
+  validates :story, length: { maximum: 2_000 }, allow_blank: true
+  validates :components, length: { maximum: 1_000 }, allow_blank: true
+  validates :literal_meaning, length: { maximum: 500 }, allow_blank: true
+  validates :mnemonic, length: { maximum: 1_000 }, allow_blank: true
+  validates :usage_note, length: { maximum: 1_000 }, allow_blank: true
+
 
   with_options on: :create do
     before_validation :set_initial_review_time
     before_validation :set_default_story_status
+    before_validation :set_story_status_from_story
   end
 
   scope(:due_for_review, -> {
@@ -97,6 +105,12 @@ class Flashcard < ApplicationRecord
   def short_story?
     # Under 80 chars is probably too short to be a useful mnemonic/story.
     story.to_s.length.positive? && story.to_s.length < 80
+  end
+
+  def set_story_status_from_story
+    return if story_status.present? && !will_save_change_to_story?
+
+    self.story_status = story.present? ? "curated" : "missing"
   end
 
   private

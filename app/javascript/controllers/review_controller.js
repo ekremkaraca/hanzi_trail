@@ -6,29 +6,22 @@ export default class extends Controller {
 
   showAnswer() {
     this.answerTarget.hidden = false;
-    this.element.classList.add("is-answer-visible");
-
-    if (this.hasShowButtonTarget) {
-      this.showButtonTarget.textContent = "Hide answer";
-    }
+    this.answerVisible = true;
+    this.showButtonTarget.textContent = "Hide answer";
   }
 
   hideAnswer() {
     this.answerTarget.hidden = true;
-    this.element.classList.remove("is-answer-visible");
-
-    if (this.hasShowButtonTarget) {
-      this.showButtonTarget.textContent = "Show answer";
-    }
+    this.answerVisible = false;
+    this.showButtonTarget.textContent = "Show answer";
   }
 
   toggleAnswer() {
-    this.answerVisible = !this.answerVisible;
-
-    this.answerTarget.hidden = !this.answerVisible;
-    this.showButtonTarget.textContent = this.answerVisible
-      ? "Hide answer"
-      : "Show answer";
+    if (this.answerVisible) {
+      this.hideAnswer();
+    } else {
+      this.showAnswer();
+    }
   }
 
   handleKeydown(event) {
