@@ -7,6 +7,7 @@ class StatsController < ApplicationController
       .count
 
     @recent_attempts = ReviewAttempt
+      .includes(:flashcards)
       .recent
       .limit(20)
   end
