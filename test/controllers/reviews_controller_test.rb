@@ -350,4 +350,20 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert future_card.reload.next_review_at > Time.current
     assert_equal "new", future_card.reload.difficulty
   end
+
+  test "saving preferences preserves filters" do
+    patch review_preferences_path, params: {
+      show_pinyin: "1",
+      source: "hsk",
+      story_status: "missing"
+    }
+
+    assert_redirected_to(
+      review_path(
+        source: "hsk",
+        story_status: "missing"
+      )
+    )
+
+  end
 end

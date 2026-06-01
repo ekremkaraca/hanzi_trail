@@ -34,7 +34,11 @@ class ReviewsController < ApplicationController
   def preferences
     session[:show_pinyin] = params[:show_pinyin] == "1"
 
-    redirect_to review_path
+    redirect_to review_path(
+      source: params[:source],
+      category: params[:category],
+      story_status: params[:story_status]
+    )
   end
 
   private

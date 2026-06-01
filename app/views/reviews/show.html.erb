@@ -162,6 +162,9 @@
             <%= form.check_box :show_pinyin, checked: session[:show_pinyin] %>
             Show pinyin before answer
           </label>
+          <%= hidden_field_tag :source, params[:source] %>
+          <%= hidden_field_tag :category, params[:category] %>
+          <%= hidden_field_tag :story_status, params[:story_status] %>
 
           <%= form.submit "Save", class: "button is-small is-light" %>
         <% end %>

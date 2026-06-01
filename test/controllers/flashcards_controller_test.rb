@@ -253,4 +253,10 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "No short stories found."
     assert_select "a[href=?]", flashcards_path, text: "Browse all flashcards"
   end
+
+  test "shows recent review attempts" do
+    get flashcard_path(flashcards(:network))
+
+    assert_response :success
+  end
 end
