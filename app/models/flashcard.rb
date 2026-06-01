@@ -107,12 +107,6 @@ class Flashcard < ApplicationRecord
     story.to_s.length.positive? && story.to_s.length < 80
   end
 
-  def set_story_status_from_story
-    return if story_status.present? && !will_save_change_to_story?
-
-    self.story_status = story.present? ? "curated" : "missing"
-  end
-
   private
 
   def set_initial_review_time
@@ -125,5 +119,11 @@ class Flashcard < ApplicationRecord
     elsif story_status.blank? || (story_status == "missing" && !will_save_change_to_story_status?)
       self.story_status = "curated"
     end
+  end
+
+  def set_story_status_from_story
+    return if story_status.present? && !will_save_change_to_story?
+
+    self.story_status = story.present? ? "curated" : "missing"
   end
 end
