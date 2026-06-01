@@ -1,0 +1,51 @@
+<section class="section stats-page">
+  <div class="container is-max-widescreen">
+    <h1 class="stats-heading">Stats</h1>
+
+    <div class="stats-cards">
+      <div class="stats-card">
+        <span class="stats-card-value"><%= @today_count %></span>
+        <span class="stats-card-label">Reviews today</span>
+      </div>
+
+      <div class="stats-card">
+        <span class="stats-card-value"><%= @rating_breakdown.values.sum %></span>
+        <span class="stats-card-label">Total reviews</span>
+      </div>
+    </div>
+
+    <div class="stats-section">
+      <h2 class="stats-subheading">Rating breakdown</h2>
+
+      <div class="stats-bars">
+        <% %w[again hard good easy].each do |rating| %>
+          <div class="stats-bar-row">
+            <span class="stats-bar-label"><%= rating %></span>
+            <div class="stats-bar-track">
+              <div class="<%= bar_fill_class(rating) %>" style="--bar-width: <%= rating_bar_width(rating, @rating_breakdown) %>"></div>
+            </div>
+            <span class="stats-bar-count"><%= @rating_breakdown[rating] || 0 %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="stats-section">
+      <h2 class="stats-subheading">Recent reviews</h2>
+
+      <div class="stats-list">
+        <% if @recent_attempts.any? %>
+          <% @recent_attempts.each do |attempt| %>
+            <div class="stats-list-item">
+              <span class="stats-list-character"><%= attempt.flashcard.character %></span>
+              <span class="<%= rating_badge_class(attempt.rating) %>"><%= attempt.rating %></span>
+              <span class="stats-list-time"><%= time_ago_in_words(attempt.reviewed_at) %> ago</span>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="stats-empty">No reviews yet.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</section>

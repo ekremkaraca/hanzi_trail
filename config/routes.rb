@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
   resources :flashcards
-  resource :review, only: :show
+  with_options only: :show do
+    resource :review
+    resource :stats
+  end
   patch "review/preferences", to: "reviews#preferences"
   patch "review/:flashcard_id", to: "reviews#update", as: :review_flashcard
 
