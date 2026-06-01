@@ -1,0 +1,129 @@
+<section class="section character-entry-page">
+  <div class="container is-max-widescreen">
+    <div class="character-entry-card">
+      <div class="character-entry-hero">
+        <div class="character-entry-symbol">
+          <div class="character-entry-badges">
+            <span class="tag is-link is-light">Character</span>
+            <span class="tag is-dark"><%= pluralize(@character_entry.flashcards_count, "word") %></span>
+          </div>
+
+          <h1><%= @character_entry.character %></h1>
+          <p><%= @character_entry.pinyin.presence || "—" %></p>
+        </div>
+
+        <div class="character-entry-summary">
+          <span class="eyebrow">Meaning</span>
+          <p class="character-entry-meaning"><%= @character_entry.meaning.presence || "—" %></p>
+
+          <div class="character-entry-summary-grid">
+            <div>
+              <span>Pinyin</span>
+              <strong><%= @character_entry.pinyin.presence || "—" %></strong>
+            </div>
+
+            <div>
+              <span>Radical</span>
+              <strong><%= @character_entry.radical.presence || "—" %></strong>
+            </div>
+
+            <div>
+              <span>Used in</span>
+              <strong><%= pluralize(@character_entry.flashcards_count, "word") %></strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <% if @character_entry.notes.present? %>
+        <div class="character-entry-notes-panel">
+          <span class="eyebrow">Notes</span>
+          <div class="content">
+            <%= simple_format(@character_entry.notes) %>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="character-entry-detail-grid">
+        <div>
+          <span>Pinyin</span>
+          <strong><%= @character_entry.pinyin.presence || "—" %></strong>
+        </div>
+
+        <div>
+          <span>Meaning</span>
+          <strong><%= @character_entry.meaning.presence || "—" %></strong>
+        </div>
+
+        <div>
+          <span>Radical</span>
+          <strong><%= @character_entry.radical.presence || "—" %></strong>
+        </div>
+
+        <div>
+          <span>Used in</span>
+          <strong><%= pluralize(@character_entry.flashcards_count, "word") %></strong>
+        </div>
+      </div>
+
+      <% if @flashcards.any? %>
+        <section class="character-entry-characters">
+          <h2>Appears in</h2>
+
+          <div class="character-entry-word-list">
+            <% @flashcards.each do |flashcard| %>
+              <article class="character-entry-word-card">
+                <div class="character-entry-word-head">
+                  <%= link_to flashcard.character, flashcard_path(flashcard), class: "character-entry-word-character" %>
+                  <p class="character-entry-word-meaning"><%= flashcard.meaning %></p>
+                </div>
+
+                <div class="character-entry-word-meta">
+                  <% if flashcard.pinyin.present? %>
+                    <span><%= flashcard.pinyin %></span>
+                  <% end %>
+
+                  <% if flashcard.category.present? %>
+                    <span><%= flashcard.category %></span>
+                  <% end %>
+
+                  <% if flashcard.hsk_level.present? %>
+                    <span>HSK <%= flashcard.hsk_level %></span>
+                  <% end %>
+                </div>
+
+                <div class="character-link-grid">
+                  <% flashcard.flashcard_characters.includes(:character_entry).order(:position).each do |link| %>
+                    <%= link_to link.character_entry.character,
+                                character_entry_path(link.character_entry),
+                                class: "character-link-card #{'is-active' if link.character_entry == @character_entry}" %>
+                  <% end %>
+                </div>
+              </article>
+            <% end %>
+          </div>
+        </section>
+      <% else %>
+        <p class="character-entry-empty">No flashcards use this character yet.</p>
+      <% end %>
+
+      <% if @related_character_entries.any? %>
+        <section class="character-entry-related">
+          <h2>Related characters</h2>
+
+          <div class="character-link-grid">
+            <% @related_character_entries.each do |entry| %>
+              <%= link_to entry.character,
+                          character_entry_path(entry),
+                          class: "character-link-card" %>
+            <% end %>
+          </div>
+        </section>
+      <% end %>
+
+      <div class="buttons mt-5">
+        <%= link_to "Back to review", review_path, class: "button is-light" %>
+      </div>
+    </div>
+  </div>
+</section>

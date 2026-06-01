@@ -113,7 +113,10 @@
               <% entry = link.character_entry %>
 
               <div class="character-link-card">
-                <span class="character-link-symbol"><%= entry.character %></span>
+                <span class="character-link-symbol">
+                    <%= link_to entry.character,
+                            character_entry_path(entry) %>
+                </span>
 
                 <% if entry.pinyin.present? %>
                   <span><%= entry.pinyin %></span>
