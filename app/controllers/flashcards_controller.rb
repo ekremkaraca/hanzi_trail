@@ -11,7 +11,7 @@ class FlashcardsController < ApplicationController
       .by_hsk_level(params[:hsk_level])
       .by_category(params[:category])
 
-    if params[:story_status] == "1"
+    if params[:story_status] == "short"
       @flashcards = @flashcards.short_story
     else
       @flashcards = @flashcards.by_story_status(params[:story_status])

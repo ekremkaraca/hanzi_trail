@@ -29,7 +29,7 @@
           <%= link_to "Missing stories", flashcards_path(story_status: "missing"), class: "button is-warning is-light" %>
           <%= link_to "Draft stories", flashcards_path(story_status: "draft"), class: "button is-info is-light" %>
           <%= link_to "Curated stories", flashcards_path(story_status: "curated"), class: "button is-success is-light" %>
-          <%= link_to "Short stories", flashcards_path(story_status: "1"), class: "button is-light" %>
+          <%= link_to "Short stories", flashcards_path(story_status: "short"), class: "button is-light" %>
         </div>
       </div>
       <%= form_with url: flashcards_path, method: :get, local: true do |form| %>
