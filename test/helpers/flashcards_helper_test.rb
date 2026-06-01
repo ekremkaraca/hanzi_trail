@@ -77,7 +77,7 @@ class FlashcardsHelperTest < ActionView::TestCase
   end
 
   test "flashcards_empty_title for short story filter" do
-    params[:story_status] = "1"
+    params[:story_status] = "short"
 
     assert_equal "No short stories found.", flashcards_empty_title
   end

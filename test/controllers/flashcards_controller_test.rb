@@ -234,7 +234,7 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
       story: "This is a longer story that should not be considered short because it has enough explanatory detail."
     )
 
-    get flashcards_path, params: { story_status: "1" }
+    get flashcards_path, params: { story_status: "short" }
 
     assert_response :success
     assert_select ".flashcard-character-link", text: short_story_card.character
@@ -247,7 +247,7 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     flashcards(:future_review).update!(story: "A" * 81)
     flashcards(:overdue_review).update!(story: "A" * 81)
 
-    get flashcards_path, params: { story_status: "1" }
+    get flashcards_path, params: { story_status: "short" }
 
     assert_response :success
     assert_includes response.body, "No short stories found."

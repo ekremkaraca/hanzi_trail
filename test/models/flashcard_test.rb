@@ -378,30 +378,12 @@ class FlashcardTest < ActiveSupport::TestCase
     assert_includes card.errors[:review_count], "must be greater than or equal to 0"
   end
 
-  test "set_story_status_from_story sets curated when story present" do
-    card = flashcards(:hsk_one)
-    card.assign_attributes(story: "A new story.", story_status: nil)
-
-    card.send(:set_story_status_from_story)
-
-    assert_equal "curated", card.story_status
-  end
-
-  test "set_story_status_from_story sets missing when story blank" do
-    card = flashcards(:network)
-    card.assign_attributes(story: nil, story_status: nil)
-
-    card.send(:set_story_status_from_story)
-
-    assert_equal "missing", card.story_status
-  end
-
-  test "set_story_status_from_story does not override existing status when story unchanged" do
+  test "sync_story_status does not override existing status when story unchanged" do
     card = flashcards(:network)
     existing_story = card.story
     card.assign_attributes(story: existing_story, story_status: "draft")
 
-    card.send(:set_story_status_from_story)
+    card.send(:sync_story_status)
 
     assert_equal "draft", card.story_status
   end

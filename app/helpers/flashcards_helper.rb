@@ -25,7 +25,7 @@ module FlashcardsHelper
     return "No draft stories found." if params[:story_status] == "draft"
     return "No curated stories found." if params[:story_status] == "curated"
     return "No missing stories found." if params[:story_status] == "missing"
-    return "No short stories found." if params[:story_status] == "1"
+    return "No short stories found." if params[:story_status] == "short"
 
     "No flashcards matched your filter."
   end

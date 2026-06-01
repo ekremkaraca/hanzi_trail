@@ -23,12 +23,8 @@ class Flashcard < ApplicationRecord
   validates :mnemonic, length: { maximum: 1_000 }, allow_blank: true
   validates :usage_note, length: { maximum: 1_000 }, allow_blank: true
 
-
-  with_options on: :create do
-    before_validation :set_initial_review_time
-    before_validation :set_default_story_status
-    before_validation :set_story_status_from_story
-  end
+  before_validation :set_initial_review_time, on: :create
+  before_validation :sync_story_status, on: %i[ create update ]
 
   scope(:due_for_review, -> {
     where("next_review_at <= ?", Time.current).order(:next_review_at, :id)
@@ -113,16 +109,9 @@ class Flashcard < ApplicationRecord
     self.next_review_at ||= Time.current
   end
 
-  def set_default_story_status
-    if story.blank?
-      self.story_status = "missing"
-    elsif story_status.blank? || (story_status == "missing" && !will_save_change_to_story_status?)
-      self.story_status = "curated"
-    end
-  end
-
-  def set_story_status_from_story
+  def sync_story_status
     return if story_status.present? && !will_save_change_to_story?
+    return if will_save_change_to_story_status?
 
     self.story_status = story.present? ? "curated" : "missing"
   end
