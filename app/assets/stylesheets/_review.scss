@@ -222,6 +222,32 @@
   }
 }
 
+/* Character strip */
+.review-character-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--hanzi-border);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.025);
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    height: 2.25rem;
+    padding: 0 0.5rem;
+    border-radius: 0.5rem;
+    background: rgba(79, 124, 255, 0.12);
+    color: #ffffff;
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+}
+
 /* Progress & buttons */
 .review-progress {
   overflow: hidden;

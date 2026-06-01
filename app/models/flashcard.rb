@@ -7,6 +7,8 @@ class Flashcard < ApplicationRecord
   STORY_STATUSES = %w[missing draft curated].freeze
 
   has_many :review_attempts, dependent: :destroy
+  has_many :flashcard_characters, dependent: :destroy
+  has_many :character_entries, through: :flashcard_characters
 
   validates :character, presence: true, uniqueness: true
   validates :pinyin, presence: true

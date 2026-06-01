@@ -141,6 +141,14 @@
                 </div>
               </div>
             <% end %>
+
+            <% if @flashcard.character_entries.any? %>
+              <div class="review-character-strip">
+                <% @flashcard.flashcard_characters.includes(:character_entry).order(:position).each do |link| %>
+                  <span><%= link.character_entry.character %></span>
+                <% end %>
+              </div>
+            <% end %>
           </div>
 
           <div

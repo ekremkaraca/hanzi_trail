@@ -364,6 +364,5 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
         story_status: "missing"
       )
     )
-
   end
 end

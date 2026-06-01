@@ -104,6 +104,30 @@
         </section>
       <% end %>
 
+      <% if @flashcard.flashcard_characters.any? %>
+        <section class="flashcard-character-links">
+          <h2>Characters in this word</h2>
+
+          <div class="character-link-grid">
+            <% @flashcard.flashcard_characters.includes(:character_entry).order(:position).each do |link| %>
+              <% entry = link.character_entry %>
+
+              <div class="character-link-card">
+                <span class="character-link-symbol"><%= entry.character %></span>
+
+                <% if entry.pinyin.present? %>
+                  <span><%= entry.pinyin %></span>
+                <% end %>
+
+                <% if entry.meaning.present? %>
+                  <small><%= entry.meaning %></small>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </section>
+      <% end %>
+
       <div class="buttons mt-5">
         <%= link_to "Back", flashcards_path, class: "button is-light" %>
       </div>
