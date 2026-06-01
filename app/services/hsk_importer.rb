@@ -1,5 +1,15 @@
 class HskImporter
+  class ImportError < StandardError; end
+
   SOURCE = "hsk".freeze
+
+  def self.import!(path:, level: nil, hsk_level: nil)
+    new(path: path, hsk_level: hsk_level || level).import!
+  rescue ImportError
+    raise
+  rescue RuntimeError => error
+    raise ImportError, error.message
+  end
 
   def initialize(path:, hsk_level:)
     @path = path
@@ -8,6 +18,19 @@ class HskImporter
 
   def call
     Flashcard.transaction { records.each { |entry| import_entry(entry) } }
+  end
+
+  def import!
+    raise ImportError, "HSK file does not exist: #{path}" unless File.file?(path)
+
+    data = parse_json
+    raise ImportError, "HSK data must be an array" unless data.is_a?(Array)
+
+    Flashcard.transaction do
+      data.each { |entry| import_entry(entry) }
+    end
+  rescue KeyError => error
+    raise ImportError, "Invalid HSK entry: missing #{error.key}"
   end
 
   private
@@ -42,5 +65,21 @@ class HskImporter
     )
 
     flashcard.save!
+  end
+
+  def parse_json
+    JSON.parse(File.read(path))
+  rescue JSON::ParserError => error
+    raise ImportError, "Invalid JSON: #{error.message}"
+  end
+
+  def first_form_for(entry)
+    forms = entry.fetch("forms")
+
+    unless forms.is_a?(Array) && forms.first.is_a?(Hash)
+      raise ImportError, "Invalid HSK entry: forms must contain at least one form"
+    end
+
+    forms.first
   end
 end

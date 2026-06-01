@@ -124,4 +124,23 @@ class HskImporterTest < ActiveSupport::TestCase
       importer.call rescue nil
     end
   end
+
+  test "raises import error for missing file" do
+    error = assert_raises(HskImporter::ImportError) do
+      HskImporter.import!(path: "missing.json", level: "old-1")
+    end
+
+    assert_match "does not exist", error.message
+  end
+
+  test "raises import error for empty forms array" do
+    path = Rails.root.join("tmp/empty_forms.json")
+    File.write(path, [ { "s" => "爱", "forms" => [] } ].to_json)
+
+    assert_raises(HskImporter::ImportError) do
+      HskImporter.import!(path: path, level: "old-1")
+    end
+  ensure
+    File.delete(path) if File.exist?(path)
+  end
 end

@@ -337,7 +337,7 @@ class FlashcardTest < ActiveSupport::TestCase
   test "short_story scope returns cards with short non-blank stories" do
     @default_card.update!(story: "Short story.")
     long = flashcards(:algorithm)
-    long.update!(story: "x" * 80)
+    long.update!(story: "x" * Flashcard::SHORT_STORY_LENGTH)
 
     assert_includes Flashcard.short_story, @default_card
     refute_includes Flashcard.short_story, long
@@ -346,10 +346,10 @@ class FlashcardTest < ActiveSupport::TestCase
   test "short_story scope excludes blank and nil stories" do
     flashcards(:hsk_one).update!(story: "")
     flashcards(:hsk_two).update!(story: nil)
-    flashcards(:network).update!(story: "x" * 80)
-    flashcards(:algorithm).update!(story: "x" * 80)
-    flashcards(:future_review).update!(story: "x" * 80)
-    flashcards(:overdue_review).update!(story: "x" * 80)
+    flashcards(:network).update!(story: "x" * Flashcard::SHORT_STORY_LENGTH)
+    flashcards(:algorithm).update!(story: "x" * Flashcard::SHORT_STORY_LENGTH)
+    flashcards(:future_review).update!(story: "x" * Flashcard::SHORT_STORY_LENGTH)
+    flashcards(:overdue_review).update!(story: "x" * Flashcard::SHORT_STORY_LENGTH)
 
     assert_empty Flashcard.short_story
   end
@@ -426,5 +426,49 @@ class FlashcardTest < ActiveSupport::TestCase
 
     assert_not card.valid?
     assert_includes card.errors[:meaning], "is too long (maximum is 500 characters)"
+  end
+
+  test "sets story status to missing when story is blank on create" do
+    card = Flashcard.create!(
+      character: "明",
+      pinyin: "míng",
+      meaning: "bright",
+      story: ""
+    )
+
+    assert_equal "missing", card.reload.story_status
+  end
+
+  test "sets story status to curated when story is present on create" do
+    card = Flashcard.create!(
+      character: "術",
+      pinyin: "xué",
+      meaning: "study",
+      story: "A learning-related character."
+    )
+
+    assert_equal "curated", card.reload.story_status
+  end
+
+  test "preserves explicit draft story status" do
+    card = flashcards(:network)
+
+    card.update!(
+      story: "Needs editorial review.",
+      story_status: "draft"
+    )
+
+    assert_equal "draft", card.reload.story_status
+  end
+
+  test "updates missing story status when story is added" do
+    card = flashcards(:hsk_one)
+    card.update!(story: "")
+
+    assert_equal "missing", card.reload.story_status
+
+    card.update!(story: "Now this card has a story.")
+
+    assert_equal "curated", card.reload.story_status
   end
 end

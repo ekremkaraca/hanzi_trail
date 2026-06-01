@@ -1,4 +1,6 @@
 class ReviewsController < ApplicationController
+  REVIEW_FILTER_PARAMS = %i[source category story_status].freeze
+
   def show
     reset_reviewed_count if params[:reset_session] == "1"
 
@@ -34,17 +36,21 @@ class ReviewsController < ApplicationController
   def preferences
     session[:show_pinyin] = params[:show_pinyin] == "1"
 
-    redirect_to review_path(
-      source: params[:source],
-      category: params[:category],
-      story_status: params[:story_status]
-    )
+    redirect_to review_path(review_filter_params)
   end
 
   private
 
   def review_params
     params.require(:review).permit(:rating)
+  end
+
+  def review_filter_params
+    params
+      .permit(*REVIEW_FILTER_PARAMS)
+      .to_h
+      .compact_blank
+      .symbolize_keys
   end
 
   def review_params_for_redirect
@@ -73,15 +79,11 @@ class ReviewsController < ApplicationController
   end
 
   def review_session_key
-    sorted = review_params_for_redirect
-      .to_h
-      .select { |_, v| v.present? }
+    review_filter_params
       .sort
       .map { |k, v| "#{k}=#{v}" }
-
-    return "all" if sorted.empty?
-
-    sorted.join("&")
+      .join("&")
+      .presence || "all"
   end
 
   def reviewed_count

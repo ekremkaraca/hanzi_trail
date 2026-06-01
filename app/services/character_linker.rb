@@ -8,14 +8,21 @@ class CharacterLinker
   end
 
   def call
-    flashcard.character.each_char.with_index do |char, index|
-      entry = CharacterEntry.find_or_create_by!(character: char)
+    FlashcardCharacter.transaction do
+      flashcard.flashcard_characters.destroy_all
+      linked_characters = {}
 
-      FlashcardCharacter.find_or_create_by!(
-        flashcard: flashcard,
-        character_entry: entry
-      ) do |link|
-        link.position = index
+      flashcard.character.each_char.with_index do |char, index|
+        next if linked_characters.key?(char)
+
+        entry = CharacterEntry.find_or_create_by!(character: char)
+
+        flashcard.flashcard_characters.create!(
+          character_entry: entry,
+          position: index
+        )
+
+        linked_characters[char] = true
       end
     end
   end

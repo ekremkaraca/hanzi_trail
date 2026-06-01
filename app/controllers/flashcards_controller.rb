@@ -5,19 +5,12 @@ class FlashcardsController < ApplicationController
   before_action :set_flashcard, only: %i[show edit update destroy]
 
   def index
-    @flashcards = Flashcard
-      .search(params[:query])
-      .by_source(params[:source])
-      .by_hsk_level(params[:hsk_level])
-      .by_category(params[:category])
-
-    if params[:story_status] == "short"
-      @flashcards = @flashcards.short_story
-    else
-      @flashcards = @flashcards.by_story_status(params[:story_status])
-    end
-
-    @flashcards = @flashcards.order(:character)
+    @flashcards = Flashcard.order(:character)
+    @flashcards = @flashcards.by_source(params[:source])
+    @flashcards = @flashcards.by_hsk_level(params[:hsk_level])
+    @flashcards = @flashcards.by_category(params[:category])
+    @flashcards = apply_story_filter(@flashcards)
+    @flashcards = @flashcards.search(params[:query])
   end
 
   def show; end
@@ -55,6 +48,17 @@ class FlashcardsController < ApplicationController
 
   def set_flashcard
     @flashcard = Flashcard.find(params[:id])
+  end
+
+  def apply_story_filter(scope)
+    case params[:story_status]
+    when "short"
+      scope.short_story
+    when *Flashcard::STORY_STATUSES
+      scope.by_story_status(params[:story_status])
+    else
+      scope
+    end
   end
 
   def flashcard_params

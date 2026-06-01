@@ -5,6 +5,8 @@ class Flashcard < ApplicationRecord
   REVIEW_RATINGS = %w[again easy good hard].freeze
   SOURCES = %w[curated hsk].freeze
   STORY_STATUSES = %w[missing draft curated].freeze
+  PSEUDO_STORY_STATUSES = %w[short].freeze
+  SHORT_STORY_LENGTH = 80
 
   has_many :review_attempts, dependent: :destroy
   has_many :flashcard_characters, dependent: :destroy
@@ -64,7 +66,7 @@ class Flashcard < ApplicationRecord
   }
 
   scope :short_story, -> {
-    where.not(story: [ nil, "" ]).where("LENGTH(story) < ?", 80)
+    where.not(story: [ nil, "" ]).where("LENGTH(story) < ?", SHORT_STORY_LENGTH)
   }
 
   def schedule_next_review!(rating)
@@ -102,7 +104,7 @@ class Flashcard < ApplicationRecord
 
   def short_story?
     # Under 80 chars is probably too short to be a useful mnemonic/story.
-    story.to_s.length.positive? && story.to_s.length < 80
+    story.to_s.length.positive? && story.to_s.length < SHORT_STORY_LENGTH
   end
 
   private
