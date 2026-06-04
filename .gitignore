@@ -39,3 +39,4 @@
 /vendor/bundle
 /.nix-gems
 /.commandcode
+/.direnv
