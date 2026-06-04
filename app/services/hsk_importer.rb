@@ -17,7 +17,7 @@ class HskImporter
   end
 
   def call
-    Flashcard.transaction { records.each { |entry| import_entry(entry) } }
+    import!
   end
 
   def import!
@@ -74,12 +74,10 @@ class HskImporter
   end
 
   def first_form_for(entry)
-    forms = entry.fetch("forms")
-
-    unless forms.is_a?(Array) && forms.first.is_a?(Hash)
+    unless entry.is_a?(Array) && entry.first.is_a?(Hash)
       raise ImportError, "Invalid HSK entry: forms must contain at least one form"
     end
 
-    forms.first
+    entry.first
   end
 end

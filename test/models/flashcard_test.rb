@@ -471,4 +471,28 @@ class FlashcardTest < ActiveSupport::TestCase
 
     assert_equal "curated", card.reload.story_status
   end
+
+  test "character linker creates entries for multi character word" do
+    card = Flashcard.create!(
+      character: "网络",
+      pinyin: "wǎngluò",
+      meaning: "network"
+    )
+
+    CharacterLinker.call(card)
+
+    assert_equal 2, card.flashcard_characters.count
+  end
+
+  test "with_story_filter short returns short stories" do
+    results = Flashcard.with_story_filter("short")
+
+    assert results.all?(&:short_story?)
+  end
+
+  test "with_story_filter curated returns curated cards" do
+    results = Flashcard.with_story_filter("curated")
+
+    assert results.all? { |card| card.story_status == "curated" }
+  end
 end

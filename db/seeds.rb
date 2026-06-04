@@ -18,3 +18,10 @@ HskImporter.new(
 ).call
 
 puts "HSK old-1 import completed."
+puts "Linking character entries..."
+
+Flashcard.find_each do |flashcard|
+  CharacterLinker.call(flashcard)
+end
+
+puts "Done."

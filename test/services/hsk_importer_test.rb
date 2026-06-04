@@ -25,8 +25,8 @@ class HskImporterTest < ActiveSupport::TestCase
       hsk_level: "old-1"
     )
 
-    error = assert_raises(RuntimeError) { importer.call }
-    assert_match(/HSK data file not found/, error.message)
+    error = assert_raises(HskImporter::ImportError) { importer.call }
+    assert_match(/does not exist/, error.message)
   end
 
   test "raises when JSON is malformed" do
@@ -35,8 +35,8 @@ class HskImporterTest < ActiveSupport::TestCase
       hsk_level: "old-1"
     )
 
-    error = assert_raises(RuntimeError) { importer.call }
-    assert_match(/Failed to parse HSK data file/, error.message)
+    error = assert_raises(HskImporter::ImportError) { importer.call }
+    assert_match(/Invalid JSON/, error.message)
   end
 
   test "skips duplicate characters already in the database" do
@@ -81,7 +81,7 @@ class HskImporterTest < ActiveSupport::TestCase
       hsk_level: "old-1"
     )
 
-    assert_raises(KeyError) { importer.call }
+    assert_raises(HskImporter::ImportError) { importer.call }
   end
 
   test "raises when form is missing meanings key" do
@@ -90,7 +90,7 @@ class HskImporterTest < ActiveSupport::TestCase
       hsk_level: "old-1"
     )
 
-    assert_raises(KeyError) { importer.call }
+    assert_raises(HskImporter::ImportError) { importer.call }
   end
 
   test "raises descriptively when entry has an empty forms array" do

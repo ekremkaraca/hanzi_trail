@@ -12,6 +12,14 @@ HanziTrail helps learners remember Mandarin characters through:
 - technical usage examples
 - spaced repetition
 
+## Features
+
+- Spaced repetition review
+- Character explorer
+- Related words
+- HSK import
+- Story-based learning
+
 ## Stack
 
 - Ruby on Rails

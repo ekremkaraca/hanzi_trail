@@ -9,7 +9,7 @@ class FlashcardsController < ApplicationController
     @flashcards = @flashcards.by_source(params[:source])
     @flashcards = @flashcards.by_hsk_level(params[:hsk_level])
     @flashcards = @flashcards.by_category(params[:category])
-    @flashcards = apply_story_filter(@flashcards)
+    @flashcards = @flashcards.with_story_filter(params[:story_status])
     @flashcards = @flashcards.search(params[:query])
   end
 
@@ -48,17 +48,6 @@ class FlashcardsController < ApplicationController
 
   def set_flashcard
     @flashcard = Flashcard.find(params[:id])
-  end
-
-  def apply_story_filter(scope)
-    case params[:story_status]
-    when "short"
-      scope.short_story
-    when *Flashcard::STORY_STATUSES
-      scope.by_story_status(params[:story_status])
-    else
-      scope
-    end
   end
 
   def flashcard_params

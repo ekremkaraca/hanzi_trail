@@ -75,7 +75,7 @@ class ReviewsController < ApplicationController
     Flashcard
         .by_source(params[:source])
         .by_category(params[:category])
-        .by_story_status(params[:story_status])
+        .with_story_filter(params[:story_status])
   end
 
   def review_session_key

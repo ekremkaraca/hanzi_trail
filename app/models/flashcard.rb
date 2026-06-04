@@ -107,6 +107,17 @@ class Flashcard < ApplicationRecord
     story.to_s.length.positive? && story.to_s.length < SHORT_STORY_LENGTH
   end
 
+  def self.with_story_filter(value)
+    case value
+    when "short"
+      short_story
+    when *STORY_STATUSES
+      by_story_status(value)
+    else
+      all
+    end
+  end
+
   private
 
   def set_initial_review_time

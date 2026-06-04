@@ -365,4 +365,10 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
       )
     )
   end
+
+  test "review supports short story filter" do
+    get review_path(story_status: "short")
+
+    assert_response :success
+  end
 end
