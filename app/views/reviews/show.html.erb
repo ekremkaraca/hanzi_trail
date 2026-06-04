@@ -147,6 +147,12 @@
                 <% @flashcard.flashcard_characters.includes(:character_entry).order(:position).each do |link| %>
                   <span><%= link.character_entry.character %></span>
                 <% end %>
+                <p class="has-text-centered mt-4">
+                  <%= link_to "Explore characters",
+                        flashcard_path(@flashcard, anchor: "characters"),
+                        class: "is-size-7" %>
+                </p>
+
               </div>
             <% end %>
           </div>
@@ -156,6 +162,12 @@
             data-review-target="actions"
           >
             <%= review_buttons_for(@flashcard) %>
+          </div>
+
+          <div class="buttons is-centered mt-4">
+            <%= link_to "Explore card",
+                  flashcard_path(@flashcard),
+                  class: "button is-light" %>
           </div>
 
           <p class="has-text-centered has-text-grey-light is-size-7 mt-4">

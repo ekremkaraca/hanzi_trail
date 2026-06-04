@@ -371,4 +371,11 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
   end
+
+  test "review page includes explore link for current card" do
+    get review_path
+
+    assert_response :success
+    assert_select "a[href=?]", flashcard_path(assigns(:flashcard)), text: "Explore card"
+  end
 end

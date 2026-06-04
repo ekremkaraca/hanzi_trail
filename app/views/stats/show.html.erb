@@ -3,15 +3,21 @@
     <h1 class="stats-heading">Stats</h1>
 
     <div class="stats-cards">
-      <div class="stats-card">
-        <span class="stats-card-value"><%= @today_count %></span>
-        <span class="stats-card-label">Reviews today</span>
-      </div>
+        <div class="stats-card">
+          <span>Reviewed today</span>
+          <strong><%= @today_count %></strong>
+        </div>
 
-      <div class="stats-card">
-        <span class="stats-card-value"><%= @rating_breakdown.values.sum %></span>
-        <span class="stats-card-label">Total reviews</span>
-      </div>
+        <div class="stats-card">
+          <span>Last 7 days</span>
+          <strong><%= @week_count %></strong>
+        </div>
+
+        <div class="stats-card">
+          <span>Total reviews</span>
+          <strong><%= @total_count %></strong>
+        </div>
+
     </div>
 
     <div class="stats-section">

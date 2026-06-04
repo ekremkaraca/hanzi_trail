@@ -15,5 +15,10 @@ class CharacterEntriesController < ApplicationController
     ).where.not(
       id: @character_entry.id
     ).distinct.order(:character).limit(20)
+
+    @flashcard_characters =
+      @character_entry.flashcard_characters
+                      .includes(:flashcard)
+                      .order(:position)
   end
 end
