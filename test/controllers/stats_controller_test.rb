@@ -42,6 +42,7 @@ class StatsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#rating-summary .stats-card-value", text: "2"
     assert_select "#most-difficult .stats-list-item", count: 3
     assert_select "#most-difficult .stats-list-item", text: /#{Regexp.escape(flashcards(:network).character)}/
+    assert_includes response.body, "2 difficult reviews"
     assert_select "#recently-reviewed .stats-list-item", text: /#{Regexp.escape(flashcards(:algorithm).character)}/
     refute_includes response.body, "Again: 124"
     refute_includes response.body, "Hard: 88"

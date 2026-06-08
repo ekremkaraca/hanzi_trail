@@ -7,15 +7,6 @@ class StatsController < ApplicationController
     @streak = StreakCalculator.call
     @rating_breakdown = ReviewAttempt.group(:rating).count
     @recent_attempts = ReviewAttempt.recent.includes(:flashcard).limit(20)
-    @most_difficult_flashcards = Flashcard
-      .left_joins(:review_attempts)
-      .select(<<~SQL.squish)
-        flashcards.*,
-        COALESCE(SUM(CASE WHEN review_attempts.rating IN ('again', 'hard') THEN 1 ELSE 0 END), 0) AS difficult_review_count
-      SQL
-      .group("flashcards.id")
-      .having("SUM(CASE WHEN review_attempts.rating IN ('again', 'hard') THEN 1 ELSE 0 END) > 0")
-      .order(Arel.sql("difficult_review_count DESC"), character: :asc)
-      .limit(3)
+    @most_difficult_flashcards = DifficultCards.call
   end
 end
