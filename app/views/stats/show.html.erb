@@ -18,6 +18,12 @@
           <strong><%= @total_count %></strong>
         </div>
 
+        <%# Surface the current streak next to the other headline stats. %>
+        <div id="current-streak" class="stats-card">
+          <span>Current streak</span>
+          <strong><%= @streak %></strong>
+        </div>
+
     </div>
 
     <div class="stats-section">
@@ -36,12 +42,45 @@
       </div>
     </div>
 
-    <div class="stats-section">
-      <h2 class="stats-subheading">Recent reviews</h2>
+    <div id="rating-summary" class="stats-section">
+      <h2 class="stats-subheading">Review counts by rating</h2>
+
+      <div class="stats-cards">
+        <% %w[again hard good easy].each do |rating| %>
+          <div class="stats-card">
+            <span class="stats-card-label"><%= rating.capitalize %></span>
+            <strong class="stats-card-value"><%= @rating_breakdown[rating] || 0 %></strong>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div id="most-difficult" class="stats-section">
+      <h2 class="stats-subheading">Most difficult</h2>
+
+      <div class="stats-list">
+        <% if @most_difficult_flashcards.any? %>
+          <% @most_difficult_flashcards.each do |flashcard| %>
+            <div class="stats-list-item">
+              <span class="stats-list-character"><%= flashcard.character %></span>
+              <span><%= flashcard.meaning %></span>
+              <span class="stats-list-time">
+                <%= pluralize(flashcard.difficult_review_count.to_i, "difficult review") %>
+              </span>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="stats-empty">No difficult cards yet.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <div id="recently-reviewed" class="stats-section">
+      <h2 class="stats-subheading">Recently reviewed</h2>
 
       <div class="stats-list">
         <% if @recent_attempts.any? %>
-          <% @recent_attempts.each do |attempt| %>
+          <% @recent_attempts.first(3).each do |attempt| %>
             <div class="stats-list-item">
               <span class="stats-list-character"><%= attempt.flashcard.character %></span>
               <span class="<%= rating_badge_class(attempt.rating) %>"><%= attempt.rating %></span>

@@ -62,10 +62,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_140002) do
     t.index ["source", "hsk_level"], name: "index_flashcards_on_source_and_hsk_level"
     t.index ["source"], name: "index_flashcards_on_source"
     t.index ["story_status"], name: "index_flashcards_on_story_status"
-    t.check_constraint "difficulty::text = ANY (ARRAY['new'::character varying, 'again'::character varying, 'easy'::character varying, 'good'::character varying, 'hard'::character varying]::text[])", name: "flashcards_difficulty_check"
+    t.check_constraint "difficulty::text = ANY (ARRAY['new'::character varying::text, 'again'::character varying::text, 'easy'::character varying::text, 'good'::character varying::text, 'hard'::character varying::text])", name: "flashcards_difficulty_check"
     t.check_constraint "review_count >= 0", name: "flashcards_review_count_check"
-    t.check_constraint "source::text = ANY (ARRAY['curated'::character varying, 'hsk'::character varying]::text[])", name: "flashcards_source_check"
-    t.check_constraint "story_status::text = ANY (ARRAY['missing'::character varying, 'draft'::character varying, 'curated'::character varying]::text[])", name: "flashcards_story_status_check"
+    t.check_constraint "source::text = ANY (ARRAY['curated'::character varying::text, 'hsk'::character varying::text])", name: "flashcards_source_check"
+    t.check_constraint "story_status::text = ANY (ARRAY['missing'::character varying::text, 'draft'::character varying::text, 'curated'::character varying::text])", name: "flashcards_story_status_check"
   end
 
   create_table "review_attempts", force: :cascade do |t|
@@ -78,7 +78,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_140002) do
     t.index ["flashcard_id"], name: "index_review_attempts_on_flashcard_id"
     t.index ["rating"], name: "index_review_attempts_on_rating"
     t.index ["reviewed_at"], name: "index_review_attempts_on_reviewed_at"
-    t.check_constraint "rating::text = ANY (ARRAY['again'::character varying, 'easy'::character varying, 'good'::character varying, 'hard'::character varying]::text[])", name: "review_attempts_rating_check"
+    t.check_constraint "rating::text = ANY (ARRAY['again'::character varying::text, 'easy'::character varying::text, 'good'::character varying::text, 'hard'::character varying::text])", name: "review_attempts_rating_check"
   end
 
   add_foreign_key "flashcard_characters", "character_entries"

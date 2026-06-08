@@ -17,6 +17,8 @@ class HskImporterTest < ActiveSupport::TestCase
     assert_equal "old-1", flashcard.hsk_level
     assert_nil flashcard.story
     assert_equal "missing", flashcard.story_status
+    # The importer should also wire the character-entry links for exploration views.
+    assert_equal [ "爱" ], flashcard.character_entries.order("flashcard_characters.position").pluck(:character)
   end
 
   test "raises when file does not exist" do

@@ -118,6 +118,10 @@ class Flashcard < ApplicationRecord
     end
   end
 
+  def last_reviewed_at
+    review_attempts.maximum(:reviewed_at)
+  end
+
   private
 
   def set_initial_review_time
