@@ -16,6 +16,6 @@ class ReviewQueue
   attr_reader :scope
 
   def due_cards
-    @due_cards ||=scope.due_for_review
+    @due_cards ||= DueFlashcards.call(scope:)
   end
 end

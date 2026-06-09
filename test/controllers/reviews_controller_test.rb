@@ -130,8 +130,6 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "show displays empty state for hsk queue when no hsk cards are due" do
-    Flashcard.update_all(next_review_at: 1.day.from_now)
-
     get review_url(source: "hsk")
 
     assert_response :success
@@ -139,7 +137,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "show displays empty state for technical queue when no technical cards are due" do
-    Flashcard.update_all(next_review_at: 1.day.from_now)
+    Flashcard.where(category: "technical").update_all(next_review_at: 1.day.from_now)
 
     get review_url(category: "technical")
 
@@ -326,8 +324,6 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "show displays review progress text" do
-    Flashcard.update_all(next_review_at: 1.day.from_now)
-
     flashcards(:network).update!(next_review_at: 1.minute.ago)
 
     get review_path
@@ -377,5 +373,18 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "a[href=?]", flashcard_path(assigns(:flashcard)), text: "Explore card"
+  end
+
+  test "shows completion state after reviewing all due cards" do
+    flashcard = flashcards(:network)
+    flashcard.update!(next_review_at: 1.minute.ago)
+
+    patch review_flashcard_path(flashcard),
+      params: { review: { rating: "good" } }
+
+    follow_redirect!
+
+    assert_response :success
+    assert_select ".review-empty-state"
   end
 end

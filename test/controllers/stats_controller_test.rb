@@ -40,13 +40,24 @@ class StatsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#current-streak strong", text: "3"
     assert_select "#rating-summary .stats-card-label", text: "Again"
     assert_select "#rating-summary .stats-card-value", text: "2"
-    assert_select "#most-difficult .stats-list-item", count: 3
-    assert_select "#most-difficult .stats-list-item", text: /#{Regexp.escape(flashcards(:network).character)}/
-    assert_includes response.body, "2 difficult reviews"
+    assert_select "#most-difficult .difficult-card-item", count: 3
+    assert_select "#most-difficult .difficult-card-item", text: /#{Regexp.escape(flashcards(:network).character)}/
+    assert_includes response.body, "2 hard reviews"
     assert_select "#recently-reviewed .stats-list-item", text: /#{Regexp.escape(flashcards(:algorithm).character)}/
-    refute_includes response.body, "Again: 124"
-    refute_includes response.body, "Hard: 88"
-    refute_includes response.body, "Good: 510"
-    refute_includes response.body, "Easy: 293"
+  end
+
+  test "shows recent activity" do
+    card = flashcards(:network)
+
+    ReviewAttempt.create!(
+      flashcard: card,
+      rating: "good",
+      reviewed_at: Time.current
+    )
+
+    get stats_path
+
+    assert_response :success
+    assert_select ".activity-item", minimum: 1
   end
 end

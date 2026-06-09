@@ -7,6 +7,7 @@ class StatsController < ApplicationController
     @streak = StreakCalculator.call
     @rating_breakdown = ReviewAttempt.group(:rating).count
     @recent_attempts = ReviewAttempt.recent.includes(:flashcard).limit(20)
-    @most_difficult_flashcards = DifficultCards.call
+    @difficult_cards = DifficultCards.call(limit: 10)
+    @average_reviews_per_day = ReviewVelocity.call
   end
 end
