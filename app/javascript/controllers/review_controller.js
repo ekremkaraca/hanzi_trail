@@ -2,18 +2,20 @@ import { Controller } from "@hotwired/stimulus";
 
 // Connects to data-controller="review"
 export default class extends Controller {
-  static targets = ["answer", "character", "showButton"];
+  static targets = ["actions", "answer", "character", "showButton"];
 
   showAnswer() {
-    this.answerTarget.hidden = false;
+    if (this.hasAnswerTarget) this.answerTarget.hidden = false;
+    if (this.hasActionsTarget) this.actionsTarget.hidden = false;
     this.answerVisible = true;
-    this.showButtonTarget.textContent = "Hide answer";
+    if (this.hasShowButtonTarget) this.showButtonTarget.textContent = "Hide answer";
   }
 
   hideAnswer() {
-    this.answerTarget.hidden = true;
+    if (this.hasAnswerTarget) this.answerTarget.hidden = true;
+    if (this.hasActionsTarget) this.actionsTarget.hidden = true;
     this.answerVisible = false;
-    this.showButtonTarget.textContent = "Show answer";
+    if (this.hasShowButtonTarget) this.showButtonTarget.textContent = "Show answer";
   }
 
   toggleAnswer() {
@@ -101,6 +103,15 @@ export default class extends Controller {
 
   connect() {
     this.answerVisible = false;
+
+    if (this.hasAnswerTarget) {
+      this.answerTarget.hidden = true;
+    }
+
+    if (this.hasActionsTarget) {
+      this.actionsTarget.hidden = true;
+    }
+
     this.loadVoices();
   }
 

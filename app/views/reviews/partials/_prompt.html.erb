@@ -1,0 +1,20 @@
+<div class="review-prompt has-text-centered mb-5">
+  <h1 class="review-character title has-text-white mb-2" data-review-target="character">
+    <%= flashcard.character %>
+  </h1>
+
+  <% if session[:show_pinyin] %>
+    <p class="subtitle is-4 has-text-grey-light mt-0">
+      <%= flashcard.pinyin %>
+    </p>
+  <% end %>
+
+  <div class="buttons is-centered mt-5">
+    <button type="button" class="button is-link" data-review-target="showButton" data-action="click->review#toggleAnswer">
+      Show answer
+    </button>
+    <button type="button" class="button is-dark" data-action="click->review#speak">
+      🔊 Speak
+    </button>
+  </div>
+</div>

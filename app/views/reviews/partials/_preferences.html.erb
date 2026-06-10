@@ -1,0 +1,14 @@
+<div class="has-text-centered mt-4 is-hidden-mobile">
+  <%= form_with url: "/review/preferences", method: :patch, class: "is-inline-block" do |form| %>
+    <label class="checkbox is-size-7 has-text-grey-light mr-2">
+      <%= form.check_box :show_pinyin, checked: session[:show_pinyin] %>
+      Show pinyin before answer
+    </label>
+
+    <%= hidden_field_tag :source, params[:source] %>
+    <%= hidden_field_tag :category, params[:category] %>
+    <%= hidden_field_tag :story_status, params[:story_status] %>
+
+    <%= form.submit "Save", class: "button is-small is-dark" %>
+  <% end %>
+</div>

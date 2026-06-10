@@ -1,0 +1,20 @@
+<div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+  <div>
+    <h1 class="title is-2">Review</h1>
+    <p class="subtitle is-6 has-text-grey-light">Learn a little every day. You've got this.</p>
+  </div>
+
+  <% if remaining_due_count.present? %>
+    <div class="box py-2 px-4 has-text-centered mb-0" aria-label="Cards remaining: <%= remaining_due_count %>">
+      <span class="is-size-7 has-text-grey">Remaining</span><br>
+      <strong><%= remaining_due_count %></strong>
+    </div>
+  <% end %>
+</div>
+
+<div class="buttons">
+  <%= link_to "All", review_path, class: review_mode_button_class(:all) %>
+  <%= link_to "HSK", review_path(source: "hsk"), class: review_mode_button_class(:hsk) %>
+  <%= link_to "Curated", review_path(source: "curated"), class: review_mode_button_class(:curated) %>
+  <%= link_to "Missing stories", review_path(story_status: "missing"), class: review_mode_button_class(:missing_stories) %>
+</div>

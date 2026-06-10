@@ -1,0 +1,19 @@
+<div class="mb-4">
+  <% progress = review_progress_percentage(reviewed_count, total_review_count) %>
+
+  <p class="review-progress-text has-text-centered is-size-7 has-text-grey-light mb-2">
+    <%= review_progress_text(reviewed_count, remaining_due_count) %>
+  </p>
+
+  <progress
+    class="progress is-info is-small m-0"
+    value="<%= progress %>"
+    max="100"
+    aria-label="Review progress: <%= progress %>%">
+  </progress>
+
+  <div class="is-flex is-justify-content-space-between is-size-7 mt-1 has-text-grey-light">
+    <span>Reviewed today: <%= reviewed_today_count %></span>
+    <span>Queue: <%= remaining_due_count %></span>
+  </div>
+</div>

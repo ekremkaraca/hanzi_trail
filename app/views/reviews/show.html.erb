@@ -1,228 +1,44 @@
-<section class="section review-page">
+<section class="section review-page pb-6">
   <div class="container is-max-widescreen">
-    <div class="review-header">
-      <div>
-        <h1 class="title is-2">Review</h1>
-        <p class="subtitle is-6 has-text-grey-light">
-          Learn a little every day. You&apos;ve got this.
-        </p>
-      </div>
 
-      <% if @remaining_due_count.present? %>
-        <div class="review-count-box" aria-label="Cards remaining: <%= @remaining_due_count %>">
-          <span class="has-text-grey-light">Cards remaining</span>
-          <strong><%= @remaining_due_count %></strong>
-        </div>
-      <% end %>
-    </div>
-
-    <div class="review-mode-bar">
-      <%= link_to "All", review_path, class: review_mode_button_class(:all) %>
-      <%= link_to "HSK", review_path(source: "hsk"), class: review_mode_button_class(:hsk) %>
-      <%= link_to "Curated", review_path(source: "curated"), class: review_mode_button_class(:curated) %>
-      <%= link_to "Missing stories", review_path(story_status: "missing"), class: review_mode_button_class(:missing_stories) %>
+    <div class="is-hidden-mobile mb-5">
+      <%= render "reviews/partials/header", remaining_due_count: @remaining_due_count %>
     </div>
 
     <% if @flashcard.present? %>
       <div
-        class="review-card box"
+        class="review-card review-session-card box has-background-dark has-text-white is-flex is-flex-direction-column"
         data-controller="review"
         data-action="keydown@window->review#handleKeydown"
       >
-        <div class="review-progress-area has-text-centered">
-          <p class="review-progress-text">
-            <%= review_progress_text(@reviewed_count, @remaining_due_count) %>
-            <span class="has-text-grey-light">Reviewed today</span>
-            <strong><%= @reviewed_today_count %></strong>
-          </p>
+        <%= render "reviews/partials/progress",
+          reviewed_count: @reviewed_count,
+          total_review_count: @total_review_count,
+          reviewed_today_count: @reviewed_today_count,
+          remaining_due_count: @remaining_due_count
+        %>
 
-          <% progress = review_progress_percentage(@reviewed_count, @total_review_count) %>
+        <%= render "reviews/partials/prompt", flashcard: @flashcard %>
 
-          <div class="review-progress" aria-label="Review progress: <%= progress %>%">
-            <div class="review-progress-bar" style="width: <%= progress %>%"></div>
-          </div>
-        </div>
+        <%= render "reviews/partials/answer", flashcard: @flashcard %>
 
-        <div class="review-prompt has-text-centered">
-          <p
-            class="review-character has-text-weight-semibold"
-            data-review-target="character"
-          >
-            <%= @flashcard.character %>
-          </p>
-
-          <% if session[:show_pinyin] %>
-            <p class="review-question-pinyin has-text-grey-light">
-              <%= @flashcard.pinyin %>
-            </p>
-          <% end %>
-
-          <div class="review-primary-actions buttons is-centered mt-5">
-            <button
-              type="button"
-              class="button is-link is-medium"
-              data-review-target="showButton"
-              data-action="click->review#toggleAnswer"
-            >
-              Show answer
-            </button>
-
-            <button
-              type="button"
-              class="button is-dark"
-              data-action="click->review#speak"
-            >
-              🔊 Speak
-            </button>
-          </div>
-        </div>
-
-        <div data-review-target="answer" hidden>
-          <hr class="review-divider">
-
-          <div class="review-answer">
-            <div class="review-hero">
-              <div class="review-hero-character">
-                <h2 data-review-target="character"><%= @flashcard.character %></h2>
-                <p class="review-hero-pinyin"><%= @flashcard.pinyin %></p>
-              </div>
-
-              <div class="review-hero-meaning">
-                <span class="eyebrow">Meaning</span>
-                <p class="review-meaning-text"><%= @flashcard.meaning %></p>
-              </div>
-            </div>
-
-            <% if @flashcard.story.present? %>
-              <div class="review-story-panel">
-                <span class="eyebrow">Story</span>
-                <div class="content">
-                  <%= simple_format(@flashcard.story) %>
-                </div>
-              </div>
-            <% end %>
-
-            <% if @flashcard.components.present?
-                || @flashcard.literal_meaning.present?
-                || @flashcard.mnemonic.present?
-                || @flashcard.usage_note.present?
-                 %>
-              <div class="review-understanding">
-                <h3>Character understanding</h3>
-
-                <div class="review-understanding-grid">
-                  <% if @flashcard.components.present? %>
-                    <div class="review-understanding-note">
-                      <h4>Components</h4>
-                      <%= simple_format(@flashcard.components) %>
-                    </div>
-                  <% end %>
-
-                  <% if @flashcard.literal_meaning.present? %>
-                    <div class="review-understanding-note">
-                      <h4>Literal meaning</h4>
-                      <%= simple_format(@flashcard.literal_meaning) %>
-                    </div>
-                  <% end %>
-
-                  <% if @flashcard.mnemonic.present? %>
-                    <div class="review-understanding-note">
-                      <h4>Memory hook</h4>
-                      <%= simple_format(@flashcard.mnemonic) %>
-                    </div>
-                  <% end %>
-
-                  <% if @flashcard.usage_note.present? %>
-                    <div class="review-understanding-note">
-                      <h4>Usage note</h4>
-                      <%= simple_format(@flashcard.usage_note) %>
-                    </div>
-                  <% end %>
-                </div>
-              </div>
-            <% end %>
-
-            <% if @flashcard.character_entries.any? %>
-              <div class="review-character-strip">
-                <% @flashcard.flashcard_characters.includes(:character_entry).order(:position).each do |link| %>
-                  <span><%= link.character_entry.character %></span>
-                <% end %>
-                <p class="has-text-centered mt-4">
-                  <%= link_to "Explore characters",
-                        flashcard_path(@flashcard, anchor: "characters"),
-                        class: "is-size-7" %>
-                </p>
-
-              </div>
-            <% end %>
-          </div>
-
-          <div
-            class="review-buttons buttons is-centered mt-6"
+        <div
+            class="mt-auto pt-5"
             data-review-target="actions"
-          >
-            <%= review_buttons_for(@flashcard) %>
-          </div>
-
-          <div class="buttons is-centered mt-4">
-            <%= link_to "Explore card",
-                  flashcard_path(@flashcard),
-                  class: "button is-light" %>
-          </div>
-
-          <p class="has-text-centered has-text-grey-light is-size-7 mt-4">
-            Use 1 · 2 · 3 · 4 keys for quick review
-          </p>
+            hidden>
+          <%= render "reviews/partials/actions", flashcard: @flashcard %>
         </div>
       </div>
 
-      <div class="review-options box">
-        <%= form_with url: "/review/preferences", method: :patch, class: "review-preferences-form" do |form| %>
-          <label class="checkbox">
-            <%= form.check_box :show_pinyin, checked: session[:show_pinyin] %>
-            Show pinyin before answer
-          </label>
-          <%= hidden_field_tag :source, params[:source] %>
-          <%= hidden_field_tag :category, params[:category] %>
-          <%= hidden_field_tag :story_status, params[:story_status] %>
+      <%= render "reviews/partials/preferences" %>
 
-          <%= form.submit "Save", class: "button is-small is-light" %>
-        <% end %>
-      </div>
     <% else %>
-      <div class="review-empty-state">
-        <div class="review-empty-icon" aria-hidden="true">✓</div>
-
-        <% if @reviewed_count.positive? %>
-            <div class="review-empty-state review-complete-state">
-              <div class="review-empty-icon" aria-hidden="true">✓</div>
-
-              <h2>Review session complete.</h2>
-              <p>You reviewed <%= pluralize(@reviewed_count, "card") %>.</p>
-              <p class="has-text-grey-light">
-                Good work. Your current review queue is clear.
-              </p>
-
-              <div class="buttons is-centered mt-5">
-                <%= link_to "View stats", stats_path, class: "button is-link" %>
-                <%= link_to "Browse cards", flashcards_path, class: "button is-light" %>
-              </div>
-            </div>
-        <% else %>
-          <h2><%= @empty_state_title %></h2>
-          <p>Review your flashcards later or browse all cards.</p>
-        <% end %>
-
-        <div class="buttons is-centered mt-5">
-          <%= link_to "Browse flashcards", flashcards_path, class: "button is-light" %>
-
-          <% if @reviewed_count.positive? %>
-            <%= link_to "Start new session",
-                  review_path(@review_filter_params.merge(reset_session: "1")),
-                  class: "button is-link" %>
-          <% end %>
-        </div>
-      </div>
+      <%= render "reviews/partials/empty_state",
+            reviewed_count: @reviewed_count,
+            review_filter_params: @review_filter_params,
+            empty_state_title: @empty_state_title
+            %>
     <% end %>
+
   </div>
 </section>
