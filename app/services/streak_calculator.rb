@@ -5,13 +5,12 @@ class StreakCalculator
 
   def call
     # Normalize the SQL dates so the streak logic stays adapter-agnostic.
-    dates =
-      ReviewAttempt
-        .distinct
-        .pluck(Arel.sql("DATE(reviewed_at)"))
-        .map(&:to_date)
-        .sort
-        .reverse
+    dates = ReviewAttempt
+      .where("reviewed_at >= ?", 1.year.ago)
+      .distinct.pluck(Arel.sql("DATE(reviewed_at)"))
+      .map(&:to_date)
+      .sort
+      .reverse
 
     streak = 0
     current = Date.current

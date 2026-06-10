@@ -4,13 +4,15 @@ class FlashcardsController < ApplicationController
   before_action :require_write_access, only: %i[new edit create update destroy]
   before_action :set_flashcard, only: %i[show edit update destroy]
 
+  FLASHCARDS_LIMIT = 200.freeze
+
   def index
-    @flashcards = Flashcard.order(:character)
+    @flashcards = Flashcard.all
     @flashcards = @flashcards.by_source(params[:source])
     @flashcards = @flashcards.by_hsk_level(params[:hsk_level])
     @flashcards = @flashcards.by_category(params[:category])
     @flashcards = @flashcards.with_story_filter(params[:story_status])
-    @flashcards = @flashcards.search(params[:query])
+    @flashcards = @flashcards.search(params[:query]).limit(FLASHCARDS_LIMIT)
   end
 
   def show; end
