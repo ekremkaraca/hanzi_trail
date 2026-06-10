@@ -11,6 +11,12 @@ class ReviewsController < ApplicationController
     @review_filter_params = review_params_for_redirect
     @total_review_count = @reviewed_count + @remaining_due_count
     @reviewed_today_count = ReviewAttempt.today.count
+
+    if @flashcard.present?
+      session[:review_return_to] = request.fullpath
+    else
+      session[:review_return_to] = nil
+    end
   end
 
   def update

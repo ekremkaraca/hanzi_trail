@@ -142,9 +142,7 @@
       </div>
 
       <div class="buttons mt-5">
-          <%= link_to "Back", flashcards_path, class: "button is-light" %>
-          <%= link_to "← Previous", flashcards_path, class: "button is-light" %>
-          <%= link_to "Next →", flashcards_path, class: "button is-light" %>
+        <%= link_to_active_review_if_present %>
       </div>
     </div>
   </div>
