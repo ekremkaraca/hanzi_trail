@@ -101,7 +101,7 @@ class HskImporterTest < ActiveSupport::TestCase
       hsk_level: "old-1"
     )
 
-    error = assert_raises(RuntimeError) { importer.call }
+    error = assert_raises(HskImporter::ImportError) { importer.call }
     assert_match(/empty forms array/, error.message)
   end
 

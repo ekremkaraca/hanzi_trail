@@ -7,8 +7,6 @@ class HskImporter
     new(path: path, hsk_level: hsk_level || level).import!
   rescue ImportError
     raise
-  rescue RuntimeError => error
-    raise ImportError, error.message
   end
 
   def initialize(path:, hsk_level:)
@@ -37,13 +35,6 @@ class HskImporter
 
   attr_reader :path, :hsk_level
 
-  def records
-    raise "HSK data file not found: #{path}" unless File.exist?(path)
-    JSON.parse(File.read(path))
-  rescue JSON::ParserError => e
-    raise "Failed to parse HSK data file: #{e.message}"
-  end
-
   def import_entry(entry)
     character = entry.fetch("simplified")
 
@@ -52,7 +43,7 @@ class HskImporter
     return if flashcard.persisted?
 
     form = entry.fetch("forms").first
-    raise "Entry '#{character}' has an empty forms array" if form.nil?
+    raise ImportError, "Entry '#{character}' has an empty forms array" if form.nil?
 
     flashcard.assign_attributes(
       pinyin: form.fetch("transcriptions").fetch("pinyin"),
@@ -73,13 +64,5 @@ class HskImporter
     JSON.parse(File.read(path))
   rescue JSON::ParserError => error
     raise ImportError, "Invalid JSON: #{error.message}"
-  end
-
-  def first_form_for(entry)
-    unless entry.is_a?(Array) && entry.first.is_a?(Hash)
-      raise ImportError, "Invalid HSK entry: forms must contain at least one form"
-    end
-
-    entry.first
   end
 end
