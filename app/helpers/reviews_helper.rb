@@ -75,7 +75,12 @@ module ReviewsHelper
   private
 
   def review_filter_params
-    params.slice(:source, :category, :story_status)
+    # Add .compact_blank to prevent blank values pollution.
+    params
+      .slice(:source, :category, :story_status)
+      .permit!
+      .to_h
+      .compact_blank
   end
 
   def review_button_params(rating)
