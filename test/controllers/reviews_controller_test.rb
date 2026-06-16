@@ -342,7 +342,8 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_response :not_found
+    assert_redirected_to review_path
+    assert_equal "This card is not due for review.", flash[:alert]
     assert future_card.reload.next_review_at > Time.current
     assert_equal "new", future_card.reload.difficulty
   end

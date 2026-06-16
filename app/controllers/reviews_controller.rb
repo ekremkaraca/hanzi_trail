@@ -20,21 +20,26 @@ class ReviewsController < ApplicationController
   end
 
   def update
-    flashcard = review_scope
-      .due_for_review
-      .find(params[:flashcard_id])
+    rating = review_params[:rating]
 
-    flashcard.schedule_next_review!(review_params[:rating])
+    unless Flashcard::REVIEW_RATINGS.include?(rating)
+      return redirect_to review_path, alert: "Invalid review rating."
+    end
 
+    card_id = params[:flashcard_id]
+    flashcard = review_scope.find(card_id)
+
+    if flashcard.next_review_at > Time.current
+      return redirect_to review_path(review_params_for_redirect),
+        alert: "This card is not due for review."
+    end
+
+    flashcard.schedule_next_review!(rating)
     increment_reviewed_count
-
     redirect_to review_path(review_params_for_redirect), notice: "Review saved."
-  rescue Flashcard::CardNotDueError
-    redirect_to review_path(review_params_for_redirect), alert: "This card is not due for review."
-  rescue ArgumentError
-    redirect_to review_path(review_params_for_redirect), alert: "Invalid review rating."
-  rescue ActionController::ParameterMissing
-    redirect_to review_path(review_params_for_redirect), alert: "Missing review parameters."
+  rescue ActiveRecord::RecordNotFound
+    redirect_to review_path(review_params_for_redirect),
+      alert: "That card is not in the current review filter."
   end
 
   def preferences
@@ -46,7 +51,7 @@ class ReviewsController < ApplicationController
   private
 
   def review_params
-    params.require(:review).permit(:rating)
+    { rating: params.dig(:review, :rating) }
   end
 
   def session_filter_params
