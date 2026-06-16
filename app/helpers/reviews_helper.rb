@@ -75,12 +75,9 @@ module ReviewsHelper
   private
 
   def review_filter_params
-    # Add .compact_blank to prevent blank values pollution.
-    params
-      .slice(:source, :category, :story_status)
-      .permit!
-      .to_h
-      .compact_blank
+    # Delegates to the shared module so the helper and controller stay in
+    # sync when a new filter key is added.
+    Review::FilterParams.from(params)
   end
 
   def review_button_params(rating)
@@ -88,9 +85,9 @@ module ReviewsHelper
       review: {
         rating: rating
       },
-      source: params[:source],
-      category: params[:category],
-      story_status: params[:story_status]
+      # Use the shared module so blank values are dropped consistently with
+      # the controller's redirect target and the session key.
+      **Review::FilterParams.from(params)
     }
   end
 end

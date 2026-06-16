@@ -8,7 +8,7 @@ class ReviewsController < ApplicationController
     @remaining_due_count = queue.remaining_count
     @empty_state_title = empty_state_title
     @reviewed_count = reviewed_count
-    @review_filter_params = review_params_for_redirect
+    @review_filter_params = filter_params
     @total_review_count = @reviewed_count + @remaining_due_count
     @reviewed_today_count = ReviewAttempt.today.count
 
@@ -30,22 +30,22 @@ class ReviewsController < ApplicationController
     flashcard = review_scope.find(card_id)
 
     if flashcard.next_review_at > Time.current
-      return redirect_to review_path(review_params_for_redirect),
+      return redirect_to review_path(filter_params),
         alert: "This card is not due for review."
     end
 
     flashcard.schedule_next_review!(rating)
     increment_reviewed_count
-    redirect_to review_path(review_params_for_redirect), notice: "Review saved."
+    redirect_to review_path(filter_params), notice: "Review saved."
   rescue ActiveRecord::RecordNotFound
-    redirect_to review_path(review_params_for_redirect),
+    redirect_to review_path(filter_params),
       alert: "That card is not in the current review filter."
   end
 
   def preferences
     session[:show_pinyin] = params[:show_pinyin] == "1"
 
-    redirect_to review_path(session_filter_params)
+    redirect_to review_path(filter_params)
   end
 
   private
@@ -54,17 +54,11 @@ class ReviewsController < ApplicationController
     { rating: params.dig(:review, :rating) }
   end
 
-  def session_filter_params
-    params
-      .slice(:source, :category, :story_status)
-      .permit!
-      .to_h
-      .compact_blank
-  end
-
-  def review_params_for_redirect
-    params.slice(:source, :category, :story_status)
-          .permit(:source, :category, :story_status)
+  # Single source of truth for the three filter keys used in redirects and
+  # session keys. Blank values are dropped so e.g. ?source= and an absent
+  # source produce the same review_path URL.
+  def filter_params
+    Review::FilterParams.from(params)
   end
 
   def empty_state_title
@@ -88,7 +82,9 @@ class ReviewsController < ApplicationController
   end
 
   def review_session_key
-    session_filter_params
+    # Use the shared filter module so the session key is built from the
+    # same three keys the helper and redirect use.
+    filter_params
       .sort
       .map { |k, v| "#{k}=#{v}" }
       .join("&")
