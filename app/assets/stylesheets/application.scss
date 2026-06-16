@@ -3,6 +3,8 @@
 
 @import url("https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css");
 
+[x-cloak] { display: none !important; }
+
 @include meta.load-css("navbar");
 @include meta.load-css("flash_messages");
 @include meta.load-css("review");

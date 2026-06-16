@@ -93,7 +93,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "keydown@window->review#handleKeydown"
-    assert_includes response.body, "data-review-target=\"showButton\""
+    assert_includes response.body, "review:toggle"
   end
 
   test "show wires speak button to review character" do

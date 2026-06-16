@@ -10,9 +10,12 @@
   <% end %>
 
   <div class="buttons is-centered mt-5">
-    <button type="button" class="button is-link" data-review-target="showButton" data-action="click->review#toggleAnswer">
-      Show answer
-    </button>
+    <button
+      type="button"
+      class="button is-link"
+      @click="window.dispatchEvent(new Event('review:toggle'))"
+      x-text="answerVisible ? 'Hide answer' : 'Show answer'"
+    ></button>
     <button type="button" class="button is-dark" data-action="click->review#speak">
       🔊 Speak
     </button>

@@ -1,35 +1,27 @@
 import { Controller } from "@hotwired/stimulus";
 
 // Connects to data-controller="review"
+//
+// Owns the side-effectful parts of the review card: Web Speech playback and
+// keyboard shortcuts (Space, 1–4) that delegate to the rating buttons.
+// Pure show/hide state lives in the Alpine `reviewCard()` component; this
+// controller stays in sync with it via the `review:visibility-changed` event.
 export default class extends Controller {
-  static targets = ["actions", "answer", "character", "showButton"];
+  static targets = ["character"];
 
-  showAnswer() {
-    if (this.hasAnswerTarget) this.answerTarget.hidden = false;
-    if (this.hasActionsTarget) this.actionsTarget.hidden = false;
-    this.answerVisible = true;
-    if (this.hasShowButtonTarget) this.showButtonTarget.textContent = "Hide answer";
-  }
-
-  hideAnswer() {
-    if (this.hasAnswerTarget) this.answerTarget.hidden = true;
-    if (this.hasActionsTarget) this.actionsTarget.hidden = true;
+  connect() {
     this.answerVisible = false;
-    if (this.hasShowButtonTarget) this.showButtonTarget.textContent = "Show answer";
+    this.loadVoices();
   }
 
-  toggleAnswer() {
-    if (this.answerVisible) {
-      this.hideAnswer();
-    } else {
-      this.showAnswer();
-    }
+  handleVisibilityChanged(event) {
+    this.answerVisible = !!event.detail?.visible;
   }
 
   handleKeydown(event) {
     if (event.code === "Space") {
       event.preventDefault();
-      this.toggleAnswer();
+      window.dispatchEvent(new Event("review:toggle"));
       return;
     }
 
@@ -100,20 +92,4 @@ export default class extends Controller {
     // containing pinyin, e.g. data-review-speech-text-value.
     return character;
   }
-
-  connect() {
-    this.answerVisible = false;
-
-    if (this.hasAnswerTarget) {
-      this.answerTarget.hidden = true;
-    }
-
-    if (this.hasActionsTarget) {
-      this.actionsTarget.hidden = true;
-    }
-
-    this.loadVoices();
-  }
-
-  disconnect() {}
 }
