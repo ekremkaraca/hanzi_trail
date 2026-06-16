@@ -38,51 +38,60 @@
     </div>
   </div>
 
-  <div class="field">
+  <div class="field" x-data="textCounter(2_000)">
     <%= form.label :story, class: "label" %>
     <div class="control">
-      <%= form.text_area :story, class: "textarea", rows: 6 %>
+      <%= form.text_area :story, class: "textarea", rows: 6, "x-ref": "field" %>
     </div>
+    <%= render "shared/char_counter", field: form, attribute: :story, char_limit: 2_000 %>
   </div>
 
-  <div class="field">
+  <div class="field" x-data="textCounter(1_000)">
     <%= form.label :components, class: "label" %>
     <div class="control">
       <%= form.text_area :components,
             class: "textarea",
             rows: 3,
-            placeholder: "网 = net; 络 = connection/thread"  %>
+            placeholder: "网 = net; 络 = connection/thread",
+            "x-ref": "field" %>
     </div>
+    <%= render "shared/char_counter", field: form, attribute: :components, char_limit: 1_000 %>
   </div>
 
-  <div class="field">
+  <div class="field" x-data="textCounter(500)">
     <%= form.label :literal_meaning, class: "label" %>
     <div class="control">
       <%= form.text_area :literal_meaning,
             class: "textarea",
             rows: 2,
-            placeholder: "net + connection"  %>
+            placeholder: "net + connection",
+            "x-ref": "field" %>
     </div>
+    <%= render "shared/char_counter", field: form, attribute: :literal_meaning, char_limit: 500 %>
   </div>
 
-  <div class="field">
+  <div class="field" x-data="textCounter(1_000)">
     <%= form.label :mnemonic, class: "label" %>
     <div class="control">
       <%= form.text_area :mnemonic,
             class: "textarea",
             rows: 3,
-            placeholder: "Imagine cables forming a giant net." %>
+            placeholder: "Imagine cables forming a giant net.",
+            "x-ref": "field" %>
     </div>
+    <%= render "shared/char_counter", field: form, attribute: :mnemonic, char_limit: 1_000 %>
   </div>
 
-  <div class="field">
+  <div class="field" x-data="textCounter(1_000)">
     <%= form.label :usage_note, class: "label" %>
     <div class="control">
       <%= form.text_area :usage_note,
             class: "textarea",
             rows: 3,
-            placeholder: "Used in words related to internet, networking, and infrastructure." %>
+            placeholder: "Used in words related to internet, networking, and infrastructure.",
+            "x-ref": "field" %>
     </div>
+    <%= render "shared/char_counter", field: form, attribute: :usage_note, char_limit: 1_000 %>
   </div>
 
   <div class="field is-grouped">

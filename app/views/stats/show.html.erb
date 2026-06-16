@@ -34,13 +34,9 @@
       </div>
     </div>
 
-    <div id="rating-summary" class="box mb-5">
-      <div class="level mb-4">
-        <div class="level-left">
-          <h2 class="title is-5 mb-0">Review counts by rating</h2>
-        </div>
-      </div>
-
+    <%= render "shared/collapsible_box",
+          id: "rating-summary",
+          title: "Review counts by rating" do %>
       <div class="columns is-multiline">
         <% %w[again hard good easy].each do |rating| %>
           <div class="column is-6-mobile is-3-tablet">
@@ -51,15 +47,11 @@
           </div>
         <% end %>
       </div>
-    </div>
+    <% end %>
 
-    <div id="rating-breakdown" class="box mb-5">
-      <div class="level mb-4">
-        <div class="level-left">
-          <h2 class="title is-5 mb-0">Rating breakdown</h2>
-        </div>
-      </div>
-
+    <%= render "shared/collapsible_box",
+          id: "rating-breakdown",
+          title: "Rating breakdown" do %>
       <% total_ratings = @rating_breakdown.values.sum %>
 
       <% %w[again hard good easy].each do |rating| %>
@@ -83,18 +75,12 @@
           </progress>
         </div>
       <% end %>
-    </div>
+    <% end %>
 
-    <div id="most-difficult" class="box mb-5">
-      <div class="level mb-4">
-        <div class="level-left">
-          <h2 class="title is-5 mb-0">Most Difficult Cards</h2>
-        </div>
-        <div class="level-right">
-          <span class="tag is-warning is-light">Top 10</span>
-        </div>
-      </div>
-
+    <%= render "shared/collapsible_box",
+          id: "most-difficult",
+          title: "Most Difficult Cards",
+          badge: content_tag(:span, "Top 10", class: "tag is-warning is-light") do %>
       <% if @difficult_cards.any? %>
         <div class="panel">
           <% @difficult_cards.each do |card| %>
@@ -108,13 +94,13 @@
       <% else %>
         <p class="has-text-grey-light">No difficult cards yet.</p>
       <% end %>
-    </div>
+    <% end %>
 
     <div class="columns is-variable is-6">
       <div class="column is-6">
-        <div id="recently-reviewed" class="box">
-          <h2 class="title is-5 mb-4">Recently reviewed</h2>
-
+        <%= render "shared/collapsible_box",
+              id: "recently-reviewed",
+              title: "Recently reviewed" do %>
           <% if @recent_attempts.any? %>
             <div class="table-container">
               <table class="table is-fullwidth is-striped is-hoverable is-narrow">
@@ -132,13 +118,13 @@
           <% else %>
             <p class="has-text-grey-light">No reviews yet.</p>
           <% end %>
-        </div>
+        <% end %>
       </div>
 
       <div class="column is-6">
-        <div class="box">
-          <h2 class="title is-5 mb-4">Recent activity</h2>
-
+        <%= render "shared/collapsible_box",
+              id: "recent-activity",
+              title: "Recent activity" do %>
           <% if @recent_attempts.any? %>
             <div class="panel">
               <% @recent_attempts.each do |attempt| %>
@@ -152,7 +138,7 @@
           <% else %>
             <p class="has-text-grey-light">No review activity yet.</p>
           <% end %>
-        </div>
+        <% end %>
       </div>
     </div>
   </div>

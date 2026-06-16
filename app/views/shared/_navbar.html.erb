@@ -1,14 +1,36 @@
-<nav class="hanzi-navbar" role="navigation" aria-label="main navigation">
+<nav
+  class="hanzi-navbar"
+  role="navigation"
+  aria-label="main navigation"
+  x-data="mobileNav(600)"
+>
   <div class="hanzi-navbar-inner">
     <%= link_to root_path, class: "hanzi-brand" do %>
       <span class="hanzi-logo">网</span>
       <strong>HanziTrail</strong>
     <% end %>
 
-    <div class="hanzi-nav-links">
-      <%= link_to "Cards", flashcards_path %>
-      <%= link_to "Review", review_path %>
-      <%= link_to "Stats", stats_path %>
+    <button
+      type="button"
+      class="hanzi-nav-toggle"
+      aria-label="Toggle navigation"
+      :aria-expanded="open.toString()"
+      x-show="isMobile"
+      @click="toggle()"
+    >
+      <span class="hanzi-nav-toggle-bar" :class="open && 'hanzi-nav-toggle-bar--open'"></span>
+      <span class="hanzi-nav-toggle-bar" :class="open && 'hanzi-nav-toggle-bar--open'"></span>
+      <span class="hanzi-nav-toggle-bar" :class="open && 'hanzi-nav-toggle-bar--open'"></span>
+    </button>
+
+    <div
+      class="hanzi-nav-links"
+      x-show="open"
+      x-cloak
+    >
+      <%= link_to "Cards", flashcards_path, "@click": "close()" %>
+      <%= link_to "Review", review_path, "@click": "close()" %>
+      <%= link_to "Stats", stats_path, "@click": "close()" %>
     </div>
   </div>
 </nav>

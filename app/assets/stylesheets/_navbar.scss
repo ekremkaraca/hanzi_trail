@@ -61,11 +61,46 @@
   box-shadow: 0 0.5rem 1.25rem rgba(79, 124, 255, 0.35);
 }
 
+.hanzi-nav-toggle {
+  margin-left: auto;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 2rem;
+  height: 1.4rem;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+
+  &-bar {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: #111827;
+    border-radius: 2px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+
+    &--open:nth-child(1) {
+      transform: translateY(0.55rem) rotate(45deg);
+    }
+
+    &--open:nth-child(2) {
+      opacity: 0;
+    }
+
+    &--open:nth-child(3) {
+      transform: translateY(-0.55rem) rotate(-45deg);
+    }
+  }
+}
+
 @media (max-width: 600px) {
   .hanzi-navbar-inner {
     gap: 0.85rem;
     min-height: 3rem;
     padding: 0 0.75rem;
+    flex-wrap: wrap;
   }
 
   .hanzi-brand {
@@ -81,8 +116,19 @@
     height: 2rem;
   }
 
+  .hanzi-nav-toggle {
+    display: inline-flex;
+  }
+
   .hanzi-nav-links {
-    gap: 0.9rem;
+    order: 3;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem 0 0.25rem;
+    border-top: 1px solid #e9edf3;
+    margin-top: 0.5rem;
 
     a {
       font-size: 0.95rem;

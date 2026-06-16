@@ -1,0 +1,35 @@
+<%# Local variables:
+    id        - the id for the wrapper div (matches existing anchors)
+    title     - the section title text
+    eyebrow   - optional small label above the title
+    open      - default state (true/false). Defaults to false.
+    badge     - optional content for the right side of the header (e.g. tags)
+%>
+<% _open = local_assigns.fetch(:open, false) %>
+<div id="<%= id %>" class="box mb-5" x-data="{ open: <%= _open %> }">
+  <button
+    type="button"
+    class="collapsible-header"
+    :aria-expanded="open.toString()"
+    aria-controls="<%= id %>-content"
+    @click="open = !open"
+  >
+    <div class="collapsible-header-text">
+      <% if local_assigns[:eyebrow].present? %>
+        <span class="eyebrow"><%= eyebrow %></span>
+      <% end %>
+      <h2 class="title is-5 mb-0"><%= title %></h2>
+    </div>
+
+    <div class="collapsible-header-right">
+      <% if local_assigns[:badge].present? %>
+        <%= badge %>
+      <% end %>
+      <span class="collapsible-caret" :class="open && 'collapsible-caret--open'" aria-hidden="true">▾</span>
+    </div>
+  </button>
+
+  <div id="<%= id %>-content" x-show="open" x-cloak class="collapsible-body">
+    <%= yield %>
+  </div>
+</div>

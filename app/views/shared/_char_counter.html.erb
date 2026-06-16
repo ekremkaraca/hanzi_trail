@@ -1,0 +1,12 @@
+<%# Local variables:
+    field       - the form builder instance (e.g. `form`)
+    attribute   - the attribute symbol (e.g. :story)
+    char_limit  - the soft cap (matches the model validation)
+%>
+<% _field_id = field.field_id(attribute) %>
+<p
+  class="help has-text-right char-counter"
+  :class="overLimit && 'char-counter--warning'"
+>
+  <span x-text="count"></span> / <%= char_limit %>
+</p>

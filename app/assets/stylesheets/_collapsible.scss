@@ -1,0 +1,59 @@
+.collapsible-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0;
+  margin: 0 0 1rem;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+
+  &:focus-visible {
+    outline: 2px solid var(--hanzi-blue);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
+}
+
+.collapsible-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.collapsible-header-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.collapsible-caret {
+  display: inline-block;
+  font-size: 1rem;
+  line-height: 1;
+  color: #6b7280;
+  transition: transform 0.18s ease;
+
+  &--open {
+    transform: rotate(180deg);
+  }
+}
+
+.collapsible-body {
+  margin-top: 0.5rem;
+}
+
+// In stats, the header lives where the title used to sit. Lift the bottom
+// margin off the wrapper so collapsed cards don't show a thin gap.
+.box {
+  .collapsible-header {
+    margin-bottom: 0;
+  }
+
+  .collapsible-body {
+    margin-top: 1rem;
+  }
+}

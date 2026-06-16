@@ -1,0 +1,11 @@
+.char-counter {
+  margin-top: 0.35rem;
+  font-variant-numeric: tabular-nums;
+  color: #6b7280;
+  transition: color 0.15s ease;
+
+  &--warning {
+    color: #d97706;
+    font-weight: 600;
+  }
+}
