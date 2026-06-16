@@ -4,13 +4,12 @@ class StreakCalculator
   end
 
   def call
-    # Normalize the SQL dates so the streak logic stays adapter-agnostic.
+    # Normalize the SQL dates so the streak logic stays Postgres-specific.
     dates = ReviewAttempt
-      .where("reviewed_at >= ?", 1.year.ago)
-      .distinct.pluck(Arel.sql("DATE(reviewed_at)"))
-      .map(&:to_date)
-      .sort
-      .reverse
+      .select("DATE(reviewed_at) AS d")
+      .distinct
+      .order(Arel.sql("DATE(reviewed_at) DESC"))
+      .map(&:d)
 
     streak = 0
     current = Date.current
