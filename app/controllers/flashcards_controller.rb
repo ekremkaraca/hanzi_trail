@@ -7,12 +7,15 @@ class FlashcardsController < ApplicationController
   FLASHCARDS_LIMIT = 200.freeze
 
   def index
-    @flashcards = Flashcard.all
-    @flashcards = @flashcards.by_source(params[:source])
-    @flashcards = @flashcards.by_hsk_level(params[:hsk_level])
-    @flashcards = @flashcards.by_category(params[:category])
-    @flashcards = @flashcards.with_story_filter(params[:story_status])
-    @flashcards = @flashcards.search(params[:query]).limit(FLASHCARDS_LIMIT)
+    @flashcards = Flashcard
+      .all
+      .by_source(params[:source])
+      .by_hsk_level(params[:hsk_level])
+      .by_category(params[:category])
+      .with_story_filter(params[:story_status])
+      .search(params[:query])
+      .order(:character)
+      .limit(FLASHCARDS_LIMIT)
   end
 
   def show; end

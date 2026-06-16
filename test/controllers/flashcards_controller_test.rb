@@ -259,4 +259,36 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
   end
+
+  test "index applies search filter before limit" do
+    3.times { |i| Flashcard.create!(character: "z#{i}", pinyin: "z", meaning: "z") }
+    get flashcards_path, params: { query: "zzz_no_match_zzz" }
+    assert_response :success
+    assert_includes response.body, "No flashcards matched your filter"
+  end
+
+  test "index caps at 200 cards and orders deterministically" do
+    220.times do |i|
+      Flashcard.create!(
+        character: "溢#{format("%03d", i)}",
+        pinyin: "yì",
+        meaning: "limitmarker",
+        category: "limit_test",
+        source: "curated"
+      )
+    end
+
+    get flashcards_path, params: { category: "limit_test" }
+    first_cards = response.body.scan(/flashcard-character-link" href="\/flashcards\/\d+">([^<]+)</).flatten
+
+    assert_equal 200, first_cards.size
+    assert_equal first_cards, first_cards.sort
+    assert_equal "溢000", first_cards.first
+    assert_equal "溢199", first_cards.last
+
+    get flashcards_path, params: { category: "limit_test" }
+    second_cards = response.body.scan(/flashcard-character-link" href="\/flashcards\/\d+">([^<]+)</).flatten
+
+    assert_equal first_cards, second_cards
+  end
 end
