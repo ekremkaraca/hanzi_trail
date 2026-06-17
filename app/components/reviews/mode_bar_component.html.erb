@@ -1,4 +1,4 @@
-<%# DRY: data-driven mode-bar links from REVIEW_MODES (helper-driven to keep the helper spec authoritative). %>
+<%# ModeBarComponent owns active-state classes so filters are explicit inputs. %>
 <div class="review-mode-bar mb-4">
-  <%= helpers.review_mode_buttons %>
+  <%= mode_links %>
 </div>

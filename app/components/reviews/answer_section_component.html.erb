@@ -6,12 +6,30 @@
   </header>
 
   <div x-data="{ activeTab: 0 }" class="review-tab-panels">
-    <%# DRY: tab list and panels are built from review_answer_tabs via helper methods %>
+    <%# The component now builds tab controls directly so panel markup stays local. %>
     <ul class="tabs" role="tablist">
-      <%= tab_list %>
+      <% tabs.each do |tab| %>
+        <li
+          data-index="<%= tab.fetch(:index) %>"
+          @click="activeTab = <%= tab.fetch(:index) %>"
+        >
+          <a
+            role="tab"
+            tabindex="0"
+            :aria-selected="activeTab === <%= tab.fetch(:index) %>"
+            @click.prevent="activeTab = <%= tab.fetch(:index) %>"
+          >
+            <%= tab.fetch(:label) %>
+          </a>
+        </li>
+      <% end %>
     </ul>
 
-    <%= tab_panels %>
+    <% tabs.each do |tab| %>
+      <div class="review-tab-panel" role="tabpanel" x-show="activeTab === <%= tab.fetch(:index) %>">
+        <%= render tab.fetch(:component).new(flashcard: flashcard) %>
+      </div>
+    <% end %>
   </div>
 
   <div class="text-center mt-4">

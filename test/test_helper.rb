@@ -1,6 +1,8 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+# Enable component-level tests for UI now owned by ViewComponent classes.
+require "view_component/test_case"
 
 module ActiveSupport
   class TestCase
