@@ -1,6 +1,7 @@
-<%= render "shared/collapsible_box",
+<%= render Shared::CollapsibleBoxComponent.new(
       id: "recently-reviewed",
-      title: "Recently reviewed" do %>
+      title: "Recently reviewed"
+    ) do %>
   <% if any_attempts? %>
     <figure style="overflow-x: auto; margin: 0;">
       <table>

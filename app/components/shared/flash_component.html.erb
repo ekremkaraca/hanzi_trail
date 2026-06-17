@@ -1,4 +1,4 @@
-<% flash.each do |type, message| %>
+<% messages.each do |type, message| %>
   <div class="flash-message is-<%= type %>"
     data-controller="flash"
     data-flash-timeout-value="4000"
@@ -6,7 +6,7 @@
     aria-live="polite">
     <div class="flash-message-content">
       <span class="flash-message-icon">
-        <%= type.to_s == "notice" ? "✓" : "!" %>
+        <%= icon_for(type) %>
       </span>
       <span class="flash-message-text"><%= message %></span>
     </div>

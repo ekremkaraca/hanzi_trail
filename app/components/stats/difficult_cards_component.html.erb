@@ -1,7 +1,8 @@
-<%= render "shared/collapsible_box",
+<%= render Shared::CollapsibleBoxComponent.new(
       id: "most-difficult",
       title: "Most Difficult Cards",
-      badge: badge do %>
+      badge: badge
+    ) do %>
   <% if any_cards? %>
     <div class="panel">
       <% difficult_cards.each do |card| %>

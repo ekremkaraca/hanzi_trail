@@ -1,0 +1,27 @@
+<article id="<%= id %>" class="panel-card mb-5" x-data="{ open: <%= open %> }">
+  <button
+    type="button"
+    class="collapsible-header"
+    :aria-expanded="aria_expanded"
+    aria-controls="<%= id %>-content"
+    @click="open = !open"
+  >
+    <div class="collapsible-header-text">
+      <% if show_eyebrow? %>
+        <span class="eyebrow"><%= eyebrow %></span>
+      <% end %>
+      <h2 class="is-size-5 mb-0"><%= title %></h2>
+    </div>
+
+    <div class="collapsible-header-right">
+      <% if show_badge? %>
+        <%= badge %>
+      <% end %>
+      <span class="collapsible-caret" :class="open && 'collapsible-caret--open'" aria-hidden="true">▾</span>
+    </div>
+  </button>
+
+  <div id="<%= id %>-content" x-show="open" x-cloak class="collapsible-body">
+    <%= content %>
+  </div>
+</article>

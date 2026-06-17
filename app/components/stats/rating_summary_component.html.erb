@@ -1,6 +1,7 @@
-<%= render "shared/collapsible_box",
+<%= render Shared::CollapsibleBoxComponent.new(
       id: "rating-summary",
-      title: "Review counts by rating" do %>
+      title: "Review counts by rating"
+    ) do %>
   <div class="grid grid--stats">
     <% ratings.each do |rating| %>
       <div class="notification is-light text-center">

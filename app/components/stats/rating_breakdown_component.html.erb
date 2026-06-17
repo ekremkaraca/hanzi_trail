@@ -1,6 +1,7 @@
-<%= render "shared/collapsible_box",
+<%= render Shared::CollapsibleBoxComponent.new(
       id: "rating-breakdown",
-      title: "Rating breakdown" do %>
+      title: "Rating breakdown"
+    ) do %>
   <% ratings.each do |rating| %>
     <% count = count_for(rating) %>
     <div class="mb-4">

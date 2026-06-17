@@ -13,14 +13,14 @@
 
   <body>
     <header>
-        <%= render "shared/navbar" %>
+        <%= render Shared::NavbarComponent.new %>
     </header>
     <main class="container">
-        <%= render "shared/flash" %>
+        <%= render Shared::FlashComponent.new %>
         <%= yield %>
     </main>
     <footer>
-        <%= render "shared/footer" %>
+        <%= render Shared::FooterComponent.new %>
     </footer>
   </body>
 </html>

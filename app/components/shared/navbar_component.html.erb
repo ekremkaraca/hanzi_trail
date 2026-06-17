@@ -5,7 +5,7 @@
   x-data="mobileNav(600)"
 >
   <div class="hanzi-navbar-inner">
-    <%= link_to root_path, class: "hanzi-brand" do %>
+    <%= helpers.link_to root_path, class: "hanzi-brand" do %>
       <span class="hanzi-logo">网</span>
       <strong>HanziTrail</strong>
     <% end %>
@@ -28,9 +28,9 @@
       x-show="open"
       x-cloak
     >
-      <%= link_to "Cards", flashcards_path, "@click": "close()" %>
-      <%= link_to "Review", review_path, "@click": "close()" %>
-      <%= link_to "Stats", stats_path, "@click": "close()" %>
+      <%= nav_link("Cards",  flashcards_path) %>
+      <%= nav_link("Review", review_path) %>
+      <%= nav_link("Stats",  stats_path) %>
     </div>
   </div>
 </nav>
