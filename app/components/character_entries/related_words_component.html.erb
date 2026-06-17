@@ -1,0 +1,19 @@
+<section class="related-words mt-5">
+  <h2 class="is-size-4 mb-3">Appears in</h2>
+
+  <% if any_links? %>
+    <div class="related-word-list">
+      <% cards.each do |card| %>
+        <%= link_to flashcard_path(card), class: "related-word-card" do %>
+          <strong><%= card.character %></strong>
+          <span><%= card.pinyin %></span>
+          <small><%= card.meaning %></small>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-grey-light">
+      No related flashcards yet.
+    </p>
+  <% end %>
+</section>

@@ -1,0 +1,27 @@
+<article class="character-entry-card">
+  <h1 class="character-entry-symbol">
+    <%= character_entry.character %>
+  </h1>
+
+  <p class="text-soft mt-3">
+    <%= pinyin_text %>
+  </p>
+
+  <p class="mt-4">
+    <strong>Meaning:</strong>
+    <%= meaning_text %>
+  </p>
+
+  <% if show_radical? %>
+    <p class="mt-2">
+      <strong>Radical:</strong>
+      <%= character_entry.radical %>
+    </p>
+  <% end %>
+
+  <% if show_notes? %>
+    <div class="content mt-4">
+      <%= formatted_notes %>
+    </div>
+  <% end %>
+</article>

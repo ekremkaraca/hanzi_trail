@@ -1,0 +1,9 @@
+<main class="character-entry-page">
+  <%= render CharacterEntries::HeaderComponent.new(character_entry: character_entry) %>
+
+  <%= render CharacterEntries::RelatedWordsComponent.new(flashcard_characters: flashcard_characters) %>
+
+  <div class="mt-5">
+    <%= helpers.link_to_active_review_if_present %>
+  </div>
+</main>
