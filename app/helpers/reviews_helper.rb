@@ -97,11 +97,11 @@ module ReviewsHelper
     tabs
   end
 
-  # DRY: tab panel partial lookup — keeps the partial name-to-index mapping in one place.
-  REVIEW_TAB_PARTIALS = {
-    0 => "story_tab",
-    1 => "breakdown_tab",
-    2 => "context_tab"
+  # DRY: tab panel component lookup — keeps the panel-class-to-index mapping in one place.
+  REVIEW_TAB_COMPONENTS = {
+    0 => ->(flashcard) { Reviews::TabPanels::StoryTabComponent.new(flashcard: flashcard) },
+    1 => ->(flashcard) { Reviews::TabPanels::BreakdownTabComponent.new(flashcard: flashcard) },
+    2 => ->(flashcard) { Reviews::TabPanels::ContextTabComponent.new(flashcard: flashcard) }
   }.freeze
 
   # DRY: render the tab list as <li> elements; safe_join ensures no stray nil entries.
@@ -123,7 +123,8 @@ module ReviewsHelper
     )
   end
 
-  # DRY: render the tab panels (one per visible tab) as <div role="tabpanel"> wrappers.
+  # DRY: render the tab panels (one per visible tab) as <div role="tabpanel"> wrappers,
+  # each composing the corresponding TabPanels::* component.
   def review_answer_tab_panels(flashcard)
     safe_join(
       review_answer_tabs(flashcard).map do |index, _label, _visible|
@@ -132,7 +133,7 @@ module ReviewsHelper
           role: "tabpanel",
           "x-show": "activeTab === #{index}"
         ) do
-          render partial: "reviews/partials/#{REVIEW_TAB_PARTIALS.fetch(index)}", locals: { flashcard: flashcard }
+          render(REVIEW_TAB_COMPONENTS.fetch(index).call(flashcard))
         end
       end
     )

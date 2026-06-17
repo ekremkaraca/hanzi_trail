@@ -1,7 +1,5 @@
-<% progress = review_progress_percentage(reviewed_count, total_review_count) %>
-
+<%# DRY: session-progress primary line; sits above the bar as a single, focused number. %>
 <div class="review-progress-card">
-  <%# DRY: session-progress primary line; sits above the bar as a single, focused number. %>
   <p class="review-progress-label">
     <span><%= reviewed_count %> reviewed · <%= remaining_due_count %> remaining</span>
     <span class="review-progress-percent"><%= progress %>%</span>

@@ -1,0 +1,39 @@
+<%# DRY: header holds the title + remaining count (hidden on mobile). The mode bar lives in its own component so it stays visible everywhere. %>
+<main class="review-page pb-6">
+  <%= render Reviews::HeaderComponent.new(remaining_due_count: remaining_due_count) %>
+  <%= render Reviews::ModeBarComponent.new %>
+
+  <% if flashcard.present? %>
+    <div
+      class="review-card review-session-card flex flex--col"
+      data-controller="review"
+      data-action="keydown@window->review#handleKeydown review:visibility-changed@window->review#handleVisibilityChanged"
+      x-data="reviewCard()"
+    >
+      <%= render Reviews::ProgressComponent.new(
+        reviewed_count: reviewed_count,
+        total_review_count: total_review_count,
+        reviewed_today_count: reviewed_today_count,
+        remaining_due_count: remaining_due_count
+      ) %>
+
+      <%= render Reviews::PromptComponent.new(flashcard: flashcard, show_pinyin: show_pinyin) %>
+
+      <%= render Reviews::AnswerSectionComponent.new(flashcard: flashcard) %>
+
+      <%= render Reviews::ActionsComponent.new(flashcard: flashcard) %>
+    </div>
+
+    <%= render Reviews::PreferencesComponent.new(
+      show_pinyin: show_pinyin,
+      filter_params: filter_params
+    ) %>
+
+  <% else %>
+    <%= render Reviews::EmptyStateComponent.new(
+      reviewed_count: reviewed_count,
+      filter_params: filter_params,
+      title: empty_state_title
+    ) %>
+  <% end %>
+</main>

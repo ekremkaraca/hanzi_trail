@@ -8,10 +8,10 @@
   <div x-data="{ activeTab: 0 }" class="review-tab-panels">
     <%# DRY: tab list and panels are built from review_answer_tabs via helper methods %>
     <ul class="tabs" role="tablist">
-      <%= review_answer_tab_list(flashcard) %>
+      <%= tab_list %>
     </ul>
 
-    <%= review_answer_tab_panels(flashcard) %>
+    <%= tab_panels %>
   </div>
 
   <div class="text-center mt-4">

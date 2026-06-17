@@ -1,13 +1,13 @@
 <div class="text-center mt-4 hidden-mobile">
   <%= form_with url: "/review/preferences", method: :patch, class: "is-inline-block" do |form| %>
     <label class="checkbox is-size-7 text-grey-light mr-2">
-      <%= form.check_box :show_pinyin, checked: session[:show_pinyin] %>
+      <%= form.check_box :show_pinyin, checked: show_pinyin %>
       Show pinyin before answer
     </label>
 
-    <%= hidden_field_tag :source, params[:source] %>
-    <%= hidden_field_tag :category, params[:category] %>
-    <%= hidden_field_tag :story_status, params[:story_status] %>
+    <%= hidden_field_tag :source, filter_params[:source] %>
+    <%= hidden_field_tag :category, filter_params[:category] %>
+    <%= hidden_field_tag :story_status, filter_params[:story_status] %>
 
     <%= form.submit "Save", class: "button is-small is-dark" %>
   <% end %>

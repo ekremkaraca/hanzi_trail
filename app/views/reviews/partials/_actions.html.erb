@@ -1,8 +1,0 @@
-<%# DRY: negative side margins let the actions escape the .review-card padding and span the full page width %>
-<div class="review-buttons grid mb-2 review-buttons--bleed">
-  <%= review_buttons_for(flashcard) %>
-</div>
-<small class="d-block text-center mt-2">
-  <%# DRY: shortcut hint text driven by REVIEW_BUTTONS keys %>
-  Use <%= review_shortcut_keys %> keys for quick review
-</small>

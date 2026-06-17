@@ -1,0 +1,24 @@
+<div class="review-tab-panel-card">
+  <div class="grid grid--2">
+    <%# DRY: render inline label rows via shared component, varying only attribute + label + color %>
+    <%= render Reviews::CharacterLabelComponent.new(
+      flashcard: flashcard,
+      attribute: :components,
+      label: "Components",
+      color: "info"
+    ) %>
+    <%= render Reviews::CharacterLabelComponent.new(
+      flashcard: flashcard,
+      attribute: :literal_meaning,
+      label: "Literal Meaning",
+      color: "info"
+    ) %>
+    <%= render Reviews::CharacterLabelComponent.new(
+      flashcard: flashcard,
+      attribute: :mnemonic,
+      label: "Memory Hook",
+      color: "success",
+      full_width: true
+    ) %>
+  </div>
+</div>

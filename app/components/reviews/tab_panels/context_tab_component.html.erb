@@ -1,11 +1,14 @@
-<%# Locals: flashcard - the Flashcard instance %>
 <div class="review-tab-panel-card">
   <div class="content is-size-6 text-white-ter">
-    <%# DRY: usage note rendered the same way as the story text %>
-    <%= render "reviews/partials/character_label", flashcard: flashcard, attribute: :usage_note, label: "Usage Note", color: "warning" %>
+    <%# DRY: usage note rendered the same way as the story text via shared component %>
+    <%= render Reviews::CharacterLabelComponent.new(
+      flashcard: flashcard,
+      attribute: :usage_note,
+      label: "Usage Note",
+      color: "warning"
+    ) %>
 
     <% if flashcard.character_entries.any? %>
-      <%# DRY: keep the character navigation but render with the same subdued type as the story %>
       <p class="mt-3 mb-1">
         <span class="is-size-7 text-grey text-uppercase tracking-wide">Components</span>
       </p>
