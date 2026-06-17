@@ -1,4 +1,6 @@
 module StatsHelper
+  REVIEW_RATINGS = %w[again hard good easy].freeze
+
   def rating_progress_class(rating)
     {
       "again" => "is-danger",

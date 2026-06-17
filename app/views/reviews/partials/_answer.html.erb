@@ -1,116 +1,20 @@
-<div
-  x-show="answerVisible"
-  x-cloak
-  style="border-top: 1px solid rgba(255,255,255,0.1);"
-  class="pt-4 mt-2"
->
-  <% has_breakdown = flashcard.components.present? || flashcard.literal_meaning.present? || flashcard.mnemonic.present? %>
-  <% has_context = flashcard.usage_note.present? || flashcard.character_entries.any? %>
+<div x-show="answerVisible" x-cloak class="review-answer-section">
+  <%# DRY: pinyin + meaning header pulled out of inline styles into a class %>
+  <header class="review-meaning-header">
+    <p class="pinyin"><%= flashcard.pinyin %></p>
+    <h2 class="meaning"><%= flashcard.meaning %></h2>
+  </header>
 
-  <div class="has-text-centered mb-4">
-    <p class="subtitle is-5 has-text-grey-light mb-1"><%= flashcard.pinyin %></p>
-    <p class="title is-3 has-text-white" style="word-wrap: break-word; white-space: normal;"><%= flashcard.meaning %></p>
+  <div x-data="{ activeTab: 0 }" class="review-tab-panels">
+    <%# DRY: tab list and panels are built from review_answer_tabs via helper methods %>
+    <ul class="tabs" role="tablist">
+      <%= review_answer_tab_list(flashcard) %>
+    </ul>
+
+    <%= review_answer_tab_panels(flashcard) %>
   </div>
 
-  <div x-data="{ activeTab: 0 }">
-    <div class="tabs is-toggle is-fullwidth is-small mb-4">
-      <ul>
-        <li
-          :class="activeTab === 0 && 'is-active'"
-          data-index="0"
-          @click="activeTab = 0"
-        >
-          <a><span>Story</span></a>
-        </li>
-        <% if has_breakdown %>
-          <li
-            :class="activeTab === 1 && 'is-active'"
-            data-index="1"
-            @click="activeTab = 1"
-          >
-            <a><span>Breakdown</span></a>
-          </li>
-        <% end %>
-        <% if has_context %>
-          <li
-            :class="activeTab === 2 && 'is-active'"
-            data-index="2"
-            @click="activeTab = 2"
-          >
-            <a><span>Context</span></a>
-          </li>
-        <% end %>
-      </ul>
-    </div>
-
-    <div class="tab-panel" x-show="activeTab === 0">
-      <% if flashcard.story.present? %>
-        <div class="notification is-dark p-4" style="background-color: rgba(255,255,255,0.03);">
-          <div class="content is-size-6 has-text-white-ter">
-            <%= simple_format(flashcard.story) %>
-          </div>
-        </div>
-      <% else %>
-        <p class="has-text-centered has-text-grey is-size-7 my-4">No story added for this card yet.</p>
-      <% end %>
-    </div>
-
-    <% if has_breakdown %>
-      <div class="tab-panel" x-show="activeTab === 1">
-        <div class="box p-4" style="background-color: rgba(0, 0, 0, 0.15); border: 1px solid rgba(255,255,255,0.03);">
-          <div class="columns is-multiline is-mobile">
-            <% if flashcard.components.present? %>
-              <div class="column is-12-mobile is-6-tablet mb-2">
-                <span class="is-size-7 has-text-info is-uppercase tracking-wide">Components</span>
-                <div class="is-size-6 mt-1"><%= simple_format(flashcard.components) %></div>
-              </div>
-            <% end %>
-
-            <% if flashcard.literal_meaning.present? %>
-              <div class="column is-12-mobile is-6-tablet mb-2">
-                <span class="is-size-7 has-text-info is-uppercase tracking-wide">Literal Meaning</span>
-                <div class="is-size-6 mt-1"><%= simple_format(flashcard.literal_meaning) %></div>
-              </div>
-            <% end %>
-
-            <% if flashcard.mnemonic.present? %>
-              <div class="column is-12">
-                <span class="is-size-7 has-text-success is-uppercase tracking-wide">Memory Hook</span>
-                <div class="is-size-6 mt-1"><%= simple_format(flashcard.mnemonic) %></div>
-              </div>
-            <% end %>
-          </div>
-        </div>
-      </div>
-    <% end %>
-
-    <% if has_context %>
-      <div class="tab-panel" x-show="activeTab === 2">
-        <div class="box p-4 mb-2" style="background-color: rgba(0, 0, 0, 0.15); border: 1px solid rgba(255,255,255,0.03);">
-          <% if flashcard.usage_note.present? %>
-            <div class="mb-3">
-              <span class="is-size-7 has-text-warning is-uppercase tracking-wide">Usage Note</span>
-              <div class="is-size-6 mt-1"><%= simple_format(flashcard.usage_note) %></div>
-            </div>
-          <% end %>
-
-          <% if flashcard.character_entries.any? %>
-            <div class="has-text-centered pt-2">
-              <span class="is-size-7 has-text-grey is-uppercase tracking-wide d-block mb-2">Component Navigation</span>
-              <div class="is-size-3 tracking-widest mb-2">
-                <% flashcard.flashcard_characters.includes(:character_entry).order(:position).each do |link| %>
-                  <span class="mx-1"><%= link.character_entry.character %></span>
-                <% end %>
-              </div>
-              <%= link_to "Explore characters →", flashcard_path(flashcard, anchor: "characters"), class: "is-size-7 has-text-link" %>
-            </div>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
-  </div>
-
-  <div class="has-text-centered mt-4">
+  <div class="text-center mt-4">
     <%= link_to "Explore card", flashcard_path(flashcard), class: "button is-dark is-outlined is-small" %>
   </div>
 </div>

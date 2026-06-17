@@ -1,42 +1,38 @@
-<section class="section review-page pb-6">
-  <div class="container is-max-widescreen">
+<main class="review-page pb-6">
+  <%# DRY: header holds the title + remaining count (hidden on mobile). The mode bar lives in its own partial so it stays visible everywhere. %>
+  <%= render "reviews/partials/header", remaining_due_count: @remaining_due_count %>
+  <%= render "reviews/partials/mode_bar" %>
 
-    <div class="is-hidden-mobile mb-5">
-      <%= render "reviews/partials/header", remaining_due_count: @remaining_due_count %>
+  <% if @flashcard.present? %>
+    <div
+      class="review-card review-session-card flex flex--col"
+      data-controller="review"
+      data-action="keydown@window->review#handleKeydown review:visibility-changed@window->review#handleVisibilityChanged"
+      x-data="reviewCard()"
+    >
+      <%= render "reviews/partials/progress",
+        reviewed_count: @reviewed_count,
+        total_review_count: @total_review_count,
+        reviewed_today_count: @reviewed_today_count,
+        remaining_due_count: @remaining_due_count
+      %>
+
+      <%= render "reviews/partials/prompt", flashcard: @flashcard %>
+
+      <%= render "reviews/partials/answer", flashcard: @flashcard %>
+
+      <div class="mt-auto pt-5" x-show="answerVisible" x-cloak>
+        <%= render "reviews/partials/actions", flashcard: @flashcard %>
+      </div>
     </div>
 
-    <% if @flashcard.present? %>
-      <div
-        class="review-card review-session-card box has-background-dark has-text-white is-flex is-flex-direction-column"
-        data-controller="review"
-        data-action="keydown@window->review#handleKeydown review:visibility-changed@window->review#handleVisibilityChanged"
-        x-data="reviewCard()"
-      >
-        <%= render "reviews/partials/progress",
+    <%= render "reviews/partials/preferences" %>
+
+  <% else %>
+    <%= render "reviews/partials/empty_state",
           reviewed_count: @reviewed_count,
-          total_review_count: @total_review_count,
-          reviewed_today_count: @reviewed_today_count,
-          remaining_due_count: @remaining_due_count
-        %>
-
-        <%= render "reviews/partials/prompt", flashcard: @flashcard %>
-
-        <%= render "reviews/partials/answer", flashcard: @flashcard %>
-
-        <div class="mt-auto pt-5" x-show="answerVisible" x-cloak>
-          <%= render "reviews/partials/actions", flashcard: @flashcard %>
-        </div>
-      </div>
-
-      <%= render "reviews/partials/preferences" %>
-
-    <% else %>
-      <%= render "reviews/partials/empty_state",
-            reviewed_count: @reviewed_count,
-            review_filter_params: @review_filter_params,
-            empty_state_title: @empty_state_title
-            %>
-    <% end %>
-
-  </div>
-</section>
+          review_filter_params: @review_filter_params,
+          empty_state_title: @empty_state_title
+          %>
+  <% end %>
+</main>

@@ -1,0 +1,14 @@
+<%# Locals:
+    flashcard - the Flashcard instance
+    attribute  - the attribute symbol (e.g. :components)
+    label      - the eyebrow text shown above the formatted text
+    color      - the Bulma text color class (e.g. "info", "success", "warning")
+    full_width - if true, span both grid columns; default false
+%>
+<% if flashcard.public_send(attribute).present? %>
+  <%# DRY: .span-full replaces the inline `grid-column: 1 / -1` style %>
+  <div class="mb-2<%= " span-full" if local_assigns[:full_width] %>">
+    <span class="is-size-7 text-<%= color %> text-uppercase tracking-wide"><%= label %></span>
+    <div class="is-size-6 mt-1"><%= simple_format(flashcard.public_send(attribute)) %></div>
+  </div>
+<% end %>

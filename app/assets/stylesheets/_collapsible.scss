@@ -1,3 +1,6 @@
+/* Use element + class specificity to win over Pico's <button> default
+   (which would otherwise paint this header blue + white). */
+button.collapsible-header,
 .collapsible-header {
   display: flex;
   align-items: center;
@@ -10,6 +13,17 @@
   text-align: left;
   cursor: pointer;
   color: inherit;
+  box-shadow: none;
+  font: inherit;
+  line-height: inherit;
+
+  &:hover,
+  &:focus,
+  &:active {
+    background: transparent;
+    color: inherit;
+    box-shadow: none;
+  }
 
   &:focus-visible {
     outline: 2px solid var(--hanzi-blue);
@@ -48,7 +62,7 @@
 
 // In stats, the header lives where the title used to sit. Lift the bottom
 // margin off the wrapper so collapsed cards don't show a thin gap.
-.box {
+.panel-card {
   .collapsible-header {
     margin-bottom: 0;
   }

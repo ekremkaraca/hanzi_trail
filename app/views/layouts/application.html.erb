@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="dark">
   <head>
     <title>HanziTrail</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -12,11 +12,15 @@
   </head>
 
   <body>
-    <%= render "shared/navbar" %>
-    <%= render "shared/flash" %>
-
-    <main>
-      <%= yield %>
+    <header>
+        <%= render "shared/navbar" %>
+    </header>
+    <main class="container">
+        <%= render "shared/flash" %>
+        <%= yield %>
     </main>
+    <footer>
+        <%= render "shared/footer" %>
+    </footer>
   </body>
 </html>

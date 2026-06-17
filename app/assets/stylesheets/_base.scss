@@ -1,12 +1,60 @@
-:root {
+/* ── HanziTrail design tokens & components (Pico-based) ── */
+
+:root,
+[data-theme="dark"] {
+  /* Brand palette */
   --hanzi-bg: #0f1724;
   --hanzi-panel: #141d2b;
   --hanzi-panel-soft: #192437;
   --hanzi-border: rgba(255, 255, 255, 0.1);
   --hanzi-text-soft: #aeb8c7;
+  --hanzi-text-muted: rgba(255, 255, 255, 0.55);
   --hanzi-blue: #4f7cff;
+  --hanzi-cyan: #67e8f9;
+  --hanzi-green: #48c78e;
+  --hanzi-red: #f14668;
+  --hanzi-yellow: #ffe08a;
+  --hanzi-orange: #f6993f;
+
+  /* Semantic colours */
+  --hanzi-success: #22c55e;
+  --hanzi-warning: #f59e0b;
+  --hanzi-danger: #ef4444;
+  --hanzi-info: #38bdf8;
+
+  /* Pico overrides so the dark theme matches our brand */
+  --pico-background-color: var(--hanzi-bg);
+  --pico-color: #f8fafc;
+  --pico-h1-color: #f8fafc;
+  --pico-h2-color: #f8fafc;
+  --pico-h3-color: #f8fafc;
+  --pico-h4-color: #f8fafc;
+  --pico-h5-color: #f8fafc;
+  --pico-h6-color: #f8fafc;
+  --pico-primary: var(--hanzi-blue);
+  --pico-primary-background: var(--hanzi-blue);
+  --pico-primary-hover: #6b91ff;
+  --pico-primary-focus: rgba(79, 124, 255, 0.25);
+  --pico-primary-inverse: #ffffff;
+  --pico-secondary: var(--hanzi-panel-soft);
+  --pico-secondary-background: var(--hanzi-panel-soft);
+  --pico-secondary-hover: #233449;
+  --pico-secondary-border: var(--hanzi-border);
+  --pico-card-background-color: var(--hanzi-panel);
+  --pico-card-sectioning-background-color: var(--hanzi-panel-soft);
+  --pico-card-box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.35);
+  --pico-form-element-background-color: rgba(15, 23, 36, 0.78);
+  --pico-form-element-border-color: rgba(255, 255, 255, 0.14);
+  --pico-form-element-color: #f8fafc;
+  --pico-form-element-placeholder-color: rgba(255, 255, 255, 0.35);
+  --pico-form-element-focus-color: rgba(79, 124, 255, 0.25);
+  --pico-form-element-spacing-vertical: 0.65rem;
+  --pico-form-element-spacing-horizontal: 0.85rem;
+  --pico-border-radius: 0.65rem;
+  --pico-spacing: 1rem;
 }
 
+/* Background gradient on top of Pico's flat colour */
 body {
   min-height: 100vh;
   background:
@@ -15,6 +63,145 @@ body {
   color: #f8fafc;
 }
 
+/* Container capped at 960px (readability-first). Pages that need a wider
+   canvas (stats, review) can override with their own class. */
+main.container,
+.container {
+  max-width: 60rem;
+  margin-inline: auto; /* Bulma's mx-auto equivalent */
+  padding-top: 1.5rem; /* Air below navbar so banners don't clip the top */
+}
+
+/* Pico styles h1–h6 aggressively; tame them a touch inside cards */
+article h1,
+article h2,
+article h3 {
+  margin: 0 0 0.5em;
+  color: inherit;
+}
+
+/* ── Eyebrow labels (small uppercase headers) ── */
+.eyebrow {
+  color: var(--hanzi-text-soft);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Card / surface helper ── */
+.panel-card {
+  padding: 1.5rem;
+  border: 1px solid var(--hanzi-border);
+  border-radius: 1rem;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
+    var(--hanzi-panel);
+}
+
+/* ── Buttons: add colour variants Pico doesn't ship with ── */
+button,
+[type="submit"],
+[type="button"],
+.button {
+  &.is-danger,
+  &.is-warning,
+  &.is-success,
+  &.is-info {
+    border-color: transparent;
+    color: #ffffff;
+
+    &:hover {
+      color: #ffffff;
+    }
+  }
+
+  &.is-danger {
+    background: var(--hanzi-danger);
+
+    &:hover {
+      background: #f87171;
+    }
+  }
+
+  &.is-warning {
+    background: var(--hanzi-warning);
+
+    &:hover {
+      background: #fbbf24;
+    }
+  }
+
+  &.is-success {
+    background: var(--hanzi-success);
+
+    &:hover {
+      background: #4ade80;
+    }
+  }
+
+  &.is-info {
+    background: var(--hanzi-info);
+
+    &:hover {
+      background: #7dd3fc;
+    }
+  }
+
+  &.is-link {
+    background: var(--hanzi-blue);
+    color: #ffffff;
+
+    &:hover {
+      background: #6b91ff;
+      color: #ffffff;
+    }
+  }
+
+  &.is-dark {
+    background: #1f2a3b;
+    border-color: var(--hanzi-border);
+    color: #f8fafc;
+
+    &:hover {
+      background: #2a3850;
+      color: #f8fafc;
+    }
+  }
+
+  &.is-light {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--hanzi-border);
+    color: #f8fafc;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: #f8fafc;
+    }
+  }
+
+  &.is-outlined {
+    background: transparent;
+    border: 1px solid currentColor;
+    color: inherit;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  &.is-medium {
+    font-size: 1rem;
+    padding: 0.55rem 1rem;
+  }
+
+  &.is-small {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.6rem;
+  }
+}
+
+button[disabled],
 .button[disabled] {
   opacity: 0.45;
   cursor: not-allowed;
@@ -25,6 +212,390 @@ body {
   }
 }
 
+/* ── Tags ── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+
+  &.is-warning {
+    background: rgba(245, 158, 11, 0.18);
+    border-color: rgba(245, 158, 11, 0.35);
+    color: #fde68a;
+  }
+
+  &.is-info {
+    background: rgba(56, 189, 248, 0.18);
+    border-color: rgba(56, 189, 248, 0.35);
+    color: #bae6fd;
+  }
+
+  &.is-success {
+    background: rgba(34, 197, 94, 0.18);
+    border-color: rgba(34, 197, 94, 0.35);
+    color: #bbf7d0;
+  }
+
+  &.is-danger {
+    background: rgba(239, 68, 68, 0.18);
+    border-color: rgba(239, 68, 68, 0.35);
+    color: #fecaca;
+  }
+
+  &.is-light {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #f8fafc;
+  }
+
+  &.is-dark {
+    background: #1f2a3b;
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #f8fafc;
+  }
+
+  &.is-link {
+    background: rgba(79, 124, 255, 0.18);
+    border-color: rgba(79, 124, 255, 0.35);
+    color: #c7d2fe;
+  }
+}
+
+/* ── Notifications (Bulma replacement) ── */
+.notification {
+  padding: 1rem 1.25rem;
+  border: 1px solid transparent;
+  border-radius: 0.65rem;
+  background: var(--hanzi-panel);
+  color: #f8fafc;
+
+  &.is-danger {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #fee2e2;
+  }
+
+  &.is-warning {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #fef3c7;
+  }
+
+  &.is-info {
+    background: rgba(56, 189, 248, 0.12);
+    border-color: rgba(56, 189, 248, 0.3);
+    color: #bae6fd;
+  }
+
+  &.is-success {
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.3);
+    color: #bbf7d0;
+  }
+
+  &.is-light {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--hanzi-border);
+    color: #f8fafc;
+  }
+
+  &.is-dark {
+    background: rgba(0, 0, 0, 0.25);
+    border-color: var(--hanzi-border);
+    color: #f8fafc;
+  }
+}
+
+/* ── Progress bars: keep Pico's <progress>, add colour variants ── */
+progress {
+  &.is-danger {
+    --pico-progress-color: var(--hanzi-danger);
+  }
+
+  &.is-warning {
+    --pico-progress-color: var(--hanzi-warning);
+  }
+
+  &.is-success {
+    --pico-progress-color: var(--hanzi-success);
+  }
+
+  &.is-info {
+    --pico-progress-color: var(--hanzi-info);
+  }
+}
+
+/* ── Layout helpers (replacement for Bulma columns/level/etc.) ── */
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.grid--stats {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.grid--cards {
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+
+.grid--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+// DRY: span both columns of a 2-col grid; used by character_label full_width mode.
+.span-full {
+  grid-column: 1 / -1;
+}
+
+.flex {
+  display: flex;
+  align-items: center;
+}
+
+.flex--between {
+  justify-content: space-between;
+}
+
+.flex--gap {
+  gap: 0.75rem;
+}
+
+.flex--gap-sm {
+  gap: 0.4rem;
+}
+
+.flex--gap-lg {
+  gap: 1.5rem;
+}
+
+.flex--wrap {
+  flex-wrap: wrap;
+}
+
+.flex--col {
+  flex-direction: column;
+}
+
+.flex--center {
+  justify-content: center;
+  align-items: center;
+}
+
+.flex--grow {
+  flex-grow: 1;
+}
+
+.hidden-mobile {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .hidden-mobile {
+    display: none !important;
+  }
+}
+
+/* ── Text helpers ── */
+.text-soft {
+  color: var(--hanzi-text-soft);
+}
+
+.text-muted {
+  color: var(--hanzi-text-muted);
+}
+
+.text-info {
+  color: var(--hanzi-info);
+}
+
+.text-success {
+  color: var(--hanzi-success);
+}
+
+.text-warning {
+  color: var(--hanzi-warning);
+}
+
+.text-danger {
+  color: var(--hanzi-danger);
+}
+
+.text-link {
+  color: var(--hanzi-blue);
+}
+
+.text-grey {
+  color: var(--hanzi-text-soft);
+}
+
+.text-grey-dark {
+  color: #cbd5e1;
+}
+
+.text-grey-light {
+  color: var(--hanzi-text-muted);
+}
+
+.text-white {
+  color: #ffffff;
+}
+
+.text-white-ter {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.text-capitalize {
+  text-transform: capitalize;
+}
+
+.tracking-wide {
+  letter-spacing: 0.05em;
+}
+
+.tracking-widest {
+  letter-spacing: 0.15em;
+}
+
+.is-size-1 { font-size: 3rem; }
+.is-size-3 { font-size: 2rem; }
+.is-size-4 { font-size: 1.5rem; }
+.is-size-5 { font-size: 1.25rem; }
+.is-size-6 { font-size: 1rem; }
+.is-size-7 { font-size: 0.85rem; }
+
+.is-uppercase { text-transform: uppercase; letter-spacing: 0.04em; }
+.is-capitalized { text-transform: capitalize; }
+.is-fullwidth { width: 100%; }
+.is-inline-block { display: inline-block; }
+.d-block { display: block; }
+
+/* ── Spacing helpers (margin/padding) ── */
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 0.75rem; }
+.mt-4 { margin-top: 1rem; }
+.mt-5 { margin-top: 1.5rem; }
+.mt-auto { margin-top: auto; }
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 0.75rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-5 { margin-bottom: 1.5rem; }
+.mb-6 { margin-bottom: 2rem; }
+
+.m-0 { margin: 0; }
+
+.pt-1 { padding-top: 0.25rem; }
+.pt-2 { padding-top: 0.5rem; }
+.pt-4 { padding-top: 1rem; }
+.pt-5 { padding-top: 1.5rem; }
+.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.py-6 { padding-top: 2rem; padding-bottom: 2rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.p-4 { padding: 1rem; }
+
+.mx-1 { margin-left: 0.25rem; margin-right: 0.25rem; }
+.mr-1 { margin-right: 0.25rem; }
+.mr-3 { margin-right: 0.75rem; }
+.ml-auto { margin-left: auto; }
+
+/* ── Tab list (Bulma `tabs` replacement, Alpine-driven) ── */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0 0 1rem;
+  list-style: none;
+  border-bottom: 1px solid var(--hanzi-border);
+
+  li {
+    margin: 0;
+    // DRY: Pico's `li { list-style: square }` would otherwise show bullets here.
+    list-style: none;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0.85rem;
+    border: 1px solid transparent;
+    border-bottom: 0;
+    border-radius: 0.5rem 0.5rem 0 0;
+    background: transparent;
+    color: var(--hanzi-text-soft);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  // DRY: Pico-native pattern — selected tab is signalled via aria-selected="true" on the anchor, not a Bulma `is-active` class.
+  li a[aria-selected="true"] {
+    background: rgba(79, 124, 255, 0.18);
+    border-color: var(--hanzi-blue);
+    color: #ffffff;
+  }
+}
+
+/* ── Panel list (Bulma `panel` replacement) ── */
+.panel {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.panel-block {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--hanzi-border);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.025);
+  color: inherit;
+  text-decoration: none;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+/* ── Icons (Bulma `icon` replacement) ── */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* ── Animations ── */
 @keyframes flash-slide-down {
   from {
     opacity: 0;

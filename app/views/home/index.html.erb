@@ -1,20 +1,15 @@
-<section class="section">
-  <div class="container">
-    <div class="box">
-      <p class="is-size-1 has-text-centered">网</p>
+<main>
+  <article class="panel-card text-center">
+    <p class="is-size-1 mb-3">网</p>
 
-      <h1 class="title has-text-centered">
-        HanziTrail
-      </h1>
+    <h1>HanziTrail</h1>
 
-      <p class="subtitle has-text-centered">
-        Story-based Mandarin flashcards for technical vocabulary.
-      </p>
+    <p class="text-soft">Story-based Mandarin flashcards for technical vocabulary.</p>
 
-      <div class="buttons is-centered">
-        <%= link_to "Start review", review_path, class: "button is-primary" %>
-        <%= link_to "Browse cards", flashcards_path, class: "button is-light" %>
-      </div>
+    <div class="flex flex--center flex--gap mt-5">
+      <%# Use button_to with GET so Pico styles render as <button>; default POST would 404 these routes %>
+      <%= button_to "Start review", review_path, method: :get, class: "outline primary" %>
+      <%= button_to "Browse cards", flashcards_path, method: :get, class: "outline secondary" %>
     </div>
-  </div>
-</section>
+  </article>
+</main>

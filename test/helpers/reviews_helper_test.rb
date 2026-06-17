@@ -47,16 +47,15 @@ class ReviewsHelperTest < ActionView::TestCase
     assert_not review_mode_active?(:unknown)
   end
 
-  test "review_mode_button_class adds is-active class when mode is active" do
-    css = review_mode_button_class(:all)
-    assert_includes css, "is-active"
+  test "review_mode_button_class marks the active mode with primary variant" do
+    assert_includes review_mode_button_class(:all), "primary"
   end
 
-  test "review_mode_button_class does not add is-active when mode is not active" do
+  test "review_mode_button_class marks inactive modes with secondary variant" do
     params[:source] = "hsk"
 
-    css = review_mode_button_class(:all)
-    assert_not_includes css, "is-active"
+    assert_includes review_mode_button_class(:all), "secondary"
+    assert_includes review_mode_button_class(:hsk), "primary"
   end
 
   test "review_button renders form for correct rating" do
@@ -65,7 +64,7 @@ class ReviewsHelperTest < ActionView::TestCase
     html = review_button(flashcard, "good")
 
     assert_includes html, "Good · 3"
-    assert_includes html, 'class="button is-success is-medium"'
+    assert_includes html, 'class="button outline primary"'
     assert_includes html, 'value="good"'
     assert_includes html, 'name="review[rating]"'
   end

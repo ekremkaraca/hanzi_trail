@@ -1,19 +1,22 @@
-<div class="mb-4">
-  <% progress = review_progress_percentage(reviewed_count, total_review_count) %>
+<% progress = review_progress_percentage(reviewed_count, total_review_count) %>
 
-  <p class="review-progress-text has-text-centered is-size-7 has-text-grey-light mb-2">
-    <%= review_progress_text(reviewed_count, remaining_due_count) %>
+<div class="review-progress-card">
+  <%# DRY: session-progress primary line; sits above the bar as a single, focused number. %>
+  <p class="review-progress-label">
+    <span><%= reviewed_count %> reviewed · <%= remaining_due_count %> remaining</span>
+    <span class="review-progress-percent"><%= progress %>%</span>
   </p>
 
   <progress
-    class="progress is-info is-small m-0"
+    class="is-info"
     value="<%= progress %>"
     max="100"
-    aria-label="Review progress: <%= progress %>%">
-  </progress>
+    aria-label="Review progress: <%= progress %>%"
+  ></progress>
 
-  <div class="is-flex is-justify-content-space-between is-size-7 mt-1 has-text-grey-light">
-    <span>Reviewed today: <%= reviewed_today_count %></span>
-    <span>Queue: <%= remaining_due_count %></span>
-  </div>
+  <%# DRY: secondary metrics (today + queue) sit below the bar as muted context. %>
+  <p class="review-progress-meta">
+    <span>Today: <strong><%= reviewed_today_count %></strong></span>
+    <span>Queue: <strong><%= remaining_due_count %></strong></span>
+  </p>
 </div>

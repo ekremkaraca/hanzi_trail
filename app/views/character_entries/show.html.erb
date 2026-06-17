@@ -1,57 +1,55 @@
-<section class="section character-entry-show-page">
-  <div class="container is-max-widescreen">
-    <div class="character-entry-card box">
-      <h1 class="character-entry-symbol">
-        <%= @character_entry.character %>
-      </h1>
+<main class="character-entry-page">
+  <article class="character-entry-card">
+    <h1 class="character-entry-symbol">
+      <%= @character_entry.character %>
+    </h1>
 
-      <p class="subtitle">
-        <%= @character_entry.pinyin.presence || "Pinyin not added yet" %>
+    <p class="text-soft mt-3">
+      <%= @character_entry.pinyin.presence || "Pinyin not added yet" %>
+    </p>
+
+    <p class="mt-4">
+      <strong>Meaning:</strong>
+      <%= @character_entry.meaning.presence || "Meaning not added yet" %>
+    </p>
+
+    <% if @character_entry.radical.present? %>
+      <p class="mt-2">
+        <strong>Radical:</strong>
+        <%= @character_entry.radical %>
       </p>
+    <% end %>
 
-      <p>
-        <strong>Meaning:</strong>
-        <%= @character_entry.meaning.presence || "Meaning not added yet" %>
-      </p>
+    <% if @character_entry.notes.present? %>
+      <div class="content mt-4">
+        <%= simple_format(@character_entry.notes) %>
+      </div>
+    <% end %>
+  </article>
 
-      <% if @character_entry.radical.present? %>
-        <p>
-          <strong>Radical:</strong>
-          <%= @character_entry.radical %>
-        </p>
-      <% end %>
+  <section class="related-words mt-5">
+    <h2 class="is-size-4 mb-3">Appears in</h2>
 
-      <% if @character_entry.notes.present? %>
-        <div class="content mt-4">
-          <%= simple_format(@character_entry.notes) %>
-        </div>
-      <% end %>
-    </div>
+    <% if @flashcard_characters.any? %>
+      <div class="related-word-list">
+        <% @flashcard_characters.each do |link| %>
+          <% card = link.flashcard %>
 
-    <section class="related-words mt-5">
-      <h2 class="title is-4">Appears in</h2>
-
-      <% if @flashcard_characters.any? %>
-        <div class="related-word-list">
-          <% @flashcard_characters.each do |link| %>
-            <% card = link.flashcard %>
-
-            <%= link_to flashcard_path(card), class: "related-word-card" do %>
-              <strong><%= card.character %></strong>
-              <span><%= card.pinyin %></span>
-              <small><%= card.meaning %></small>
-            <% end %>
+          <%= link_to flashcard_path(card), class: "related-word-card" do %>
+            <strong><%= card.character %></strong>
+            <span><%= card.pinyin %></span>
+            <small><%= card.meaning %></small>
           <% end %>
-        </div>
-      <% else %>
-        <p class="has-text-grey-light">
-          No related flashcards yet.
-        </p>
-      <% end %>
-    </section>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-grey-light">
+        No related flashcards yet.
+      </p>
+    <% end %>
+  </section>
 
-    <div class="buttons mt-5">
-      <%= link_to_active_review_if_present %>
-    </div>
+  <div class="mt-5">
+    <%= link_to_active_review_if_present %>
   </div>
-</section>
+</main>

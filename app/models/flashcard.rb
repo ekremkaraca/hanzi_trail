@@ -122,6 +122,11 @@ class Flashcard < ApplicationRecord
     review_attempts.maximum(:reviewed_at)
   end
 
+  # DRY: shared ordered association used by flashcard show and review answer views
+  def ordered_characters
+    flashcard_characters.includes(:character_entry).order(:position)
+  end
+
   private
 
   def set_initial_review_time

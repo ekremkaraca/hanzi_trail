@@ -1,0 +1,10 @@
+<%# Locals: flashcard - the Flashcard instance %>
+<% if flashcard.story.present? %>
+  <div class="review-tab-panel-card">
+    <div class="content is-size-6 text-white-ter">
+      <%= simple_format(flashcard.story) %>
+    </div>
+  </div>
+<% else %>
+  <p class="review-tab-empty">No story added for this card yet.</p>
+<% end %>

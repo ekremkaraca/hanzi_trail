@@ -1,0 +1,39 @@
+.stats-page {
+  min-height: calc(100vh - 3.25rem);
+}
+
+.stats-card-label {
+  color: var(--hanzi-text-soft);
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.stats-card-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0;
+}
+
+.difficult-card-item {
+  align-items: flex-start;
+}
+
+.activity-item {
+  align-items: center;
+}
+
+.stats-list-item {
+  td {
+    padding: 0.6rem 0.75rem;
+    border-color: var(--hanzi-border);
+    vertical-align: middle;
+  }
+}
+
+.stats-list-character {
+  font-weight: 600;
+  color: #f8fafc;
+}

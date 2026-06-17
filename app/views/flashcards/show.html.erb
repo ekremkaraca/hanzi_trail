@@ -1,149 +1,122 @@
-<section class="section flashcard-show-page">
-  <div class="container is-max-widescreen">
-    <div class="flashcard-show-card">
-      <div class="flashcard-show-hero">
-        <div class="flashcard-show-symbol <%= flashcard_character_size_class(@flashcard) %>">
-          <div class="flashcard-show-badges">
-            <%= story_status_tag(@flashcard) %>
+<main class="flashcard-show-page">
+  <article class="flashcard-show-card">
+    <div class="flashcard-show-hero">
+      <div class="flashcard-show-symbol <%= flashcard_character_size_class(@flashcard) %>">
+        <div class="flashcard-show-badges">
+          <%= story_status_tag(@flashcard) %>
 
-            <% if @flashcard.source.present? %>
-              <span class="tag is-link is-light"><%= @flashcard.source %></span>
-            <% end %>
-          </div>
-
-          <h1><%= @flashcard.character %></h1>
-          <p><%= @flashcard.pinyin %></p>
+          <%# DRY: tag-if-present collapses the "blank? then skip, else wrap in tag" pattern %>
+          <%= tag_if_present(@flashcard.source, color: "link") %>
         </div>
 
-        <div class="flashcard-show-summary">
-          <span class="eyebrow">Meaning</span>
-          <p class="flashcard-meaning-text"><%= @flashcard.meaning %></p>
-
-          <% if @flashcard.category == "history" %>
-            <div class="flashcard-context-note">
-              Historical term — meaning and usage may depend on time period and political context.
-            </div>
-          <% end %>
-        </div>
+        <h1><%= @flashcard.character %></h1>
+        <p><%= @flashcard.pinyin %></p>
       </div>
 
-      <% if @flashcard.story.present? %>
-        <div class="flashcard-story-panel">
-          <span class="eyebrow">Story</span>
-          <div class="content">
-            <%= simple_format(@flashcard.story) %>
+      <div class="flashcard-show-summary">
+        <span class="eyebrow">Meaning</span>
+        <p class="flashcard-meaning-text"><%= @flashcard.meaning %></p>
+
+        <% if @flashcard.category == "history" %>
+          <div class="flashcard-context-note">
+            Historical term — meaning and usage may depend on time period and political context.
           </div>
-        </div>
-      <% end %>
-
-      <div class="flashcard-detail-grid">
-        <div>
-          <span>Category</span>
-          <strong><%= @flashcard.category.presence || "—" %></strong>
-        </div>
-
-        <div>
-          <span>HSK</span>
-          <strong><%= @flashcard.hsk_level.presence || "—" %></strong>
-        </div>
-
-        <div>
-          <span>Review count</span>
-          <strong><%= @flashcard.review_count %></strong>
-        </div>
-
-        <div>
-          <span>Next review</span>
-          <strong>
-            <% if @flashcard.next_review_at.past? %>
-              Overdue by <%= distance_of_time_in_words(@flashcard.next_review_at, Time.current) %>
-            <% else %>
-              Due in <%= distance_of_time_in_words(Time.current, @flashcard.next_review_at) %>
-            <% end %>
-          </strong>
-        </div>
-      </div>
-
-      <% if @flashcard.components.present?
-          || @flashcard.literal_meaning.present?
-          || @flashcard.mnemonic.present?
-          || @flashcard.usage_note.present? %>
-
-        <section class="flashcard-understanding">
-          <h2>Character understanding</h2>
-
-          <div class="flashcard-understanding-grid">
-            <% if @flashcard.components.present? %>
-              <div class="flashcard-note">
-                <h3>Components</h3>
-                <%= simple_format(@flashcard.components) %>
-              </div>
-            <% end %>
-
-            <% if @flashcard.literal_meaning.present? %>
-              <div class="flashcard-note">
-                <h3>Literal meaning</h3>
-                <%= simple_format(@flashcard.literal_meaning) %>
-              </div>
-            <% end %>
-
-            <% if @flashcard.mnemonic.present? %>
-              <div class="flashcard-note">
-                <h3>Memory hook</h3>
-                <%= simple_format(@flashcard.mnemonic) %>
-              </div>
-            <% end %>
-
-            <% if @flashcard.usage_note.present? %>
-              <div class="flashcard-note">
-                <h3>Usage note</h3>
-                <%= simple_format(@flashcard.usage_note) %>
-              </div>
-            <% end %>
-          </div>
-        </section>
-      <% end %>
-
-      <% if @flashcard.flashcard_characters.any? %>
-        <section id="characters" class="flashcard-character-links">
-          <h2>Characters in this word</h2>
-
-          <div class="character-link-grid">
-            <% @flashcard.flashcard_characters.includes(:character_entry).order(:position).each do |link| %>
-              <% entry = link.character_entry %>
-
-              <%= link_to character_entry_path(entry), class: "character-link-card" do %>
-                <span class="character-link-symbol"><%= entry.character %></span>
-
-                <% if entry.pinyin.present? %>
-                  <span class="character-link-pinyin"><%= entry.pinyin %></span>
-                <% end %>
-
-                <small>
-                  <% if entry.meaning.present? %>
-                    <%= entry.meaning %>
-                  <% else %>
-                    Explore character
-                  <% end %>
-                </small>
-              <% end %>
-            <% end %>
-          </div>
-        </section>
-      <% end %>
-
-      <div>
-          Last reviewed:
-          <% if @flashcard.last_reviewed_at.present? %>
-            <%= time_ago_in_words(@flashcard.last_reviewed_at) %> ago
-          <% else %>
-            Never
-          <% end %>
-      </div>
-
-      <div class="buttons mt-5">
-        <%= link_to_active_review_if_present %>
+        <% end %>
       </div>
     </div>
-  </div>
-</section>
+
+    <% if @flashcard.story.present? %>
+      <div class="flashcard-story-panel">
+        <span class="eyebrow">Story</span>
+        <div class="content">
+          <%= simple_format(@flashcard.story) %>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="flashcard-detail-grid">
+      <div>
+        <span>Category</span>
+        <strong><%= @flashcard.category.presence || "—" %></strong>
+      </div>
+
+      <div>
+        <span>HSK</span>
+        <strong><%= presence_or_dash(@flashcard.hsk_level) %></strong>
+      </div>
+
+      <div>
+        <span>Review count</span>
+        <strong><%= @flashcard.review_count %></strong>
+      </div>
+
+      <div>
+        <span>Next review</span>
+        <strong>
+          <%# DRY: shared next-review formatting in FlashcardsHelper %>
+          <%= next_review_text(@flashcard) %>
+        </strong>
+      </div>
+    </div>
+
+    <% if @flashcard.components.present?
+        || @flashcard.literal_meaning.present?
+        || @flashcard.mnemonic.present?
+        || @flashcard.usage_note.present? %>
+
+      <section class="flashcard-understanding">
+        <h2>Character understanding</h2>
+
+        <div class="flashcard-understanding-grid">
+          <%# DRY: render character-note cards via shared partial, varying only attribute + title %>
+          <%= render "flashcards/character_note", flashcard: @flashcard, attribute: :components, title: "Components" %>
+          <%= render "flashcards/character_note", flashcard: @flashcard, attribute: :literal_meaning, title: "Literal meaning" %>
+          <%= render "flashcards/character_note", flashcard: @flashcard, attribute: :mnemonic, title: "Memory hook" %>
+          <%= render "flashcards/character_note", flashcard: @flashcard, attribute: :usage_note, title: "Usage note" %>
+        </div>
+      </section>
+    <% end %>
+
+    <% if @flashcard.flashcard_characters.any? %>
+      <section id="characters" class="flashcard-character-links">
+        <h2>Characters in this word</h2>
+
+        <div class="character-link-grid">
+          <%# DRY: use shared ordered_characters association to keep ordering in one place %>
+          <% @flashcard.ordered_characters.each do |link| %>
+            <% entry = link.character_entry %>
+
+            <%= link_to character_entry_path(entry), class: "character-link-card" do %>
+              <span class="character-link-symbol"><%= entry.character %></span>
+
+              <% if entry.pinyin.present? %>
+                <span class="character-link-pinyin"><%= entry.pinyin %></span>
+              <% end %>
+
+              <small>
+                <% if entry.meaning.present? %>
+                  <%= entry.meaning %>
+                <% else %>
+                  Explore character
+                <% end %>
+              </small>
+            <% end %>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+
+    <div class="mt-4">
+        Last reviewed:
+        <% if @flashcard.last_reviewed_at.present? %>
+          <%= time_ago_in_words(@flashcard.last_reviewed_at) %> ago
+        <% else %>
+          Never
+        <% end %>
+    </div>
+
+    <div class="mt-5">
+      <%= link_to_active_review_if_present %>
+    </div>
+  </article>
+</main>

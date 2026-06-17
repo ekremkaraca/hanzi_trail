@@ -6,7 +6,7 @@
     badge     - optional content for the right side of the header (e.g. tags)
 %>
 <% _open = local_assigns.fetch(:open, false) %>
-<div id="<%= id %>" class="box mb-5" x-data="{ open: <%= _open %> }">
+<article id="<%= id %>" class="panel-card mb-5" x-data="{ open: <%= _open %> }">
   <button
     type="button"
     class="collapsible-header"
@@ -18,7 +18,7 @@
       <% if local_assigns[:eyebrow].present? %>
         <span class="eyebrow"><%= eyebrow %></span>
       <% end %>
-      <h2 class="title is-5 mb-0"><%= title %></h2>
+      <h2 class="is-size-5 mb-0"><%= title %></h2>
     </div>
 
     <div class="collapsible-header-right">
@@ -32,4 +32,4 @@
   <div id="<%= id %>-content" x-show="open" x-cloak class="collapsible-body">
     <%= yield %>
   </div>
-</div>
+</article>

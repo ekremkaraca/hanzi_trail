@@ -1,145 +1,126 @@
-<section class="section stats-page">
-  <div class="container is-max-widescreen">
-    <div class="level mb-5">
-      <div class="level-left">
-        <div>
-          <h1 class="title is-2 mb-2">Stats</h1>
-          <p class="subtitle is-6 has-text-grey-light">
-            Review activity at a glance.
-          </p>
-        </div>
-      </div>
-    </div>
+<main class="stats-page">
+  <div class="mb-5">
+    <h1>Stats</h1>
+    <p class="text-soft">
+      Review activity at a glance.
+    </p>
+  </div>
 
-    <div class="columns is-multiline mb-5">
-      <% [
-        ["Reviewed today", @today_count],
-        ["Last 7 days", @week_count],
-        ["Total reviews", @total_count],
-        ["Avg / active day", @average_reviews_per_day]
-      ].each do |label, value| %>
-        <div class="column is-6-mobile is-3-tablet is-one-quarter-desktop">
-          <div class="box has-text-centered">
-            <span class="has-text-grey-light is-uppercase is-size-7"><%= label %></span>
-            <strong class="title is-3 mt-2 mb-0"><%= value %></strong>
-          </div>
+  <div class="grid grid--stats mb-5">
+    <% [
+      ["Reviewed today", @today_count],
+      ["Last 7 days", @week_count],
+      ["Total reviews", @total_count],
+      ["Avg / active day", @average_reviews_per_day]
+    ].each do |label, value| %>
+      <article class="panel-card text-center">
+        <span class="text-grey-light text-uppercase is-size-7"><%= label %></span>
+        <strong class="is-size-3 mt-2 mb-0 d-block"><%= value %></strong>
+      </article>
+    <% end %>
+
+    <article id="current-streak" class="panel-card text-center">
+      <span class="text-grey-light text-uppercase is-size-7">Current streak</span>
+      <strong class="is-size-3 mt-2 mb-0 d-block"><%= @streak %></strong>
+    </article>
+  </div>
+
+  <%= render "shared/collapsible_box",
+        id: "rating-summary",
+        title: "Review counts by rating" do %>
+    <div class="grid grid--stats">
+      <%# DRY: shared REVIEW_RATINGS constant from StatsHelper %>
+      <% StatsHelper::REVIEW_RATINGS.each do |rating| %>
+        <div class="notification is-light text-center">
+          <p class="stats-card-label"><%= rating.capitalize %></p>
+          <strong class="stats-card-value"><%= @rating_breakdown[rating] || 0 %></strong>
         </div>
       <% end %>
-
-      <div class="column is-6-mobile is-3-tablet is-one-quarter-desktop">
-        <div id="current-streak" class="box has-text-centered">
-          <span class="has-text-grey-light is-uppercase is-size-7">Current streak</span>
-          <strong class="title is-3 mt-2 mb-0"><%= @streak %></strong>
-        </div>
-      </div>
     </div>
+  <% end %>
 
-    <%= render "shared/collapsible_box",
-          id: "rating-summary",
-          title: "Review counts by rating" do %>
-      <div class="columns is-multiline">
-        <% %w[again hard good easy].each do |rating| %>
-          <div class="column is-6-mobile is-3-tablet">
-            <div class="notification is-light has-text-centered">
-              <p class="stats-card-label has-text-grey-dark is-uppercase is-size-7 mb-2"><%= rating.capitalize %></p>
-              <strong class="stats-card-value title is-4 mb-0"><%= @rating_breakdown[rating] || 0 %></strong>
-            </div>
-          </div>
+  <%= render "shared/collapsible_box",
+        id: "rating-breakdown",
+        title: "Rating breakdown" do %>
+    <% total_ratings = @rating_breakdown.values.sum %>
+
+    <% %w[again hard good easy].each do |rating| %>
+      <% count = @rating_breakdown.fetch(rating, 0) %>
+      <div class="mb-4">
+        <div class="flex flex--between mb-2">
+          <span class="text-white is-capitalized"><%= rating %></span>
+          <span class="tag is-light"><%= count %></span>
+        </div>
+
+        <progress
+          class="<%= rating_progress_class(rating) %>"
+          value="<%= count %>"
+          max="<%= total_ratings.positive? ? total_ratings : 1 %>"
+        >
+          <%= count %>
+        </progress>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%= render "shared/collapsible_box",
+        id: "most-difficult",
+        title: "Most Difficult Cards",
+        badge: content_tag(:span, "Top 10", class: "tag is-warning") do %>
+    <% if @difficult_cards.any? %>
+      <div class="panel">
+        <% @difficult_cards.each do |card| %>
+          <%= link_to flashcard_path(card), class: "panel-block difficult-card-item" do %>
+            <span class="has-text-weight-semibold mr-3"><%= card.character %></span>
+            <span class="flex--grow"><%= card.meaning %></span>
+            <span class="tag is-warning"><%= pluralize(card.difficult_review_count, "hard review") %></span>
+          <% end %>
         <% end %>
       </div>
+    <% else %>
+      <p class="text-grey-light">No difficult cards yet.</p>
     <% end %>
+  <% end %>
 
+  <div class="grid grid--2" style="gap: 1.5rem;">
     <%= render "shared/collapsible_box",
-          id: "rating-breakdown",
-          title: "Rating breakdown" do %>
-      <% total_ratings = @rating_breakdown.values.sum %>
-
-      <% %w[again hard good easy].each do |rating| %>
-        <% count = @rating_breakdown.fetch(rating, 0) %>
-        <div class="mb-4">
-          <div class="level is-mobile mb-2">
-            <div class="level-left">
-              <span class="has-text-weight-semibold is-capitalized"><%= rating %></span>
-            </div>
-            <div class="level-right">
-              <span class="tag is-light"><%= count %></span>
-            </div>
-          </div>
-
-          <progress
-            class="progress <%= rating_progress_class(rating) %> is-small"
-            value="<%= count %>"
-            max="<%= total_ratings.positive? ? total_ratings : 1 %>"
-          >
-            <%= count %>
-          </progress>
-        </div>
+          id: "recently-reviewed",
+          title: "Recently reviewed" do %>
+      <% if @recent_attempts.any? %>
+        <figure style="overflow-x: auto; margin: 0;">
+          <table>
+            <tbody>
+              <% @recent_attempts.first(3).each do |attempt| %>
+                <tr class="stats-list-item">
+                  <td class="stats-list-character"><%= attempt.flashcard.character %></td>
+                  <td><span class="tag is-light is-capitalized"><%= attempt.rating %></span></td>
+                  <td class="text-grey-light text-right"><%= time_ago_in_words(attempt.reviewed_at) %> ago</td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </figure>
+      <% else %>
+        <p class="text-grey-light">No reviews yet.</p>
       <% end %>
     <% end %>
 
     <%= render "shared/collapsible_box",
-          id: "most-difficult",
-          title: "Most Difficult Cards",
-          badge: content_tag(:span, "Top 10", class: "tag is-warning is-light") do %>
-      <% if @difficult_cards.any? %>
+          id: "recent-activity",
+          title: "Recent activity" do %>
+      <% if @recent_attempts.any? %>
         <div class="panel">
-          <% @difficult_cards.each do |card| %>
-            <%= link_to flashcard_path(card), class: "panel-block difficult-card-item is-align-items-flex-start" do %>
-              <span class="has-text-weight-semibold mr-3"><%= card.character %></span>
-              <span class="is-flex-grow-1"><%= card.meaning %></span>
-              <span class="tag is-warning is-light"><%= pluralize(card.difficult_review_count, "hard review") %></span>
+          <% @recent_attempts.each do |attempt| %>
+            <%= link_to flashcard_path(attempt.flashcard), class: "panel-block activity-item" do %>
+              <span class="has-text-weight-semibold mr-3"><%= attempt.flashcard.character %></span>
+              <span class="tag is-info mr-3"><%= attempt.rating.titleize %></span>
+              <span class="text-grey-light ml-auto"><%= time_ago_in_words(attempt.reviewed_at) %> ago</span>
             <% end %>
           <% end %>
         </div>
       <% else %>
-        <p class="has-text-grey-light">No difficult cards yet.</p>
+        <p class="text-grey-light">No review activity yet.</p>
       <% end %>
     <% end %>
-
-    <div class="columns is-variable is-6">
-      <div class="column is-6">
-        <%= render "shared/collapsible_box",
-              id: "recently-reviewed",
-              title: "Recently reviewed" do %>
-          <% if @recent_attempts.any? %>
-            <div class="table-container">
-              <table class="table is-fullwidth is-striped is-hoverable is-narrow">
-                <tbody>
-                  <% @recent_attempts.first(3).each do |attempt| %>
-                    <tr class="stats-list-item">
-                      <td class="stats-list-character has-text-weight-semibold"><%= attempt.flashcard.character %></td>
-                      <td><span class="tag is-light is-capitalized"><%= attempt.rating %></span></td>
-                      <td class="has-text-grey-light has-text-right"><%= time_ago_in_words(attempt.reviewed_at) %> ago</td>
-                    </tr>
-                  <% end %>
-                </tbody>
-              </table>
-            </div>
-          <% else %>
-            <p class="has-text-grey-light">No reviews yet.</p>
-          <% end %>
-        <% end %>
-      </div>
-
-      <div class="column is-6">
-        <%= render "shared/collapsible_box",
-              id: "recent-activity",
-              title: "Recent activity" do %>
-          <% if @recent_attempts.any? %>
-            <div class="panel">
-              <% @recent_attempts.each do |attempt| %>
-                <%= link_to flashcard_path(attempt.flashcard), class: "panel-block activity-item" do %>
-                  <span class="has-text-weight-semibold mr-3"><%= attempt.flashcard.character %></span>
-                  <span class="tag is-info is-light mr-3"><%= attempt.rating.titleize %></span>
-                  <span class="has-text-grey-light ml-auto"><%= time_ago_in_words(attempt.reviewed_at) %> ago</span>
-                <% end %>
-              <% end %>
-            </div>
-          <% else %>
-            <p class="has-text-grey-light">No review activity yet.</p>
-          <% end %>
-        <% end %>
-      </div>
-    </div>
   </div>
-</section>
+</main>

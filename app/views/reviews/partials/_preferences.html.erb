@@ -1,6 +1,6 @@
-<div class="has-text-centered mt-4 is-hidden-mobile">
+<div class="text-center mt-4 hidden-mobile">
   <%= form_with url: "/review/preferences", method: :patch, class: "is-inline-block" do |form| %>
-    <label class="checkbox is-size-7 has-text-grey-light mr-2">
+    <label class="checkbox is-size-7 text-grey-light mr-2">
       <%= form.check_box :show_pinyin, checked: session[:show_pinyin] %>
       Show pinyin before answer
     </label>
