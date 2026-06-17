@@ -1,0 +1,21 @@
+<%= render "shared/collapsible_box",
+      id: "recently-reviewed",
+      title: "Recently reviewed" do %>
+  <% if any_attempts? %>
+    <figure style="overflow-x: auto; margin: 0;">
+      <table>
+        <tbody>
+          <% display_attempts.each do |attempt| %>
+            <tr class="stats-list-item">
+              <td class="stats-list-character"><%= attempt.flashcard.character %></td>
+              <td><span class="tag is-light is-capitalized"><%= attempt.rating %></span></td>
+              <td class="text-grey-light text-right"><%= reviewed_ago(attempt) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </figure>
+  <% else %>
+    <p class="text-grey-light">No reviews yet.</p>
+  <% end %>
+<% end %>

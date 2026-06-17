@@ -1,0 +1,25 @@
+<main class="stats-page">
+  <div class="mb-5">
+    <h1>Stats</h1>
+    <p class="text-soft">
+      Review activity at a glance.
+    </p>
+  </div>
+
+  <div class="grid grid--stats mb-5">
+    <%# DRY: stat cards share the same shape; data-driven iteration replaces repeated markup %>
+    <%= safe_join(stat_cards.map { |c| render(Stats::StatCardComponent.new(label: c[:label], value: c[:value])) }) %>
+    <%= render Stats::StatCardComponent.new(label: "Current streak", value: streak, dom_id: "current-streak") %>
+  </div>
+
+  <%= render Stats::RatingSummaryComponent.new(rating_breakdown: rating_breakdown) %>
+
+  <%= render Stats::RatingBreakdownComponent.new(rating_breakdown: rating_breakdown) %>
+
+  <%= render Stats::DifficultCardsComponent.new(difficult_cards: difficult_cards) %>
+
+  <div class="grid grid--2" style="gap: 1.5rem;">
+    <%= render Stats::RecentReviewsComponent.new(recent_attempts: recent_attempts) %>
+    <%= render Stats::RecentActivityComponent.new(recent_attempts: recent_attempts) %>
+  </div>
+</main>

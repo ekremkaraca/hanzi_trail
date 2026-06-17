@@ -1,0 +1,21 @@
+<%= render "shared/collapsible_box",
+      id: "rating-breakdown",
+      title: "Rating breakdown" do %>
+  <% ratings.each do |rating| %>
+    <% count = count_for(rating) %>
+    <div class="mb-4">
+      <div class="flex flex--between mb-2">
+        <span class="text-white is-capitalized"><%= rating %></span>
+        <span class="tag is-light"><%= count %></span>
+      </div>
+
+      <progress
+        class="<%= progress_class(rating) %>"
+        value="<%= count %>"
+        max="<%= progress_max %>"
+      >
+        <%= count %>
+      </progress>
+    </div>
+  <% end %>
+<% end %>
