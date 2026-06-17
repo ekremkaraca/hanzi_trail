@@ -1,0 +1,24 @@
+<div class="flashcard-show-hero">
+  <div class="flashcard-show-symbol <%= character_size_class %>">
+    <div class="flashcard-show-badges">
+      <%= render Flashcards::StoryStatusTagComponent.new(flashcard: flashcard) %>
+
+      <%# DRY: tag-if-present collapses the "blank? then skip, else wrap in tag" pattern %>
+      <%= render Flashcards::TagIfPresentComponent.new(flashcard.source, color: "link") %>
+    </div>
+
+    <h1><%= flashcard.character %></h1>
+    <p><%= flashcard.pinyin %></p>
+  </div>
+
+  <div class="flashcard-show-summary">
+    <span class="eyebrow">Meaning</span>
+    <p class="flashcard-meaning-text"><%= flashcard.meaning %></p>
+
+    <% if flashcard.category == "history" %>
+      <div class="flashcard-context-note">
+        Historical term — meaning and usage may depend on time period and political context.
+      </div>
+    <% end %>
+  </div>
+</div>

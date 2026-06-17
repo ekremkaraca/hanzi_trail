@@ -1,0 +1,28 @@
+<main class="flashcards-page">
+  <%= render Flashcards::Index::HeaderComponent.new %>
+
+  <%= render Flashcards::Index::FilterBarComponent.new(params: params) %>
+
+  <div class="flashcards-table-card">
+    <% if any_flashcards? %>
+      <table class="flashcards-table">
+        <thead>
+          <tr>
+            <th>Card</th>
+            <th>Meaning</th>
+            <th>Meta</th>
+            <th>Review</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% flashcards.each do |flashcard| %>
+            <%= render Flashcards::RowComponent.new(flashcard: flashcard) %>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <%= render Flashcards::EmptyStateComponent.new(story_status: story_status) %>
+    <% end %>
+  </div>
+</main>

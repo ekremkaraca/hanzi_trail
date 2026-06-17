@@ -1,0 +1,15 @@
+<div x-data="textCounter(<%= char_limit %>)">
+  <label>
+    <%= form.label attribute %>
+    <%= form.text_area attribute,
+          rows: rows,
+          placeholder: placeholder,
+          "x-ref": "field" %>
+  </label>
+  <p
+    class="char-counter text-right"
+    :class="overLimit && 'char-counter--warning'"
+  >
+    <span x-text="count"></span> / <%= char_limit %>
+  </p>
+</div>

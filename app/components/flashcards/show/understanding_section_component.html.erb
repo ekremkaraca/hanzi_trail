@@ -1,0 +1,14 @@
+<section class="flashcard-understanding">
+  <h2>Character understanding</h2>
+
+  <div class="flashcard-understanding-grid">
+    <%# DRY: render character-note cards via shared component, varying only attribute + title %>
+    <% self.class::NOTES.each do |note| %>
+      <%= render Flashcards::Show::CharacterNoteComponent.new(
+        flashcard: flashcard,
+        attribute: note[:attribute],
+        title: note[:title]
+      ) %>
+    <% end %>
+  </div>
+</section>

@@ -1,0 +1,31 @@
+<main class="flashcard-show-page">
+  <article class="flashcard-show-card">
+    <%= render Flashcards::Show::HeroComponent.new(flashcard: flashcard) %>
+
+    <%= render Flashcards::Show::StoryPanelComponent.new(flashcard: flashcard) %>
+
+    <%= render Flashcards::Show::DetailGridComponent.new(flashcard: flashcard) %>
+
+    <%= render Flashcards::Show::UnderstandingSectionComponent.new(flashcard: flashcard) %>
+
+    <%= render Flashcards::Show::CharacterLinksComponent.new(flashcard: flashcard) %>
+
+    <div class="mt-4">
+        Last reviewed:
+        <% if flashcard.last_reviewed_at.present? %>
+          <%= helpers.time_ago_in_words(flashcard.last_reviewed_at) %> ago
+        <% else %>
+          Never
+        <% end %>
+    </div>
+
+    <% if active_review_path.present? %>
+      <div class="mt-5">
+        <%= link_to active_review_path, class: "button is-info is-fullwidth mb-4" do %>
+          <%= content_tag(:span, "←", class: "icon mr-1") %>
+          <%= content_tag(:strong, "Return to Active Review") %>
+        <% end %>
+      </div>
+    <% end %>
+  </article>
+</main>

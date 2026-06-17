@@ -1,0 +1,21 @@
+<div class="flashcard-detail-grid">
+  <div>
+    <span>Category</span>
+    <strong><%= flashcard.category.presence || "—" %></strong>
+  </div>
+
+  <div>
+    <span>HSK</span>
+    <strong><%= helpers.presence_or_dash(flashcard.hsk_level) %></strong>
+  </div>
+
+  <div>
+    <span>Review count</span>
+    <strong><%= flashcard.review_count %></strong>
+  </div>
+
+  <div>
+    <span>Next review</span>
+    <strong><%= next_review_text %></strong>
+  </div>
+</div>

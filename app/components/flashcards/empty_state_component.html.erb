@@ -1,0 +1,22 @@
+<div class="flashcards-empty-state">
+  <div class="flashcards-empty-icon">
+    ◈
+  </div>
+
+  <h2 class="flashcards-empty-title">
+    <%= title %>
+  </h2>
+
+  <p class="flashcards-empty-text">
+    Draft stories will appear here once imported or curated flashcards gain initial story content.
+  </p>
+
+  <div class="flashcards-empty-actions">
+    <%# DRY: reuse the shared shortcut link helper %>
+    <%= render Flashcards::ShortcutsComponent.new(status: "missing") %>
+
+    <%= link_to "Browse all flashcards",
+          flashcards_path,
+          class: "button is-light" %>
+  </div>
+</div>

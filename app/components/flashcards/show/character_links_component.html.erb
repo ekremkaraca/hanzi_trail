@@ -1,0 +1,26 @@
+<section id="characters" class="flashcard-character-links">
+  <h2>Characters in this word</h2>
+
+  <div class="character-link-grid">
+    <%# DRY: use shared ordered_characters association to keep ordering in one place %>
+    <% flashcard.ordered_characters.each do |link| %>
+      <% entry = link.character_entry %>
+
+      <%= link_to character_entry_path(entry), class: "character-link-card" do %>
+        <span class="character-link-symbol"><%= entry.character %></span>
+
+        <% if entry.pinyin.present? %>
+          <span class="character-link-pinyin"><%= entry.pinyin %></span>
+        <% end %>
+
+        <small>
+          <% if entry.meaning.present? %>
+            <%= entry.meaning %>
+          <% else %>
+            Explore character
+          <% end %>
+        </small>
+      <% end %>
+    <% end %>
+  </div>
+</section>

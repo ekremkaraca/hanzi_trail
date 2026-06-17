@@ -1,5 +1,5 @@
 <main>
   <h1>New flashcard</h1>
 
-  <%= render "form", flashcard: @flashcard %>
+  <%= render Flashcards::FormComponent.new(flashcard: @flashcard) %>
 </main>

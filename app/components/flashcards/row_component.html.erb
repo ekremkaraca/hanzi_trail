@@ -1,0 +1,31 @@
+<tr>
+  <td class="flashcard-card-cell">
+    <%= link_to flashcard.character, flashcard_path(flashcard), class: "flashcard-character-link" %>
+    <span class="flashcard-pinyin"><%= flashcard.pinyin %></span>
+  </td>
+
+  <td class="flashcard-meaning-cell">
+    <%= truncate(flashcard.meaning, length: 120) %>
+  </td>
+
+  <td>
+    <div class="flex flex--wrap flex--gap-sm">
+      <%# DRY: tag-if-present collapses the "blank? then skip, else wrap in tag" pattern %>
+      <%= render Flashcards::TagIfPresentComponent.new(flashcard.category, color: "dark") %>
+
+      <span class="tag is-link">
+        <%= flashcard.source.presence || "curated" %>
+      </span>
+
+      <%= render Flashcards::TagIfPresentComponent.new(flashcard.hsk_level, color: "info") %>
+
+      <%= render Flashcards::StoryStatusTagComponent.new(flashcard: flashcard) %>
+      <%= render Flashcards::StoryQualityTagComponent.new(flashcard: flashcard) %>
+    </div>
+  </td>
+
+  <td class="flashcard-review-cell">
+    <strong><%= flashcard.review_count %></strong>
+    <span class="text-grey-light">reviews</span>
+  </td>
+</tr>
