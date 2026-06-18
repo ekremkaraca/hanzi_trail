@@ -11,12 +11,8 @@
     <%= render Flashcards::Show::CharacterLinksComponent.new(flashcard: flashcard) %>
 
     <div class="mt-4">
-        Last reviewed:
-        <% if flashcard.last_reviewed_at.present? %>
-          <%= helpers.time_ago_in_words(flashcard.last_reviewed_at) %> ago
-        <% else %>
-          Never
-        <% end %>
+      Last reviewed:
+      <%= last_reviewed_text %>
     </div>
 
     <% if active_review_path.present? %>
