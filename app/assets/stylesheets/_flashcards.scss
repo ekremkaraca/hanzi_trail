@@ -33,16 +33,6 @@
   margin-bottom: 1.25rem;
 }
 
-.flashcard-filter-actions {
-  display: flex;
-  gap: 0.75rem;
-  align-self: flex-end;
-}
-
-.missing-stories-button {
-  width: fit-content;
-}
-
 .flashcards-table-card {
   overflow: hidden;
   border: 1px solid var(--hanzi-border);
@@ -265,18 +255,6 @@
     .button {
       width: 100%;
       margin-top: 1rem;
-    }
-  }
-
-  .missing-stories-button {
-    width: 100%;
-  }
-
-  .flashcard-filter-actions {
-    width: 100%;
-
-    .button {
-      flex: 1;
     }
   }
 
