@@ -1,3 +1,8 @@
+# Load and launch SimpleCov at the very top of your test helper
+require 'simplecov'
+SimpleCov.start 'rails'
+
+# Previous content of test helper now starts here
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
