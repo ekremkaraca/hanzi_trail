@@ -1,6 +1,19 @@
 # Load and launch SimpleCov at the very top of your test helper
-require 'simplecov'
-SimpleCov.start 'rails'
+require "simplecov"
+
+SimpleCov.merge_subprocesses true
+# For forked child processes, SimpleCov's built-in at_fork block can't
+# register a new at_exit hook because @at_exit_hook_installed is inherited
+# from the parent. Register one manually so each child saves its results.
+SimpleCov.at_fork do |pid|
+  SimpleCov.command_name "Minitest_#{pid}"
+  SimpleCov.print_errors false
+  SimpleCov.formatter SimpleCov::Formatter::SimpleFormatter
+  SimpleCov.minimum_coverage 0
+  SimpleCov.start
+  Kernel.at_exit { Coverage.running? && SimpleCov.at_exit_behavior }
+end
+SimpleCov.start "rails"
 
 # Previous content of test helper now starts here
 ENV["RAILS_ENV"] ||= "test"
