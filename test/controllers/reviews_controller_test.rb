@@ -348,6 +348,32 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "new", future_card.reload.difficulty
   end
 
+  test "rejects rating when card is outside the current filter scope" do
+    curated_card = flashcards(:network)
+    curated_card.update!(next_review_at: 1.minute.ago)
+
+    patch review_flashcard_url(curated_card, source: "hsk"),
+      params: { review: { rating: "good" } }
+
+    assert_redirected_to review_path(source: "hsk")
+    assert_equal "That card is not in the current review filter.", flash[:alert]
+  end
+
+  test "resets reviewed count when reset_session param is set" do
+    flashcard = flashcards(:network)
+    flashcard.update!(next_review_at: 1.minute.ago)
+    flashcards(:algorithm).update!(next_review_at: 1.minute.ago)
+
+    patch review_flashcard_path(flashcard),
+      params: { review: { rating: "good" } }
+
+    follow_redirect!
+    assert_includes response.body, "1 reviewed"
+
+    get review_path(reset_session: "1")
+    assert_includes response.body, "0 reviewed"
+  end
+
   test "saving preferences preserves filters" do
     patch review_preferences_path, params: {
       show_pinyin: "1",
