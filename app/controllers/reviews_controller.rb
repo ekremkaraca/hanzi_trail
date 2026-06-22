@@ -1,42 +1,52 @@
 class ReviewsController < ApplicationController
   def show
+    # Let users restart the per-filter progress counter from the empty state.
     reset_reviewed_count if params[:reset_session] == "1"
 
-    queue = ReviewQueue.new(scope: review_scope)
+    # Queue owns filter-aware card selection; the controller only exposes view data.
+    @review_queue = Review::Queue.new(
+      filters: filter_params,
+      session: session
+    )
 
-    @flashcard = queue.next_card
-    @remaining_due_count = queue.remaining_count
+    @flashcard = @review_queue.next_card
+    @remaining_due_count = @review_queue.remaining_count
     @empty_state_title = empty_state_title
     @reviewed_count = reviewed_count
     @review_filter_params = filter_params
     @total_review_count = @reviewed_count + @remaining_due_count
     @reviewed_today_count = ReviewAttempt.today.count
 
-    if @flashcard.present?
-      session[:review_return_to] = request.fullpath
-    else
-      session[:review_return_to] = nil
-    end
+    # Preserve the active review URL for "back to review" links on card pages.
+    session[:review_return_to] = @flashcard.present? ? request.fullpath : nil
   end
 
   def update
     rating = review_params[:rating]
 
+    # Keep invalid input as a redirect instead of surfacing a 500 from the service.
     unless Flashcard::REVIEW_RATINGS.include?(rating)
       return redirect_to review_path, alert: "Invalid review rating."
     end
 
-    card_id = params[:flashcard_id]
-    flashcard = review_scope.find(card_id)
+    # Find through the queue scope so filtered review URLs cannot rate outside cards.
+    flashcard = Review::Queue.new(filters: filter_params, session: session)
+      .scope
+      .find(params[:flashcard_id])
 
-    if flashcard.next_review_at > Time.current
-      return redirect_to review_path(filter_params),
-        alert: "This card is not due for review."
-    end
+    # Scheduler owns the locked mutation and review-attempt side effect.
+    Review::Scheduler.new(
+      flashcard: flashcard,
+      rating: rating
+    ).call
 
-    flashcard.schedule_next_review!(rating)
+    # Count only successful reviews in the current filter-specific session.
     increment_reviewed_count
+
     redirect_to review_path(filter_params), notice: "Review saved."
+  rescue Flashcard::CardNotDueError
+    redirect_to review_path(filter_params),
+      alert: "This card is not due for review."
   rescue ActiveRecord::RecordNotFound
     redirect_to review_path(filter_params),
       alert: "That card is not in the current review filter."
