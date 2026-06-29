@@ -38,49 +38,6 @@ class FlashcardTest < ActiveSupport::TestCase
     refute_includes Flashcard.due_for_review, future_review
   end
 
-  test "schedule_next_review increments review count" do
-    assert_difference -> { @default_card.reload.review_count }, 1 do
-      @default_card.schedule_next_review!("good")
-    end
-  end
-
-  test "schedule_next_review updates difficulty" do
-    @default_card.schedule_next_review!("hard")
-
-    assert_equal "hard", @default_card.reload.difficulty
-  end
-
-  test "schedule_next_review rejects invalid rating" do
-    @default_card = flashcards(:network)
-
-    assert_raises(ArgumentError) do
-      @default_card.schedule_next_review!("perfect")
-    end
-  end
-
-  test "schedule_next_review raises CardNotDueError when next_review_at is in the future" do
-    future_card = flashcards(:future_review)
-
-    assert_raises(Flashcard::CardNotDueError) do
-      future_card.schedule_next_review!("good")
-    end
-  end
-
-  test "schedule_next_review does not change card when not due" do
-    future_card = flashcards(:future_review)
-    original_review_at = future_card.next_review_at
-    original_review_count = future_card.review_count
-
-    begin
-      future_card.schedule_next_review!("good")
-    rescue Flashcard::CardNotDueError
-      # expected
-    end
-
-    assert_equal original_review_at, future_card.reload.next_review_at
-    assert_equal original_review_count, future_card.review_count
-  end
-
   test "defaults story status to missing when story is blank" do
     flashcard = Flashcard.new(
       character: "新",
@@ -204,58 +161,12 @@ class FlashcardTest < ActiveSupport::TestCase
     assert_not flashcard.short_story?
   end
 
-  test "schedule_next_review creates review attempt" do
-    card = flashcards(:network)
-    card.update!(next_review_at: 1.minute.ago)
-
-    assert_difference("ReviewAttempt.count", 1) do
-      card.schedule_next_review!("good")
-    end
-
-    attempt = ReviewAttempt.last
-
-    assert_equal card, attempt.flashcard
-    assert_equal "good", attempt.rating
-  end
-
   test "rejects overly long story" do
     card = flashcards(:network)
     card.story = "x" * 2_001
 
     assert_not card.valid?
     assert_includes card.errors[:story], "is too long (maximum is 2000 characters)"
-  end
-
-  test "schedule_next_review with again sets 1 minute interval" do
-    freeze_time do
-      @default_card.update!(next_review_at: 1.minute.ago)
-      @default_card.schedule_next_review!("again")
-      assert_in_delta 1.minute.from_now, @default_card.reload.next_review_at, 1.second
-    end
-  end
-
-  test "schedule_next_review with hard sets 1 day interval" do
-    freeze_time do
-      @default_card.update!(next_review_at: 1.minute.ago)
-      @default_card.schedule_next_review!("hard")
-      assert_in_delta 1.day.from_now, @default_card.reload.next_review_at, 1.second
-    end
-  end
-
-  test "schedule_next_review with good sets 3 day interval" do
-    freeze_time do
-      @default_card.update!(next_review_at: 1.minute.ago)
-      @default_card.schedule_next_review!("good")
-      assert_in_delta 3.days.from_now, @default_card.reload.next_review_at, 1.second
-    end
-  end
-
-  test "schedule_next_review with easy sets 7 day interval" do
-    freeze_time do
-      @default_card.update!(next_review_at: 1.minute.ago)
-      @default_card.schedule_next_review!("easy")
-      assert_in_delta 7.days.from_now, @default_card.reload.next_review_at, 1.second
-    end
   end
 
   test "by_source scope filters by source" do

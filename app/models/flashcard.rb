@@ -69,27 +69,6 @@ class Flashcard < ApplicationRecord
     where.not(story: [ nil, "" ]).where("LENGTH(story) < ?", SHORT_STORY_LENGTH)
   }
 
-  def schedule_next_review!(rating)
-    raise ArgumentError, "Invalid rating" unless REVIEW_RATINGS.include?(rating)
-
-    intervals = { "again" => 1.minute, "hard" => 1.day, "good" => 3.days, "easy" => 7.days }
-
-    with_lock do
-      raise CardNotDueError unless next_review_at <= Time.current
-
-      update!(
-        difficulty: rating,
-        review_count: review_count + 1,
-        next_review_at: intervals.fetch(rating).from_now
-      )
-
-      review_attempts.create!(
-        rating: rating,
-        reviewed_at: Time.current
-      )
-    end
-  end
-
   def story_missing?
     story_status == "missing"
   end
