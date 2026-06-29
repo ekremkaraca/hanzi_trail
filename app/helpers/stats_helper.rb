@@ -1,5 +1,5 @@
 module StatsHelper
-  REVIEW_RATINGS = %w[again hard good easy].freeze
+  REVIEW_RATINGS = Flashcard::REVIEW_RATINGS
 
   def rating_progress_class(rating)
     {
