@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "bootsnap", "~> 1.24", ">= 1.24.6", require: false
+gem "bootsnap", "~> 1.25", require: false
 gem "dartsass-rails", "~> 0.5.1"
 gem "importmap-rails", "~> 2.2", ">= 2.2.3"
 gem "jbuilder", "~> 2.15", ">= 2.15.1"
