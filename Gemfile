@@ -13,7 +13,7 @@ gem "solid_cable", "~> 4.0"
 gem "solid_cache", "~> 1.0", ">= 1.0.10"
 gem "solid_queue", "~> 1.4"
 gem "stimulus-rails", "~> 1.3", ">= 1.3.4"
-gem "thruster", "~> 0.1.21", require: false
+gem "thruster", "~> 0.1.26", require: false
 gem "turbo-rails", "~> 2.0", ">= 2.0.23"
 gem "tzinfo-data", "~> 1.2026", ">= 1.2026.2", platforms: %i[ windows jruby ]
 gem "view_component", "~> 4"
