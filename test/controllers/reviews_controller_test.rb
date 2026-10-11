@@ -359,7 +359,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "That card is not in the current review filter.", flash[:alert]
   end
 
-  test "resets reviewed count when reset_session param is set" do
+  test "reset route restarts the reviewed counter" do
     flashcard = flashcards(:network)
     flashcard.update!(next_review_at: 1.minute.ago)
     flashcards(:algorithm).update!(next_review_at: 1.minute.ago)
@@ -370,14 +370,21 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_includes response.body, "1 reviewed"
 
-    get review_path(reset_session: "1")
+    patch review_reset_path
+    follow_redirect!
     assert_includes response.body, "0 reviewed"
   end
 
-  test "return-to-review session path excludes transient reset_session param" do
+  test "reset route preserves the active filter" do
+    patch review_reset_path(source: "hsk")
+
+    assert_redirected_to review_path(source: "hsk")
+  end
+
+  test "return-to-review session path excludes transient query params" do
     flashcards(:hsk_one).update!(next_review_at: 1.minute.ago)
 
-    get review_path(source: "hsk", reset_session: "1")
+    get review_path(source: "hsk", some_junk: "1")
 
     assert_equal review_path(source: "hsk"), session[:review_return_to]
   end

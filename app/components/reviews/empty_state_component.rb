@@ -14,8 +14,9 @@ module Reviews
       reviewed_count.to_i.positive?
     end
 
+    # "Start new session" restarts the counter via PATCH review/reset.
     def new_session_path
-      review_path(filter_params.merge(reset_session: "1"))
+      review_reset_path(filter_params)
     end
   end
 end

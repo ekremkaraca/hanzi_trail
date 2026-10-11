@@ -1,8 +1,5 @@
 class ReviewsController < ApplicationController
   def show
-    # Let users restart the per-filter progress counter from the empty state.
-    reset_reviewed_count if params[:reset_session] == "1"
-
     # Queue owns filter-aware card selection; the controller only exposes view data.
     @review_queue = Review::Queue.new(
       filters: filter_params,
@@ -18,9 +15,9 @@ class ReviewsController < ApplicationController
     @reviewed_today_count = ReviewAttempt.today.count
 
     # Preserve the active review URL for "back to review" links on card pages.
-    # Built from filter_params only, so transient query keys (e.g. the
-    # ?reset_session=1 that this very action consumes) never leak into the
-    # stored URL and fire again on "Return to Active Review".
+    # Built from filter_params only, so stray query keys can never leak into
+    # the stored URL that ApplicationHelper#link_to_active_review_if_present
+    # later renders.
     session[:review_return_to] = @flashcard.present? ? review_path(filter_params) : nil
   end
 
@@ -57,6 +54,14 @@ class ReviewsController < ApplicationController
 
   def preferences
     session[:show_pinyin] = params[:show_pinyin] == "1"
+
+    redirect_to review_path(filter_params)
+  end
+
+  # Restart the per-filter progress counter from the empty state. PATCH, not
+  # a GET query flag, so prefetched or replayed page views never reset it.
+  def reset
+    reset_reviewed_count
 
     redirect_to review_path(filter_params)
   end

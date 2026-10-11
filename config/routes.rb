@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   end
 
   patch "review/preferences", to: "reviews#preferences"
+  patch "review/reset", to: "reviews#reset", as: :review_reset
   patch "review/:flashcard_id", to: "reviews#update", as: :review_flashcard
 
   get "up" => "rails/health#show", as: :rails_health_check
