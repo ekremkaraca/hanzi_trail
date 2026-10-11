@@ -5,8 +5,6 @@ class HskImporter
 
   def self.import!(path:, level: nil, hsk_level: nil)
     new(path: path, hsk_level: hsk_level || level).import!
-  rescue ImportError
-    raise
   end
 
   def initialize(path:, hsk_level:)
