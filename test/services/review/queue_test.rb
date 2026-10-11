@@ -115,20 +115,4 @@ class Review::QueueTest < ActiveSupport::TestCase
     assert_equal short_story_card, queue.next_card
     assert_equal 1, queue.remaining_count
   end
-
-  test "empty_state_message returns natural empty message when no cards are due overall" do
-    Flashcard.update_all(next_review_at: 1.year.from_now)
-
-    queue = Review::Queue.new(filters: {}, session: {})
-
-    assert_nil queue.next_card
-    assert_equal "No cards due!", queue.empty_state_message
-  end
-
-  test "empty_state_message returns filter warning when filters are too strict" do
-    queue = Review::Queue.new(filters: { source: "non_existent_source" }, session: {})
-
-    assert_nil queue.next_card
-    assert_equal "No cards match your current filters.", queue.empty_state_message
-  end
 end

@@ -15,13 +15,6 @@ module Review
       due_cards.count
     end
 
-    def empty_state_message
-      # Keep service-level messaging available without changing the current view.
-      return "No cards due!" if next_card.nil? && filters.empty?
-
-      "No cards match your current filters."
-    end
-
     def scope
       # Reuse the model scopes so queue filtering stays identical to the old controller.
       Flashcard

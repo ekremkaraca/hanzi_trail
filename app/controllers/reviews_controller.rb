@@ -84,13 +84,6 @@ class ReviewsController < ApplicationController
     params[:category].to_s.humanize.downcase
   end
 
-  def review_scope
-    Flashcard
-        .by_source(params[:source])
-        .by_category(params[:category])
-        .with_story_filter(params[:story_status])
-  end
-
   def review_session_key
     # Use the shared filter module so the session key is built from the
     # same three keys the helper and redirect use.
