@@ -15,6 +15,8 @@
         >
           <a
             role="tab"
+            id="review-tab-<%= tab.fetch(:index) %>-tab"
+            aria-controls="review-tab-<%= tab.fetch(:index) %>-panel"
             tabindex="0"
             :aria-selected="activeTab === <%= tab.fetch(:index) %>"
             @click.prevent="activeTab = <%= tab.fetch(:index) %>"
@@ -26,7 +28,13 @@
     </ul>
 
     <% tabs.each do |tab| %>
-      <div class="review-tab-panel" role="tabpanel" x-show="activeTab === <%= tab.fetch(:index) %>">
+      <div
+        class="review-tab-panel"
+        role="tabpanel"
+        id="review-tab-<%= tab.fetch(:index) %>-panel"
+        aria-labelledby="review-tab-<%= tab.fetch(:index) %>-tab"
+        x-show="activeTab === <%= tab.fetch(:index) %>"
+      >
         <%= render tab.fetch(:component).new(flashcard: flashcard) %>
       </div>
     <% end %>
