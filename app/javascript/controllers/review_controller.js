@@ -19,16 +19,20 @@ export default class extends Controller {
   }
 
   handleKeydown(event) {
-    // Don't hijack keys while the user is operating a form control or link
-    // (e.g. the "Show pinyin" checkbox, where Space would toggle the answer
-    // instead of the checkbox).
-    if (this.isInteractive(event.target)) return;
-
+    // Space natively activates focused buttons/links and toggles checkboxes,
+    // so never hijack it while an interactive control has focus.
     if (event.code === "Space") {
+      if (this.isInteractive(event.target)) return;
+
       event.preventDefault();
       window.dispatchEvent(new Event("review:toggle"));
       return;
     }
+
+    // Digit keys are inert on buttons and checkboxes; only suppress them
+    // for text entry so rating with 1-4 still works right after clicking
+    // "Show answer" (focus stays on that button).
+    if (this.isTextEntry(event.target)) return;
 
     if (!this.answerVisible) return;
 
@@ -48,6 +52,18 @@ export default class extends Controller {
     return (
       target.isContentEditable ||
       ["INPUT", "TEXTAREA", "SELECT", "BUTTON", "A"].includes(target.tagName)
+    );
+  }
+
+  isTextEntry(target) {
+    if (!(target instanceof HTMLElement)) return false;
+
+    if (target.isContentEditable) return true;
+    if (["TEXTAREA", "SELECT"].includes(target.tagName)) return true;
+
+    return (
+      target.tagName === "INPUT" &&
+      !["checkbox", "radio", "button", "submit"].includes(target.type)
     );
   }
 
