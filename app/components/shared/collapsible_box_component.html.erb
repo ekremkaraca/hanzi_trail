@@ -2,7 +2,7 @@
   <button
     type="button"
     class="collapsible-header"
-    :aria-expanded="aria_expanded"
+    :aria-expanded="open.toString()"
     aria-controls="<%= id %>-content"
     @click="open = !open"
   >

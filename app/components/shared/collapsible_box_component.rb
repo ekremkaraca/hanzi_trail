@@ -19,9 +19,5 @@ module Shared
     def show_badge?
       badge.present?
     end
-
-    def aria_expanded
-      open.to_s
-    end
   end
 end
