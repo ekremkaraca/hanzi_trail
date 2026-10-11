@@ -20,4 +20,18 @@ class ReviewVelocityTest < ActiveSupport::TestCase
 
     assert_equal 1.5, ReviewVelocity.call
   end
+
+  test "buckets attempts by local day when the UTC date differs" do
+    # Two attempts at 00:30 Istanbul share one local day but sit on
+    # different UTC days; the average must be over one active day.
+    travel_to Time.zone.local(2026, 10, 11, 0, 30, 0) do
+      ReviewAttempt.delete_all
+      card = flashcards(:network)
+
+      ReviewAttempt.create!(flashcard: card, rating: "good", reviewed_at: Time.current)
+      ReviewAttempt.create!(flashcard: card, rating: "good", reviewed_at: Time.current + 3.hours)
+
+      assert_equal 2.0, ReviewVelocity.call
+    end
+  end
 end

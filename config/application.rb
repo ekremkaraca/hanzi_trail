@@ -11,6 +11,10 @@ module HanziTrail
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
 
+    # Day-scoped features (streak, "reviewed today") must roll over at the
+    # owner's local midnight, not UTC midnight.
+    config.time_zone = "Europe/Istanbul"
+
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.

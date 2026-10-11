@@ -52,4 +52,19 @@ class StreakCalculatorTest < ActiveSupport::TestCase
       assert_equal 3, StreakCalculator.call
     end
   end
+
+  test "counts attempts from the local day even when their UTC date is earlier" do
+    # 00:30 Istanbul lands on the previous calendar day in UTC (21:30).
+    travel_to Time.zone.local(2026, 10, 11, 0, 30, 0) do
+      ReviewAttempt.delete_all
+
+      ReviewAttempt.create!(
+        flashcard: flashcards(:network),
+        rating: "good",
+        reviewed_at: Time.current
+      )
+
+      assert_equal 1, StreakCalculator.call
+    end
+  end
 end
