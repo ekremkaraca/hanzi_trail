@@ -19,6 +19,11 @@ export default class extends Controller {
   }
 
   handleKeydown(event) {
+    // Don't hijack keys while the user is operating a form control or link
+    // (e.g. the "Show pinyin" checkbox, where Space would toggle the answer
+    // instead of the checkbox).
+    if (this.isInteractive(event.target)) return;
+
     if (event.code === "Space") {
       event.preventDefault();
       window.dispatchEvent(new Event("review:toggle"));
@@ -35,6 +40,15 @@ export default class extends Controller {
       event.preventDefault();
       button.click();
     }
+  }
+
+  isInteractive(target) {
+    if (!(target instanceof HTMLElement)) return false;
+
+    return (
+      target.isContentEditable ||
+      ["INPUT", "TEXTAREA", "SELECT", "BUTTON", "A"].includes(target.tagName)
+    );
   }
 
   speak() {
