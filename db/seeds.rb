@@ -20,7 +20,10 @@ HskImporter.new(
 puts "HSK old-1 import completed."
 puts "Linking character entries..."
 
-Flashcard.find_each do |flashcard|
+# HskImporter already linked the cards it imported; only curated seed rows
+# (and any strays) still need links. Re-linking everything would destroy and
+# recreate every join row on each db:seed run.
+Flashcard.where.missing(:flashcard_characters).find_each do |flashcard|
   CharacterLinker.call(flashcard)
 end
 
