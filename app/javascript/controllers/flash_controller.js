@@ -13,17 +13,20 @@ export default class extends Controller {
 
   disconnect() {
     clearTimeout(this.dismissTimer)
+    clearTimeout(this.removeTimer)
   }
 
   close() {
     this.element.classList.add("is-leaving")
 
-    this.element.addEventListener(
-      "animationend",
-      () => {
-        this.element.remove()
-      },
-      { once: true },
-    )
+    const remove = () => {
+      if (this.element.isConnected) this.element.remove()
+    }
+
+    this.element.addEventListener("animationend", remove, { once: true })
+
+    // Fallback: reduced-motion or a missing animation never fires
+    // animationend, which otherwise leaves the flash on screen forever.
+    this.removeTimer = setTimeout(remove, 1000)
   }
 }
