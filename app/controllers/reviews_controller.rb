@@ -18,7 +18,10 @@ class ReviewsController < ApplicationController
     @reviewed_today_count = ReviewAttempt.today.count
 
     # Preserve the active review URL for "back to review" links on card pages.
-    session[:review_return_to] = @flashcard.present? ? request.fullpath : nil
+    # Built from filter_params only, so transient query keys (e.g. the
+    # ?reset_session=1 that this very action consumes) never leak into the
+    # stored URL and fire again on "Return to Active Review".
+    session[:review_return_to] = @flashcard.present? ? review_path(filter_params) : nil
   end
 
   def update

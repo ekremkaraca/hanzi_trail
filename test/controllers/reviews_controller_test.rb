@@ -374,6 +374,14 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "0 reviewed"
   end
 
+  test "return-to-review session path excludes transient reset_session param" do
+    flashcards(:hsk_one).update!(next_review_at: 1.minute.ago)
+
+    get review_path(source: "hsk", reset_session: "1")
+
+    assert_equal review_path(source: "hsk"), session[:review_return_to]
+  end
+
   test "saving preferences preserves filters" do
     patch review_preferences_path, params: {
       show_pinyin: "1",
