@@ -29,17 +29,4 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "—", presence_or_dash("")
     assert_equal "—", presence_or_dash(nil)
   end
-
-  test "tag_if_present returns empty string when value is blank" do
-    assert_equal "", tag_if_present("", color: "info")
-    assert_equal "", tag_if_present(nil, color: "info")
-  end
-
-  test "tag_if_present renders a Bulma tag span when value is present" do
-    result = tag_if_present("HSK 1", color: "info")
-
-    assert_match "HSK 1", result
-    assert_match "tag is-info", result
-    assert_includes result, "span"
-  end
 end

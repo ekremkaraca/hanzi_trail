@@ -12,11 +12,4 @@ module ApplicationHelper
   def presence_or_dash(value)
     value.presence || "—"
   end
-
-  # DRY: render a Bulma tag only when the value is present
-  def tag_if_present(value, color:, css_class: "tag")
-    return "" if value.blank?
-
-    tag.span(value, class: "#{css_class} is-#{color}")
-  end
 end
