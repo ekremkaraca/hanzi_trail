@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resource :session
   resources :flashcards
 
   with_options only: :show do

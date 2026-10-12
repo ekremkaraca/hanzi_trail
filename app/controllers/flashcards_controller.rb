@@ -1,7 +1,8 @@
 class FlashcardsController < ApplicationController
-  # Review updates remain enabled for the local MVP because review is the core flow.
-  # Flashcard CRUD is disabled until authentication exists.
-  before_action :require_write_access, only: %i[new edit create update destroy]
+  # Browsing and practice stay public; every write requires a curator.
+  # `except:` (not `only:`) so future actions default to gated.
+  allow_unauthenticated_access
+  before_action :require_authentication, except: %i[index show]
   before_action :set_flashcard, only: %i[show edit update destroy]
 
   FLASHCARDS_LIMIT = 200.freeze

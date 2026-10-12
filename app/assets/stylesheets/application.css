@@ -638,6 +638,14 @@ progress.progress--info { accent-color: var(--hanzi-info); }
 
 .hanzi-nav-links a:hover { color: #ffffff; }
 
+.hanzi-nav-user {
+  color: var(--hanzi-text-muted);
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 12rem;
+}
+
 .hanzi-logo {
   align-items: center;
   background: var(--hanzi-blue);
@@ -859,6 +867,36 @@ button.collapsible-header:hover,
 }
 
 .char-counter--warning { color: #d97706; font-weight: 600; }
+
+/* ── Sign-in page ── */
+.session-page {
+  display: grid;
+  min-height: calc(100vh - 8rem);
+  padding: 2rem 0;
+  place-items: center;
+}
+
+.session-card {
+  max-width: 26rem;
+  width: 100%;
+}
+
+.field-label {
+  color: var(--hanzi-text-soft);
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+  gap: 0.35rem;
+  margin-bottom: 0.9rem;
+}
+
+.field-label input {
+  width: 100%;
+}
+
+.session-form .btn--block {
+  margin-top: 0.5rem;
+}
 
 /* ── Review page ── */
 .review-page { min-height: calc(100vh - 3.25rem); }

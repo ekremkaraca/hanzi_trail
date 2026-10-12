@@ -1,4 +1,6 @@
 class CharacterEntriesController < ApplicationController
+  allow_unauthenticated_access
+
   def show
     @character_entry = CharacterEntry
                        .includes(flashcard_characters: :flashcard)

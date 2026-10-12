@@ -19,6 +19,7 @@ SimpleCov.start "rails"
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+require_relative "test_helpers/session_test_helper"
 # Enable component-level tests for UI now owned by ViewComponent classes.
 require "view_component/test_case"
 

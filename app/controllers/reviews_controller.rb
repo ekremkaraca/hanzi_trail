@@ -1,4 +1,6 @@
 class ReviewsController < ApplicationController
+  allow_unauthenticated_access
+
   def show
     # Queue owns filter-aware card selection; the controller only exposes view data.
     @review_queue = Review::Queue.new(

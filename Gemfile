@@ -35,3 +35,6 @@ group :test do
   gem "selenium-webdriver"
   gem "simplecov", "~> 1.1", require: false
 end
+gem "action_policy"
+
+gem "bcrypt", "~> 3.1"

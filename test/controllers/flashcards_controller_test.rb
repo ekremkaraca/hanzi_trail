@@ -12,14 +12,41 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should get new" do
+  test "anonymous visitors are sent to sign-in for write actions" do
     get new_flashcard_url
-    assert_redirected_to flashcards_path
-    assert_equal "Editing is disabled until authentication is added", flash[:alert]
+    assert_redirected_to new_session_path
+
+    get edit_flashcard_url(@flashcard)
+    assert_redirected_to new_session_path
+
+    assert_no_difference("Flashcard.count") do
+      post flashcards_url, params: {
+        flashcard: { character: "北京", pinyin: "Běijīng", meaning: "Beijing" }
+      }
+    end
+    assert_redirected_to new_session_path
+
+    patch flashcard_url(@flashcard), params: { flashcard: { meaning: "nope" } }
+    assert_redirected_to new_session_path
+    assert_not_equal "nope", @flashcard.reload.meaning
+
+    assert_no_difference("Flashcard.count") do
+      delete flashcard_url(@flashcard)
+    end
+    assert_redirected_to new_session_path
   end
 
-  test "should create flashcard" do
-    assert_no_difference("Flashcard.count") do
+  test "curators can get new" do
+    sign_in_as users(:one)
+
+    get new_flashcard_url
+    assert_response :success
+  end
+
+  test "curators create flashcard" do
+    sign_in_as users(:one)
+
+    assert_difference("Flashcard.count", 1) do
       post flashcards_url, params: {
         flashcard: {
           character: "北京",
@@ -31,40 +58,40 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_redirected_to flashcards_path
-    assert_equal "Editing is disabled until authentication is added", flash[:alert]
+    assert_redirected_to flashcard_url(Flashcard.find_by(character: "北京"))
+  end
+
+  test "curators can get edit" do
+    sign_in_as users(:one)
+
+    get edit_flashcard_url(@flashcard)
+    assert_response :success
+  end
+
+  test "curators update flashcard" do
+    sign_in_as users(:one)
+
+    patch flashcard_url(@flashcard), params: {
+      flashcard: { meaning: "network / web / mesh" }
+    }
+
+    assert_redirected_to flashcard_url(@flashcard)
+    assert_equal "network / web / mesh", @flashcard.reload.meaning
+  end
+
+  test "curators destroy flashcard" do
+    sign_in_as users(:one)
+
+    assert_difference("Flashcard.count", -1) do
+      delete flashcard_url(@flashcard)
+    end
+
+    assert_redirected_to flashcards_url
   end
 
   test "should show flashcard" do
     get flashcard_url(@flashcard)
     assert_response :success
-  end
-
-  test "should get edit" do
-    get edit_flashcard_url(@flashcard)
-    assert_redirected_to flashcards_path
-    assert_equal "Editing is disabled until authentication is added", flash[:alert]
-  end
-
-  test "should update flashcard" do
-    patch flashcard_url(@flashcard), params: {
-      flashcard: {
-        meaning: "network / web"
-      }
-    }
-
-    assert_redirected_to flashcards_path
-    assert_equal "Editing is disabled until authentication is added", flash[:alert]
-    assert_not_equal "network / web", @flashcard.reload.meaning
-  end
-
-  test "should destroy flashcard" do
-    assert_no_difference("Flashcard.count") do
-      delete flashcard_url(@flashcard)
-    end
-
-    assert_redirected_to flashcards_url
-    assert_equal "Editing is disabled until authentication is added", flash[:alert]
   end
 
   test "index shows all flashcards by default" do
@@ -186,33 +213,6 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "No flashcards matched your filter"
     assert_select "a[href=?]", flashcards_path, text: "Browse all flashcards"
-  end
-
-  test "create is disabled without authentication" do
-    assert_no_difference "Flashcard.count" do
-      post flashcards_path, params: {
-        flashcard: {
-          character: "测",
-          pinyin: "cè",
-          meaning: "test"
-        }
-      }
-    end
-
-    assert_redirected_to flashcards_path
-    assert_equal "Editing is disabled until authentication is added", flash[:alert]
-  end
-
-  test "update is disabled without authentication" do
-    patch flashcard_path(@flashcard), params: {
-      flashcard: {
-        meaning: "updated meaning"
-      }
-    }
-
-    assert_redirected_to flashcards_path
-    assert_equal "Editing is disabled until authentication is added", flash[:alert]
-    assert_not_equal "updated meaning", @flashcard.reload.meaning
   end
 
   test "index shows draft stories shortcut" do

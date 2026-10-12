@@ -1,4 +1,6 @@
 class StatsController < ApplicationController
+  allow_unauthenticated_access
+
   def show
     @today_count = ReviewAttempt.today.count
     @week_count = ReviewAttempt.where(reviewed_at: 7.days.ago..Time.current).count

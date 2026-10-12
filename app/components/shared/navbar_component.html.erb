@@ -31,6 +31,13 @@
       <%= nav_link("Cards",  flashcards_path) %>
       <%= nav_link("Review", review_path) %>
       <%= nav_link("Stats",  stats_path) %>
+
+      <% if Current.user %>
+        <span class="hanzi-nav-user"><%= Current.user.email_address %></span>
+        <%= button_to "Sign out", session_path, method: :delete, class: "btn btn--sm btn--ghost", "@click": "close()" %>
+      <% else %>
+        <%= nav_link("Sign in", new_session_path) %>
+      <% end %>
     </div>
   </div>
 </nav>
