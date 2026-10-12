@@ -26,8 +26,15 @@ Rails.application.configure do
     policy.form_action :self
   end
 
-  # Cookie session id doubles as the nonce source: guaranteed per-session,
-  # unknown to attackers, and already rotating.
-  config.content_security_policy_nonce_generator = ->(request) { request.session.id.to_s }
-  config.content_security_policy_nonce_directives = %w[script-src]
+  # Per-request random nonce. The stock session-id generator from the Rails
+  # template is unusable here: the cookie session is lazy and session.id is
+  # "" for visitors who never touched a review action, producing an empty
+  # nonce that leaves Turbo's injected progress-bar <style> blocked.
+  config.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }
+  # style-src must be in the nonce list: Turbo's progress bar injects a
+  # <style> element and stamps it with the nonce read from the
+  # <meta name="csp-nonce"> tag. With only script-src listed, Rails leaves
+  # that meta empty and the injected stylesheet is blocked (prod console
+  # error at turbo.es2017-esm.js createStylesheetElement).
+  config.content_security_policy_nonce_directives = %w[script-src style-src]
 end
