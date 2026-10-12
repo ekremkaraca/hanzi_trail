@@ -43,6 +43,22 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "signed-in curator sees write affordances on public index" do
+    sign_in_as users(:one)
+
+    get flashcards_url
+    assert_response :success
+    assert_select "a[href=?]", new_flashcard_path, text: "New flashcard"
+    assert_select "a[href=?]", new_session_path, count: 0
+  end
+
+  test "anonymous visitors see sign-in affordances on index" do
+    get flashcards_url
+
+    assert_select "a[href=?]", new_session_path, text: "Sign in to create"
+    assert_select "a[href=?]", new_flashcard_path, count: 0
+  end
+
   test "curators create flashcard" do
     sign_in_as users(:one)
 

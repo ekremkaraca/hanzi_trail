@@ -15,6 +15,18 @@
       <%= last_reviewed_text %>
     </div>
 
+    <% if helpers.allowed_to?(:update?, flashcard) %>
+      <div class="flex flex--gap flex--wrap mt-2">
+        <%= link_to "Edit card", edit_flashcard_path(flashcard), class: "btn btn--sm btn--ghost" %>
+        <%= button_to "Delete",
+          flashcard_path(flashcard),
+          method: :delete,
+          class: "btn btn--sm btn--danger",
+          form_class: "d-inline-block",
+          data: { turbo_confirm: "Delete #{flashcard.character} for good?" } %>
+      </div>
+    <% end %>
+
     <% if active_review_path.present? %>
       <div class="mt-5">
         <%= link_to active_review_path, class: "btn btn--info btn--block mb-4" do %>

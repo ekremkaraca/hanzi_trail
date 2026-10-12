@@ -22,12 +22,15 @@ class FlashcardsController < ApplicationController
   def show; end
 
   def new
+    authorize! Flashcard
     @flashcard = Flashcard.new
   end
 
   def edit; end
 
   def create
+    authorize! Flashcard
+
     @flashcard = Flashcard.new(flashcard_params)
 
     if @flashcard.save
@@ -38,6 +41,8 @@ class FlashcardsController < ApplicationController
   end
 
   def update
+    authorize! @flashcard
+
     if @flashcard.update(flashcard_params)
       redirect_to @flashcard, notice: "Flashcard was successfully updated."
     else
@@ -46,6 +51,8 @@ class FlashcardsController < ApplicationController
   end
 
   def destroy
+    authorize! @flashcard
+
     @flashcard.destroy
     redirect_to flashcards_url, notice: "Flashcard was successfully destroyed."
   end

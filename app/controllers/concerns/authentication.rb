@@ -2,6 +2,10 @@ module Authentication
   extend ActiveSupport::Concern
 
   included do
+    # Always resume the session so public pages still know who is signed
+    # in (navbar state, allowed_to? affordances). allow_unauthenticated_access
+    # below skips only the enforcement, never the resume.
+    before_action :resume_session
     before_action :require_authentication
     helper_method :authenticated?
   end
