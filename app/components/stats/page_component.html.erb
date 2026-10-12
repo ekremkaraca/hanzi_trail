@@ -18,7 +18,7 @@
 
   <%= render Stats::DifficultCardsComponent.new(difficult_cards: difficult_cards) %>
 
-  <div class="grid grid--2" style="gap: 1.5rem;">
+  <div class="grid grid--2 gap-lg">
     <%= render Stats::RecentReviewsComponent.new(recent_attempts: recent_attempts) %>
     <%= render Stats::RecentActivityComponent.new(recent_attempts: recent_attempts) %>
   </div>

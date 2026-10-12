@@ -460,6 +460,8 @@ progress.progress--info { accent-color: var(--hanzi-info); }
 .cap { text-transform: capitalize; }
 .d-inline-block { display: inline-block; }
 .d-block { display: block; }
+.gap-lg { gap: 1.5rem; }
+.scroll-x { margin: 0; overflow-x: auto; }
 .fw-semibold { font-weight: 600; }
 
 /* Font-size scale */
