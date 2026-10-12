@@ -406,4 +406,28 @@ class FlashcardTest < ActiveSupport::TestCase
 
     assert results.all? { |card| card.story_status == "curated" }
   end
+
+  test "create links each character to an entry automatically" do
+    card = Flashcard.create!(character: "电话", pinyin: "diànhuà", meaning: "telephone")
+
+    assert_equal %w[电 话], card.reload.character_entries.map(&:character)
+  end
+
+  test "changing character relinks entries" do
+    card = Flashcard.create!(character: "电", pinyin: "diàn", meaning: "electric")
+    assert_equal [ "电" ], card.character_entries.map(&:character)
+
+    card.update!(character: "电话")
+
+    assert_equal %w[电 话], card.reload.character_entries.map(&:character)
+  end
+
+  test "unrelated update does not rebuild links" do
+    card = Flashcard.create!(character: "电", pinyin: "diàn", meaning: "electric")
+    link = card.flashcard_characters.first
+
+    card.update!(meaning: "electricity")
+
+    assert_equal link.id, card.reload.flashcard_characters.first.id
+  end
 end

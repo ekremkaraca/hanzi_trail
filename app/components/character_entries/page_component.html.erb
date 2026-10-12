@@ -3,6 +3,18 @@
 
   <%= render CharacterEntries::RelatedWordsComponent.new(flashcard_characters: flashcard_characters) %>
 
+  <% if helpers.allowed_to?(:update?, character_entry) %>
+    <div class="flex flex--gap flex--wrap mt-4">
+      <%= link_to "Edit character", edit_character_entry_path(character_entry), class: "btn btn--sm btn--ghost" %>
+      <%= button_to "Delete",
+        character_entry_path(character_entry),
+        method: :delete,
+        class: "btn btn--sm btn--danger",
+        form_class: "d-inline-block",
+        data: { turbo_confirm: "Delete #{character_entry.character} and its card links?" } %>
+    </div>
+  <% end %>
+
   <div class="mt-5">
     <%= helpers.link_to_active_review_if_present %>
   </div>

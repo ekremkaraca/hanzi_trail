@@ -54,8 +54,7 @@ class HskImporter
     )
 
     flashcard.save!
-    # Populate character-entry links so imported cards show up in exploration views.
-    CharacterLinker.call(flashcard)
+    # Character links are created by Flashcard's after_save relink callback.
   end
 
   def parse_json

@@ -2,15 +2,14 @@ require "test_helper"
 
 class CharacterLinkerTest < ActiveSupport::TestCase
   test "links flashcard to individual characters" do
+    # The Flashcard after_save callback now runs the linker on create.
     card = Flashcard.create!(
       character: "网络",
       pinyin: "wǎngluò",
       meaning: "network"
     )
 
-    assert_difference("FlashcardCharacter.count", 2) do
-      CharacterLinker.call(card)
-    end
+    assert_equal 2, card.flashcard_characters.count
 
     assert_equal [ "网", "络" ], card.character_entries.order("flashcard_characters.position").pluck(:character)
   end

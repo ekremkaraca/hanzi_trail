@@ -1,0 +1,8 @@
+<main class="character-entry-page">
+  <h1 class="fs-3 mb-4">
+    Editing character
+    <span class="text-bright"><%= @character_entry.character %></span>
+  </h1>
+
+  <%= render CharacterEntries::FormComponent.new(character_entry: @character_entry) %>
+</main>

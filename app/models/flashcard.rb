@@ -30,6 +30,12 @@ class Flashcard < ApplicationRecord
   before_validation :set_initial_review_time, on: :create
   before_validation :sync_story_status, on: %i[ create update ]
 
+  # Curators can now edit cards, so the character-entry links must follow
+  # the character. Runs on create too (saved_change_to_character? is true
+  # for new records), replacing the explicit CharacterLinker calls that
+  # the importer used to make.
+  after_save :relink_characters, if: :saved_change_to_character?
+
   scope(:due_for_review, -> {
     where("next_review_at <= ?", Time.current).order(:next_review_at, :id)
   })
@@ -107,6 +113,10 @@ class Flashcard < ApplicationRecord
   end
 
   private
+
+  def relink_characters
+    CharacterLinker.call(self)
+  end
 
   def set_initial_review_time
     self.next_review_at ||= Time.current

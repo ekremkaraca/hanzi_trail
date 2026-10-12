@@ -5,8 +5,9 @@ Rails.application.routes.draw do
   with_options only: :show do
     resource :review
     resource :stats
-    resources :character_entries
   end
+
+  resources :character_entries, only: %i[show edit update destroy]
 
   patch "review/preferences", to: "reviews#preferences"
   patch "review/reset", to: "reviews#reset", as: :review_reset
