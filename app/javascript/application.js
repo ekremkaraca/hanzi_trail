@@ -68,8 +68,10 @@ Alpine.data("collapsible", (defaultOpen = true) => ({
   },
 }))
 
-// Mobile nav. `breakpoint` (in px) controls when the hamburger appears;
-// nav links are visible above it and collapsed below it.
+// Mobile nav. `breakpoint` (in px) controls when the hamburger appears.
+// `open` only tracks the mobile disclosure; desktop visibility is derived
+// from isMobile in the template (x-show="!isMobile || open"), so resizing
+// desktop -> mobile never leaves a stale open menu behind.
 Alpine.data("mobileNav", (breakpoint = 600) => ({
   open: false,
   breakpoint: Number(breakpoint) || 600,
@@ -81,12 +83,12 @@ Alpine.data("mobileNav", (breakpoint = 600) => ({
   },
 
   // Re-evaluate on every resize so the hamburger reacts to orientation
-  // changes. On wide viewports we force the menu open so desktop users
-  // never get a trapped-closed state.
+  // changes; collapse the disclosure whenever we enter mobile width.
   applyViewportState() {
+    const wasMobile = this.isMobile
     this.isMobile = window.innerWidth <= this.breakpoint
-    if (!this.isMobile) {
-      this.open = true
+    if (this.isMobile && !wasMobile) {
+      this.open = false
     }
   },
 

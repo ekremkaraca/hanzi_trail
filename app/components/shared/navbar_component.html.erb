@@ -25,7 +25,7 @@
 
     <div
       class="hanzi-nav-links"
-      x-show="open"
+      x-show="!isMobile || open"
       x-cloak
     >
       <%= nav_link("Cards",  flashcards_path) %>
