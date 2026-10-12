@@ -12,7 +12,7 @@
       <%= render Flashcards::ShortcutsComponent.new %>
     </div>
   </div>
-  <%= form_with url: flashcards_path, method: :get, local: true do |form| %>
+  <%= form_with url: flashcards_path, method: :get, local: true, class: "pure-form" do |form| %>
     <div class="flashcard-filter-grid">
       <label class="filter-search-field">
         <%= form.label :query, "Search" %>

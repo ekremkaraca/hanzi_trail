@@ -1,5 +1,5 @@
 <div class="text-center mt-4 hidden-mobile">
-  <%= form_with url: "/review/preferences", method: :patch, class: "d-inline-block" do |form| %>
+  <%= form_with url: "/review/preferences", method: :patch, class: "pure-form d-inline-block" do |form| %>
     <label class="checkbox fs-7 text-dim mr-2">
       <%= form.check_box :show_pinyin, checked: show_pinyin %>
       Show pinyin before answer
