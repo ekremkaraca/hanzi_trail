@@ -127,6 +127,7 @@ textarea::placeholder {
   color: rgba(255, 255, 255, 0.35);
 }
 
+input:focus,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
@@ -275,8 +276,11 @@ progress::-moz-progress-bar {
   color: var(--hanzi-text);
 }
 
+.pure-form input:focus,
 .pure-form input:focus-visible,
+.pure-form select:focus,
 .pure-form select:focus-visible,
+.pure-form textarea:focus,
 .pure-form textarea:focus-visible {
   border-color: var(--hanzi-blue);
   box-shadow: var(--hanzi-focus-ring);
@@ -868,6 +872,51 @@ button.collapsible-header:hover,
 
 .char-counter--warning { color: #d97706; font-weight: 600; }
 
+/* ── Forms ── */
+.form-card {
+  max-width: 36rem;
+}
+
+.form-section + .form-section {
+  border-top: 1px solid var(--hanzi-border);
+  margin-top: 1.75rem;
+  padding-top: 1.5rem;
+}
+
+.form-grid--2 {
+  display: grid;
+  gap: 0 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 600px) {
+  .form-grid--2 { grid-template-columns: 1fr; }
+}
+
+/* One labelled block: label text + control (+ optional counter). */
+.field {
+  color: var(--hanzi-text-soft);
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+  gap: 0.35rem;
+  margin-bottom: 0.9rem;
+}
+
+.field > label {
+  color: var(--hanzi-text);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Stacked pure-form controls fill the card instead of the ~200px
+   browser default width. */
+.pure-form-stacked input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+.pure-form-stacked textarea,
+.pure-form-stacked select {
+  width: 100%;
+}
+
 /* ── Sign-in page ── */
 .session-page {
   display: grid;
@@ -878,19 +927,6 @@ button.collapsible-header:hover,
 
 .session-card {
   max-width: 26rem;
-  width: 100%;
-}
-
-.field-label {
-  color: var(--hanzi-text-soft);
-  display: flex;
-  flex-direction: column;
-  font-size: 0.85rem;
-  gap: 0.35rem;
-  margin-bottom: 0.9rem;
-}
-
-.field-label input {
   width: 100%;
 }
 

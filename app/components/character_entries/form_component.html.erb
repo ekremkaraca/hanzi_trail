@@ -1,44 +1,52 @@
 <%= form_with model: character_entry, class: "pure-form pure-form-stacked" do |form| %>
-  <% if has_errors? %>
-    <div class="notice notice--danger">
-      <p><strong>Please fix the following errors:</strong></p>
-      <ul>
-        <% error_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
+  <div class="panel-card form-card">
+    <h1 class="fs-3 mb-5">
+      Editing character
+      <span class="text-bright"><%= character_entry.character %></span>
+    </h1>
+
+    <% if has_errors? %>
+      <div class="notice notice--danger mb-4">
+        <p><strong>Please fix the following errors:</strong></p>
+        <ul>
+          <% error_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%# Character is the identity of the entry (and the CharacterLinker
+       match key) — shown for context, never editable here. %>
+    <label class="field">
+      Character
+      <%= form.text_field :character, disabled: true %>
+    </label>
+
+    <div class="form-grid--2">
+      <label class="field">
+        Pinyin
+        <%= form.text_field :pinyin, placeholder: "wǎng" %>
+      </label>
+      <label class="field">
+        Radical
+        <%= form.text_field :radical, placeholder: "糸 (58)" %>
+      </label>
     </div>
-  <% end %>
 
-  <%# Character is the identity of the entry (and the key CharacterLinker
-     matches on) — shown for context, never editable here. %>
-  <label>
-    <%= form.label :character %>
-    <%= form.text_field :character, disabled: true %>
-  </label>
+    <label class="field">
+      Meaning
+      <%= form.text_field :meaning, placeholder: "net; web" %>
+    </label>
 
-  <label>
-    <%= form.label :pinyin %>
-    <%= form.text_field :pinyin, placeholder: "wǎng" %>
-  </label>
+    <label class="field">
+      Notes
+      <%= form.text_area :notes, rows: 6, placeholder: "Etymology, usage notes, mnemonics…" %>
+    </label>
 
-  <label>
-    <%= form.label :meaning %>
-    <%= form.text_field :meaning, placeholder: "net; web" %>
-  </label>
-
-  <label>
-    <%= form.label :radical %>
-    <%= form.text_field :radical, placeholder: "糸 (58)" %>
-  </label>
-
-  <label>
-    <%= form.label :notes %>
-    <%= form.text_area :notes, rows: 6, placeholder: "Etymology, usage notes, mnemonics…" %>
-  </label>
-
-  <div class="flex flex--gap mt-4">
-    <%= form.submit "Save character", class: "btn btn--primary" %>
-    <%= link_to "Cancel", character_entry_path(character_entry), class: "btn btn--ghost" %>
+    <div class="flex flex--gap mt-5">
+      <%= form.submit "Save character", class: "btn btn--primary" %>
+      <%= link_to "Cancel", character_entry_path(character_entry), class: "btn btn--ghost" %>
+    </div>
   </div>
 <% end %>

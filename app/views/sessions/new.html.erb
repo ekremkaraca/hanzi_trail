@@ -4,11 +4,11 @@
     <p class="text-soft mb-4">Curator access — browsing and practice stay open to everyone.</p>
 
     <%= form_with url: session_path, class: "pure-form pure-form-stacked session-form" do |form| %>
-      <label class="field-label">
+      <label class="field">
         Email
         <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "you@example.com", value: params[:email_address] %>
       </label>
-      <label class="field-label">
+      <label class="field">
         Password
         <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "Your password", maxlength: 72 %>
       </label>
