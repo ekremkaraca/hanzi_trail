@@ -1,11 +1,13 @@
 module Reviews
   class ActionsComponent < ViewComponent::Base
     # Own rating metadata here so the component fully defines the action row.
+    # tone = semantic button colour: again red, hard amber, good brand blue,
+    # easy green — the row should read at a glance like the SRS meaning.
     REVIEW_BUTTONS = {
-      "again" => { label: "Again", key: "1" },
-      "hard"  => { label: "Hard",  key: "2" },
-      "good"  => { label: "Good",  key: "3" },
-      "easy"  => { label: "Easy",  key: "4" }
+      "again" => { label: "Again", key: "1", tone: "btn--danger" },
+      "hard"  => { label: "Hard",  key: "2", tone: "btn--warning" },
+      "good"  => { label: "Good",  key: "3", tone: "btn--primary" },
+      "easy"  => { label: "Easy",  key: "4", tone: "btn--success" }
     }.freeze
 
     def initialize(flashcard:, filter_params:)
@@ -35,7 +37,7 @@ module Reviews
         helpers.review_flashcard_path(flashcard),
         method: :patch,
         params: review_button_params(rating),
-        class: "btn btn--primary",
+        class: "btn #{config.fetch(:tone)}",
         data: { review_rating: config.fetch(:key) }
       )
     end
