@@ -4,18 +4,18 @@
   <% if has_reviewed_cards? %>
     <h2>Review session complete.</h2>
     <p class="text-soft mt-2">You reviewed <%= pluralize(reviewed_count, "card") %>.</p>
-    <p class="text-grey">Good work. Your current review queue is clear.</p>
+    <p class="text-soft">Good work. Your current review queue is clear.</p>
 
     <div class="flex flex--center flex--gap mt-5">
-      <%= link_to "View stats", stats_path, class: "button is-link" %>
-      <%= button_to "Start new session", new_session_path, method: :patch, class: "button is-dark" %>
+      <%= link_to "View stats", stats_path, class: "btn btn--primary" %>
+      <%= button_to "Start new session", new_session_path, method: :patch, class: "btn btn--dark" %>
     </div>
   <% else %>
     <h2><%= title || "No cards due right now" %></h2>
-    <p class="text-grey mt-2">Review your flashcards later or browse all cards.</p>
+    <p class="text-soft mt-2">Review your flashcards later or browse all cards.</p>
   <% end %>
 
   <div class="mt-5">
-    <%= link_to "Browse flashcards", flashcards_path, class: "button is-light" %>
+    <%= link_to "Browse flashcards", flashcards_path, class: "btn btn--ghost" %>
   </div>
 </article>

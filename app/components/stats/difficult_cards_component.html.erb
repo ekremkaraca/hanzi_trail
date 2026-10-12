@@ -4,16 +4,16 @@
       badge: badge
     ) do %>
   <% if any_cards? %>
-    <div class="panel">
+    <div class="stack">
       <% difficult_cards.each do |card| %>
-        <%= link_to flashcard_path(card), class: "panel-block difficult-card-item" do %>
-          <span class="has-text-weight-semibold mr-3"><%= card.character %></span>
+        <%= link_to flashcard_path(card), class: "stack-row difficult-card-item" do %>
+          <span class="fw-semibold mr-3"><%= card.character %></span>
           <span class="flex--grow"><%= card.meaning %></span>
-          <span class="tag is-warning"><%= pluralize(card.difficult_review_count, "hard review") %></span>
+          <span class="badge badge--warning"><%= pluralize(card.difficult_review_count, "hard review") %></span>
         <% end %>
       <% end %>
     </div>
   <% else %>
-    <p class="text-grey-light">No difficult cards yet.</p>
+    <p class="text-dim">No difficult cards yet.</p>
   <% end %>
 <% end %>

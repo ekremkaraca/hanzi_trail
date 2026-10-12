@@ -1,6 +1,6 @@
 <main>
   <article class="panel-card text-center">
-    <p class="is-size-1 mb-3">网</p>
+    <p class="fs-1 mb-3">网</p>
 
     <h1>HanziTrail</h1>
 
@@ -8,8 +8,8 @@
 
     <div class="flex flex--center flex--gap mt-5">
       <%# Use button_to with GET so Pico styles render as <button>; default POST would 404 these routes %>
-      <%= button_to "Start review", review_path, method: :get, class: "outline primary" %>
-      <%= button_to "Browse cards", flashcards_path, method: :get, class: "outline secondary" %>
+      <%= button_to "Start review", review_path, method: :get, class: "btn btn--primary" %>
+      <%= button_to "Browse cards", flashcards_path, method: :get, class: "btn btn--ghost" %>
     </div>
   </article>
 </main>

@@ -35,7 +35,7 @@ module Reviews
         helpers.review_flashcard_path(flashcard),
         method: :patch,
         params: review_button_params(rating),
-        class: "button outline primary",
+        class: "btn btn--primary",
         data: { review_rating: config.fetch(:key) }
       )
     end

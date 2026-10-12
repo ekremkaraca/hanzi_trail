@@ -32,11 +32,10 @@ module Reviews
 
     def mode_button_class(mode)
       helpers.class_names(
-        "button",
-        "is-small",
-        "outline",
-        "secondary": !mode_active?(mode),
-        "primary": mode_active?(mode)
+        "btn",
+        "btn--sm",
+        "btn--ghost": !mode_active?(mode),
+        "btn--primary": mode_active?(mode)
       )
     end
 

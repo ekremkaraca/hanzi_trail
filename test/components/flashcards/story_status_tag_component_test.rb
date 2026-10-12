@@ -9,7 +9,7 @@ module Flashcards
       render_inline(StoryStatusTagComponent.new(flashcard: flashcard))
 
       assert_text "Missing Story"
-      assert_selector ".tag.is-warning"
+      assert_selector ".badge.badge--warning"
     end
 
     test "renders draft story tag" do
@@ -19,7 +19,7 @@ module Flashcards
       render_inline(StoryStatusTagComponent.new(flashcard: flashcard))
 
       assert_text "Draft Story"
-      assert_selector ".tag.is-info"
+      assert_selector ".badge.badge--info"
     end
 
     test "renders curated story tag" do
@@ -29,7 +29,7 @@ module Flashcards
       render_inline(StoryStatusTagComponent.new(flashcard: flashcard))
 
       assert_text "Curated Story"
-      assert_selector ".tag.is-success"
+      assert_selector ".badge.badge--success"
     end
 
     test "renders unknown story tag for unexpected status" do
@@ -39,7 +39,7 @@ module Flashcards
       render_inline(StoryStatusTagComponent.new(flashcard: flashcard))
 
       assert_text "Unknown Story"
-      assert_selector ".tag.is-light"
+      assert_selector ".badge.badge--neutral"
     end
   end
 end

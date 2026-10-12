@@ -9,7 +9,7 @@ module Flashcards
 
         render_inline(HeroComponent.new(flashcard: flashcard))
 
-        assert_selector ".flashcard-show-symbol.is-phrase-character"
+        assert_selector ".flashcard-show-symbol.symbol--phrase"
       end
 
       test "uses long size class for three characters" do
@@ -18,7 +18,7 @@ module Flashcards
 
         render_inline(HeroComponent.new(flashcard: flashcard))
 
-        assert_selector ".flashcard-show-symbol.is-long-character"
+        assert_selector ".flashcard-show-symbol.symbol--long"
       end
 
       test "uses no length modifier for one or two characters" do
@@ -28,8 +28,8 @@ module Flashcards
         render_inline(HeroComponent.new(flashcard: flashcard))
 
         assert_selector ".flashcard-show-symbol"
-        assert_no_selector ".flashcard-show-symbol.is-long-character"
-        assert_no_selector ".flashcard-show-symbol.is-phrase-character"
+        assert_no_selector ".flashcard-show-symbol.symbol--long"
+        assert_no_selector ".flashcard-show-symbol.symbol--phrase"
       end
     end
   end

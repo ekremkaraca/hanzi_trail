@@ -14,9 +14,9 @@ module Flashcards
         length = flashcard.character.length
 
         if length >= 4
-          "is-phrase-character"
+          "symbol--phrase"
         elsif length >= 3
-          "is-long-character"
+          "symbol--long"
         end
       end
     end

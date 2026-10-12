@@ -17,7 +17,7 @@ class ApplicationHelperTest < ActionView::TestCase
     # Verify it targets the correct URL from the session
     assert_match "href=\"#{target_path}\"", result
     # Verify our Bulma styling and layout texts are present
-    assert_match "button is-info is-fullwidth", result
+    assert_match "btn btn--info btn--block", result
     assert_match "Return to Active Review", result
   end
 

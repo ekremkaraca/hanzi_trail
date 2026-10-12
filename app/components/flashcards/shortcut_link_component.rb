@@ -17,7 +17,7 @@ module Flashcards
     end
 
     def css_class
-      "button #{config.fetch(:css_class)}"
+      "btn btn--sm #{config.fetch(:tone)}"
     end
   end
 end

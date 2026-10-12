@@ -4,7 +4,7 @@
     ) do %>
   <div class="grid grid--stats">
     <% ratings.each do |rating| %>
-      <div class="notification is-light text-center">
+      <div class="notice notice--neutral text-center">
         <p class="stats-card-label"><%= rating.capitalize %></p>
         <strong class="stats-card-value"><%= count_for(rating) %></strong>
       </div>

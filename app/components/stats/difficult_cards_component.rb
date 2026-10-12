@@ -9,7 +9,7 @@ module Stats
     attr_reader :difficult_cards
 
     def badge
-      helpers.content_tag(:span, "Top 10", class: "tag is-warning")
+      helpers.content_tag(:span, "Top 10", class: "badge badge--warning")
     end
 
     def flashcard_path(card)

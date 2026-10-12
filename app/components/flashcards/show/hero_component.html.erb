@@ -4,7 +4,7 @@
       <%= render Flashcards::StoryStatusTagComponent.new(flashcard: flashcard) %>
 
       <%# DRY: tag-if-present collapses the "blank? then skip, else wrap in tag" pattern %>
-      <%= render Flashcards::TagIfPresentComponent.new(flashcard.source, color: "link") %>
+      <%= render Flashcards::TagIfPresentComponent.new(flashcard.source, color: "accent") %>
     </div>
 
     <h1><%= flashcard.character %></h1>

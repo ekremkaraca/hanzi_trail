@@ -3,12 +3,12 @@
   <div class="flex flex--between flex--gap">
     <div>
       <h1>Review</h1>
-      <p class="text-grey-light">Learn a little every day. You've got this.</p>
+      <p class="text-dim">Learn a little every day. You've got this.</p>
     </div>
 
     <% if remaining_due_count.present? %>
       <div class="review-count-box" aria-label="Cards remaining: <%= remaining_due_count %>">
-        <span class="text-grey-light">Remaining</span>
+        <span class="text-dim">Remaining</span>
         <strong><%= remaining_due_count %></strong>
       </div>
     <% end %>

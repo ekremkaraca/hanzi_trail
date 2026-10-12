@@ -11,9 +11,9 @@
   <td>
     <div class="flex flex--wrap flex--gap-sm">
       <%# DRY: tag-if-present collapses the "blank? then skip, else wrap in tag" pattern %>
-      <%= render Flashcards::TagIfPresentComponent.new(flashcard.category, color: "dark") %>
+      <%= render Flashcards::TagIfPresentComponent.new(flashcard.category, color: "ink") %>
 
-      <span class="tag is-link">
+      <span class="badge badge--accent">
         <%= flashcard.source.presence || "curated" %>
       </span>
 
@@ -26,6 +26,6 @@
 
   <td class="flashcard-review-cell">
     <strong><%= flashcard.review_count %></strong>
-    <span class="text-grey-light">reviews</span>
+    <span class="text-dim">reviews</span>
   </td>
 </tr>

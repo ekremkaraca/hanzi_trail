@@ -1,6 +1,6 @@
 module Flashcards
   class TagIfPresentComponent < ViewComponent::Base
-    def initialize(value, color:, css_class: "tag")
+    def initialize(value, color:, css_class: "badge")
       @value = value
       @color = color
       @css_class = css_class
@@ -15,7 +15,7 @@ module Flashcards
     attr_reader :value, :color, :css_class
 
     def full_class
-      "#{css_class} is-#{color}"
+      "#{css_class} #{css_class}--#{color}"
     end
   end
 end

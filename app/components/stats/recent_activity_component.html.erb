@@ -3,16 +3,16 @@
       title: "Recent activity"
     ) do %>
   <% if any_attempts? %>
-    <div class="panel">
+    <div class="stack">
       <% recent_attempts.each do |attempt| %>
-        <%= link_to flashcard_path(attempt), class: "panel-block activity-item" do %>
-          <span class="has-text-weight-semibold mr-3"><%= attempt.flashcard.character %></span>
-          <span class="tag is-info mr-3"><%= attempt.rating.titleize %></span>
-          <span class="text-grey-light ml-auto"><%= reviewed_ago(attempt) %></span>
+        <%= link_to flashcard_path(attempt), class: "stack-row activity-item" do %>
+          <span class="fw-semibold mr-3"><%= attempt.flashcard.character %></span>
+          <span class="badge badge--info mr-3"><%= attempt.rating.titleize %></span>
+          <span class="text-dim ml-auto"><%= reviewed_ago(attempt) %></span>
         <% end %>
       <% end %>
     </div>
   <% else %>
-    <p class="text-grey-light">No review activity yet.</p>
+    <p class="text-dim">No review activity yet.</p>
   <% end %>
 <% end %>

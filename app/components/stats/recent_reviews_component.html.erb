@@ -9,14 +9,14 @@
           <% display_attempts.each do |attempt| %>
             <tr class="stats-list-item">
               <td class="stats-list-character"><%= attempt.flashcard.character %></td>
-              <td><span class="tag is-light is-capitalized"><%= attempt.rating %></span></td>
-              <td class="text-grey-light text-right"><%= reviewed_ago(attempt) %></td>
+              <td><span class="badge badge--neutral cap"><%= attempt.rating %></span></td>
+              <td class="text-dim text-right"><%= reviewed_ago(attempt) %></td>
             </tr>
           <% end %>
         </tbody>
       </table>
     </figure>
   <% else %>
-    <p class="text-grey-light">No reviews yet.</p>
+    <p class="text-dim">No reviews yet.</p>
   <% end %>
 <% end %>

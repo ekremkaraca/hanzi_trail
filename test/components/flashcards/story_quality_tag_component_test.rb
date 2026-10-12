@@ -9,7 +9,7 @@ module Flashcards
       render_inline(StoryQualityTagComponent.new(flashcard: flashcard))
 
       assert_text "Needs expansion"
-      assert_selector ".tag.is-danger"
+      assert_selector ".badge.badge--danger"
     end
 
     test "does not render for normal story" do
@@ -19,7 +19,7 @@ module Flashcards
       render_inline(StoryQualityTagComponent.new(flashcard: flashcard))
 
       assert_no_text "Needs expansion"
-      assert_no_selector ".tag.is-danger"
+      assert_no_selector ".badge.badge--danger"
     end
   end
 end
