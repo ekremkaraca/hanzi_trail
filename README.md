@@ -55,6 +55,8 @@ I operate under a strict **Human-Accountable** engineering philosophy:
 * **Architectural ownership:** High-level systemic design, framework state boundaries, and technical tradeoffs are entirely human-driven.
 * **Verified integrity:** Every single AI-assisted refactor is gated by a robust, passing test suite before it ever touches the main branch.
 
+What this looks like in practice, from the current history: the Pico/Sass → Pure CSS migration, the authentication + action_policy stack, and the security/CSP hardening were all AI-paired. Every commit carries a `Co-Authored-By` signature and a message that states the *why*, cites the failing evidence, and records the suite count. When an AI-authored fix regressed the rating shortcuts (`cb0e915` followed `ea14b67`), the regression was caught by a live browser pass, documented, and fixed in its own commit — not silently squashed. The decision trail lives in [`docs/DECISION_LOG.md`](docs/DECISION_LOG.md).
+
 ## Data Sources
 
 Vocabulary baselines are built upon the [complete-hsk-vocabulary](https://github.com/drkameleon/complete-hsk-vocabulary) project by drkameleon, utilized under the MIT license. All specialized technical categorizations, mnemonics, and custom story layers were designed specifically for HanziTrail.
@@ -63,6 +65,6 @@ Vocabulary baselines are built upon the [complete-hsk-vocabulary](https://github
 
 Please note the current state of the application boundaries:
 
-* **Authentication Pending:** Flashcard modification (CRUD) is strictly disabled at the controller level until user authentication is introduced.
-* **Global Review State:** Spaced repetition progress is currently global; multi-user session scoping will follow the authentication layer.
+* **Curator auth is live:** Flashcard and character-entry CRUD requires a signed-in curator (Rails 8 `has_secure_password` sessions + `action_policy`). There is no public signup — accounts are provisioned via `bin/rails users:create[email]`, and password reset is CLI-only until SMTP delivery exists.
+* **Global review state:** Spaced repetition progress and stats remain global; per-user review attribution is deferred (see [`docs/BACKLOG.md`](docs/BACKLOG.md)).
 * **Audio Synthesis:** Text-to-Speech capabilities rely entirely on native browser Web Speech API implementations and system-level Chinese voice packs.
