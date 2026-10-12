@@ -68,3 +68,10 @@ Please note the current state of the application boundaries:
 * **Curator auth is live:** Flashcard and character-entry CRUD requires a signed-in curator (Rails 8 `has_secure_password` sessions + `action_policy`). There is no public signup — accounts are provisioned via `bin/rails users:create[email]`, and password reset is CLI-only until SMTP delivery exists.
 * **Global review state:** Spaced repetition progress and stats remain global; per-user review attribution is deferred (see [`docs/BACKLOG.md`](docs/BACKLOG.md)).
 * **Audio Synthesis:** Text-to-Speech capabilities rely entirely on native browser Web Speech API implementations and system-level Chinese voice packs.
+
+## Documentation
+
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — how the app works **today** (read this first)
+- [`docs/DECISION_LOG.md`](docs/DECISION_LOG.md) — append-only build & audit history; the
+  `§N` markers in code comments and commit messages cite this file
+- [`docs/BACKLOG.md`](docs/BACKLOG.md) — known deferred work, each item citing its origin
