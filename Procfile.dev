@@ -1,1 +1,3 @@
 web: bin/rails server -p 3000
+# Dev TLS terminator -> https://hanzitrail.localhost:8443 (see Caddyfile)
+proxy: caddy run --config Caddyfile

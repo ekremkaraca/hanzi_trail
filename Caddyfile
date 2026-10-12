@@ -1,0 +1,17 @@
+# Dev-only TLS terminator in front of Puma (started by `bin/dev`).
+# Caddy sets X-Forwarded-Proto/Host/For on the proxy hop, so Rails sees a real
+# https request; `hanzitrail.localhost` is allowed by Rails' dev host list with
+# no config. Production parity: force_ssl/assume_ssl/Secure cookies on Fly.
+{
+	# https-only dev listener — don't also bind :80 just to redirect to it
+	auto_https disable_redirects
+}
+
+https://hanzitrail.localhost:8443 {
+	tls internal # Caddy's local CA — run `caddy trust` once to avoid browser warnings
+	encode zstd gzip
+
+	# No request_body cap here yet: this app has no uploads. If they land,
+	# mirror the model's hard limit at the proxy as a second line of defence.
+	reverse_proxy 127.0.0.1:3000
+}

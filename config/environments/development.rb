@@ -37,8 +37,17 @@ Rails.application.configure do
   # Make template changes take effect immediately.
   config.action_mailer.perform_caching = false
 
-  # Set localhost to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+  # Mailer links point at the Caddy dev proxy (see Caddyfile) so anything
+  # email-generated matches the prod-shaped https origin. Direct
+  # http://localhost:3000 still works for tooling; Caddy forwards
+  # X-Forwarded-Proto so request.ssl? is true through the proxy.
+  # config.assume_ssl stays off deliberately: it would make bare :3000
+  # look like https and silently drop Secure cookies on the unproxied port.
+  config.action_mailer.default_url_options = {
+    host: "hanzitrail.localhost",
+    port: 8443,
+    protocol: "https"
+  }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

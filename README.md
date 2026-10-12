@@ -22,17 +22,28 @@ HanziTrail helps engineers and technical professionals retain Mandarin character
 
 - **Backend:** Ruby on Rails 8 (with Solid Cache / Solid Queue)
 - **Frontend Interaction:** Hotwire (Turbo Drive) + Alpine.js (for localized UI state)
-- **Styling:** Pico.css (Semantic, classless baseline)
+- **Styling:** Pure CSS (vendored primitives) + one hand-written `application.css` design layer — no preprocessor
 - **Database:** PostgreSQL
 - **Testing:** Minitest (Comprehensive unit, functional, and system integration suite)
 
 ## Development
 
+Requirements: Ruby (via mise), PostgreSQL, and [Caddy 2.x](https://caddyserver.com/) —
+`bin/dev` runs Caddy as a local HTTPS proxy in front of Puma.
+
 ```bash
 bin/setup
-bin/rails server
-
+caddy trust        # once (needs sudo): install Caddy's local CA so browsers trust the cert
+bin/dev            # Rails + Caddy -> https://hanzitrail.localhost:8443
 ```
+
+- `https://hanzitrail.localhost:8443` — the prod-shaped origin (TLS, `request.ssl?`
+  true via `X-Forwarded-Proto`, HTTP/2); use this in the browser day to day.
+- `http://localhost:3000` — Puma directly, still alive for tooling/curl.
+- Chrome resolves `*.localhost` natively; on Firefox, if it doesn't resolve, add
+  `127.0.0.1 hanzitrail.localhost` to `/etc/hosts`.
+- Curator accounts are provisioned via CLI (no public signup):
+  `bin/rails users:create[you@example.com]`
 
 ## AI-Assisted, Human-Accountable
 
