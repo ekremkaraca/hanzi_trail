@@ -79,12 +79,14 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
 
-  # Enable DNS rebinding protection and other `Host` header attacks.
-  # config.hosts = [
-  #   "example.com",     # Allow requests from example.com
-  #   /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
-  # ]
-  #
-  # Skip DNS rebinding protection for the default health check endpoint.
-  # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  # DNS-rebinding / Host-header protection. An EMPTY config.hosts does NOT
+  # reject hostile hosts — ActionDispatch::HostAuthorization short-circuits and
+  # allows everything when its list is empty (probed: hosts=[] let
+  # evil.example.com through with 200). The app is single-host on Fly, so pin
+  # that host; override with APP_HOST when a custom domain is attached.
+  config.hosts << ENV.fetch("APP_HOST", "hanzitrail.fly.dev")
+
+  # The Fly health check must not be host-blocked (it is what the release
+  # command waits on). Keep /up outside the check, matching the published path.
+  config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 end
