@@ -24,7 +24,9 @@ HanziTrail helps engineers and technical professionals retain Mandarin character
 - **Frontend Interaction:** Hotwire (Turbo Drive) + Alpine.js (for localized UI state)
 - **Styling:** Pure CSS (vendored primitives) + one hand-written `application.css` design layer — no preprocessor
 - **Database:** PostgreSQL
-- **Testing:** Minitest (Comprehensive unit, functional, and system integration suite)
+- **Testing:** Minitest — unit, functional, controller and ViewComponent
+  coverage (no browser/system tests; `test/system` does not exist and the
+  `bin/ci` system step is disabled)
 
 ## Development
 
