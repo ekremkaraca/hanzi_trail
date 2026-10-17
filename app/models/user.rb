@@ -3,8 +3,9 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
 
   # has_secure_password checks presence and the 72-byte bcrypt cap only;
-  # the security guide leaves minimum length to us.
-  validates :password, length: { minimum: 10 }, on: :create
+  # the security guide leaves minimum length to us. Keep the floor enforced
+  # whenever a password is actually being set, including updates.
+  validates :password, length: { minimum: 10 }, if: -> { password.present? }
 
   # The DB has a unique index but no model rule, so a duplicate (or blank)
   # email surfaced as a raw PG::UniqueViolation from bin/rails users:create
