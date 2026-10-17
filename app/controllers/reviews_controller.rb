@@ -34,7 +34,7 @@ class ReviewsController < ApplicationController
     # Find through the queue scope so filtered review URLs cannot rate outside cards.
     flashcard = Review::Queue.new(filters: filter_params, session: session)
       .scope
-      .find(params[:flashcard_id])
+      .find(QueryParam.scalar(params[:flashcard_id]))
 
     # Scheduler owns the locked mutation and review-attempt side effect.
     Review::Scheduler.new(

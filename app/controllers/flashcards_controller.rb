@@ -65,7 +65,9 @@ class FlashcardsController < ApplicationController
   private
 
   def set_flashcard
-    @flashcard = Flashcard.find(params[:id])
+    # QueryParam.scalar keeps an Array/Hash id (?id[]=1) from reaching find,
+    # which would otherwise return a collection and 500 downstream.
+    @flashcard = Flashcard.find(QueryParam.scalar(params[:id]))
   end
 
   def flashcard_params

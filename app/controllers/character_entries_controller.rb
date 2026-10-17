@@ -44,9 +44,10 @@ class CharacterEntriesController < ApplicationController
   private
 
   def set_character_entry
+    # QueryParam.scalar keeps an Array/Hash id from reaching find.
     @character_entry = CharacterEntry
                        .includes(flashcard_characters: :flashcard)
-                       .find(params[:id])
+                       .find(QueryParam.scalar(params[:id]))
   end
 
   def character_entry_params
