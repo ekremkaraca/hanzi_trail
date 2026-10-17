@@ -82,16 +82,16 @@ class ReviewsController < ApplicationController
   end
 
   def empty_state_title
-    return "No HSK cards are due right now." if params[:source] == "hsk"
-    return "No curated cards are due right now." if params[:source] == "curated"
-    return "No missing-story cards are due right now." if params[:story_status] == "missing"
-    return "No #{category_label} cards are due right now." if params[:category].present?
+    source = QueryParam.scalar(params[:source])
+    story_status = QueryParam.scalar(params[:story_status])
+    category = QueryParam.scalar(params[:category])
+
+    return "No HSK cards are due right now." if source == "hsk"
+    return "No curated cards are due right now." if source == "curated"
+    return "No missing-story cards are due right now." if story_status == "missing"
+    return "No #{category.to_s.humanize.downcase} cards are due right now." if category.present?
 
     "No cards due right now."
-  end
-
-  def category_label
-    params[:category].to_s.humanize.downcase
   end
 
   def review_session_key
