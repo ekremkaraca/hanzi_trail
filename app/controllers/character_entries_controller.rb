@@ -27,6 +27,16 @@ class CharacterEntriesController < ApplicationController
   def destroy
     authorize! @character_entry
 
+    # Refuse to delete an entry any card still needs: the card's character list
+    # is derived from its character string and would be corrupted with no way to
+    # repair it (see CharacterEntry#deletable?).
+    unless @character_entry.deletable?
+      return redirect_to @character_entry,
+        alert: "#{@character_entry.character} is still part of " \
+               "#{@character_entry.required_by_cards.count} card(s); " \
+               "delete or edit those cards first."
+    end
+
     @character_entry.destroy
     redirect_to flashcards_path, notice: "Character was successfully deleted."
   end

@@ -6,12 +6,20 @@
   <% if helpers.allowed_to?(:update?, character_entry) %>
     <div class="flex flex--gap flex--wrap mt-4">
       <%= link_to "Edit character", edit_character_entry_path(character_entry), class: "btn btn--sm btn--ghost" %>
-      <%= button_to "Delete",
-        character_entry_path(character_entry),
-        method: :delete,
-        class: "btn btn--sm btn--danger",
-        form_class: "d-inline-block",
-        data: { turbo_confirm: "Delete #{character_entry.character} and its card links?" } %>
+      <% if deletable? %>
+        <%= button_to "Delete",
+          character_entry_path(character_entry),
+          method: :delete,
+          class: "btn btn--sm btn--danger",
+          form_class: "d-inline-block",
+          data: { turbo_confirm: "Delete #{character_entry.character}?" } %>
+      <% else %>
+        <%# Deleting this entry would strip its hanzi from the cards below with no
+            way to restore it, so the action is withheld (CharacterEntry#deletable?). %>
+        <p class="text-dim fs-7 mb-0">
+          In use by the cards below — edit those cards first.
+        </p>
+      <% end %>
     </div>
   <% end %>
 

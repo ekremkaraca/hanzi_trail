@@ -8,5 +8,12 @@ module CharacterEntries
     private
 
     attr_reader :character_entry, :flashcard_characters
+
+    # Deleting an entry any card still needs corrupts those cards irreversibly
+    # (CharacterEntry#deletable?), so the affordance is hidden rather than
+    # offering an action the controller will refuse.
+    def deletable?
+      character_entry.deletable?
+    end
   end
 end

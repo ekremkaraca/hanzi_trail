@@ -105,20 +105,57 @@ class CharacterEntriesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "网", entry.reload.character
   end
 
-  test "curator destroys a character entry and unlinks cards" do
+  test "curator cannot destroy an entry a card still needs" do
     sign_in_as users(:one)
+    # flashcards(:network) has character 网; fixture entry one is also 网, so the
+    # card depends on it. Deleting it used to strip 网 from the card's breakdown
+    # permanently — the controller must refuse instead.
     entry = character_entries(:one)
     card = flashcards(:network)
-
-    # Fixtures bypass callbacks, so wire the join explicitly.
     card.flashcard_characters.create!(character_entry: entry, position: 0)
+
+    assert_no_difference("CharacterEntry.count") do
+      delete character_entry_path(entry)
+    end
+
+    assert_redirected_to character_entry_path(entry)
+    assert_match(/still part of/, flash[:alert])
+    assert card.reload.persisted?
+    assert_includes card.reload.character_entries, entry
+  end
+
+  test "curator destroys an entry no card needs" do
+    sign_in_as users(:one)
+    entry = CharacterEntry.create!(character: "鑫")
 
     assert_difference("CharacterEntry.count", -1) do
       delete character_entry_path(entry)
     end
 
     assert_redirected_to flashcards_path
-    assert card.reload.persisted?, "the flashcard itself must survive"
-    assert_empty card.reload.character_entries
+    assert_equal "Character was successfully deleted.", flash[:notice]
+  end
+
+  test "entry page withholds the delete affordance for an in-use entry" do
+    sign_in_as users(:one)
+    entry = character_entries(:one)
+    card = flashcards(:network)
+    card.flashcard_characters.create!(character_entry: entry, position: 0)
+
+    get character_entry_path(entry)
+
+    assert_response :success
+    assert_select "form[action=?]", character_entry_path(entry), count: 0
+    assert_includes response.body, "In use by the cards below"
+  end
+
+  test "entry page offers delete for an unused entry" do
+    sign_in_as users(:one)
+    entry = CharacterEntry.create!(character: "鑫")
+
+    get character_entry_path(entry)
+
+    assert_response :success
+    assert_select "form[action=?]", character_entry_path(entry), count: 1
   end
 end
