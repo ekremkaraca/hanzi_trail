@@ -30,4 +30,19 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
     assert_empty cookies[:session_id]
   end
+
+  # Regression: an array-valued credential (?email_address[]=a) reached
+  # authenticate_by and raised ArgumentError, 500ing the public sign-in form.
+  test "create survives array-valued credentials" do
+    post session_path, params: { email_address: [ "a" ], password: [ "b" ] }
+
+    assert_redirected_to new_session_path
+    assert_nil cookies[:session_id]
+  end
+
+  test "create survives a NUL byte in credentials" do
+    post session_path, params: { email_address: "#{@user.email_address}\u0000", password: "password" }
+
+    assert_response :redirect
+  end
 end

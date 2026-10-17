@@ -8,13 +8,16 @@ class FlashcardsController < ApplicationController
   FLASHCARDS_LIMIT = 200.freeze
 
   def index
+    # Scrub every filter through QueryParam: a raw params value can be an Array,
+    # a nested Hash, or carry a NUL byte, each of which 500s a String-only scope
+    # (probed: ?query[]=a, ?query=%00).
     @flashcards = Flashcard
       .all
-      .by_source(params[:source])
-      .by_hsk_level(params[:hsk_level])
-      .by_category(params[:category])
-      .with_story_filter(params[:story_status])
-      .search(params[:query])
+      .by_source(QueryParam.scalar(params[:source]))
+      .by_hsk_level(QueryParam.scalar(params[:hsk_level]))
+      .by_category(QueryParam.scalar(params[:category]))
+      .with_story_filter(QueryParam.scalar(params[:story_status]))
+      .search(QueryParam.scalar(params[:query]))
       .order(:character)
       .limit(FLASHCARDS_LIMIT)
   end

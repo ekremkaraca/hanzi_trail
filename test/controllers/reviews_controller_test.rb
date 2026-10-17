@@ -429,4 +429,21 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select ".review-empty-state"
   end
+
+  # Regression: a raw non-String filter value (?source[]=x) or a NUL byte
+  # (?source=%00) reached a String-only scope and 500ed the public review page.
+  test "review page survives a NUL byte in every filter" do
+    %i[source category].each do |key|
+      get review_path(key => "a\u0000b")
+      assert_response :success, "?#{key} with a NUL byte should render, got #{response.status}"
+    end
+  end
+
+  test "review page treats a nested-hash filter as absent instead of 500ing" do
+    # A hash reaches a String-only comparison (?source[a]=b); the array shape is
+    # tolerated by `where`, the hash is not.
+    get review_path(source: { "a" => "b" })
+
+    assert_response :success
+  end
 end

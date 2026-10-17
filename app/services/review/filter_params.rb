@@ -7,7 +7,9 @@ module Review
 
       FILTER_KEYS.each_with_object({}) do |key, filters|
         # Read from a plain hash copy so Rails does not log unrelated form keys as unpermitted.
-        value = raw_params[key.to_s] || raw_params[key]
+        # QueryParam drops non-String shapes and NUL bytes that would otherwise
+        # reach a String-only scope (?source[]=x, ?source=%00 both 500ed /review).
+        value = QueryParam.scalar(raw_params[key.to_s] || raw_params[key])
         # Keep URLs/session keys stable by treating blank filter values as absent.
         filters[key] = value if value.present?
       end

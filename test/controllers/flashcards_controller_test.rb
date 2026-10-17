@@ -307,4 +307,28 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal first_cards, second_cards
   end
+
+  # Regression: raw query-string values that are not Strings reached a
+  # String-only scope and 500ed a public page with no auth required. A NUL byte
+  # is rejected by PostgreSQL, and an Array/nested Hash raised NoMethodError
+  # inside sanitize_sql_like (probed against a live server).
+  test "index survives a NUL byte in every filter" do
+    %i[query category source hsk_level].each do |key|
+      get flashcards_path, params: { key => "a\u0000b" }
+      assert_response :success, "?#{key} with a NUL byte should render, got #{response.status}"
+    end
+  end
+
+  test "index treats an array-valued filter as absent instead of 500ing" do
+    get flashcards_path, params: { query: [ "a" ] }
+    assert_response :success
+    # Treated as no filter, so the full (capped) list renders.
+    assert_select ".flashcard-character-link", minimum: 1
+  end
+
+  test "index treats a nested-hash filter as absent instead of 500ing" do
+    get flashcards_path, params: { query: { "a" => "b" } }
+    assert_response :success
+    assert_select ".flashcard-character-link", minimum: 1
+  end
 end

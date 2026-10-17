@@ -6,7 +6,15 @@ class SessionsController < ApplicationController
   end
 
   def create
-    if user = User.authenticate_by(params.permit(:email_address, :password))
+    # QueryParam.scalar keeps an Array/Hash credential (?email_address[]=a) from
+    # reaching authenticate_by, which raised ArgumentError and 500ed the public
+    # sign-in form; a non-String shape is treated as an absent credential.
+    credentials = {
+      email_address: QueryParam.scalar(params[:email_address]),
+      password: QueryParam.scalar(params[:password])
+    }
+
+    if user = User.authenticate_by(credentials)
       start_new_session_for user
       redirect_to after_authentication_url
     else
