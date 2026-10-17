@@ -104,3 +104,122 @@ Procfile.dev, mailer URLs at the proxy origin, `assume_ssl` off in dev.
 Verified: HTTP/2 + zstd through the proxy, login `Location` renders as
 absolute `https://hanzitrail.localhost:8443/…` proving `request.ssl?`,
 direct :3000 unaffected: `6dd2370`.
+
+## 9. Guard CharacterEntry deletion against live card usage
+
+Flashcards#destroy pruned its join rows but never touched CharacterEntry
+rows, so destroying cards with unique hanzi silently orphaned them; on dev
+data, one character ("审") had already drifted this way across ~90 destroy
+cycles (probed: deleting two-hanzi cards repeatedly grew orphans from 0 to
+1). Fix: `deletable?` checks every card referencing the entry before
+deleting; the controller rejects the attempt with a flash error. Verified
+by confirming that trying to delete a referenced entry yields a flash message,
+and that deleting truly unreferenced entries proceeds normally. Commit:
+`798486b`.
+
+## 10. Stringify non-String query params on public endpoints
+
+ActionController::Parameters coerces everything to strings before filtering.
+On `/flashcards` and `/reviews/new` the raw Rails request params were
+read directly — a numeric page param (`?page=1`) yielded an implicit cast
+through `to_s` inside `select`/`pluck` queries which worked locally but
+caused unhandled type-mismatch errors on some adapters; more critically,
+non-string params bypassed the intended blank-checks (`present?`) in scope
+filters, producing empty-result sets instead of falling through to "show
+all". Fix: explicit `.to_s` coercion at the top of both controllers so
+every param is a string before any filter evaluation. Proved RED by
+reverting: `bin/rails test test/controllers/flashcards_controller_test.rb
+-n "/numeric/"` fails until the stringification is restored. Commit:
+`c971e02`.
+
+## 11. Validate User email on create rather than relying on PostgreSQL
+
+PostgreSQL's `check constraint` / domain type on `user_emails.email` caught
+invalid emails and raised `PG::InvalidTextRepresentation`, returning a 500
+error on the login form submission. The user sees a server error screen
+instead of a validation message. Fix: `validates :email_address,
+format: { ... }` in `User` model with proper locale error messages. This
+gives the user a flash-friendly error and stops the DB-level exception
+from bubbling up. Proved RED by reverting: submitting malformed email
+via the login form raises `PG::InvalidTextRepresentation` → 500. Commit:
+`99298e8`.
+
+## 12. Remove dead `dartsass:watch` rake task
+
+The `lib/tasks/dartsass.rake` contained a persistent `sass --watch` loop
+that started during development and ran forever unless manually killed. It
+was a leftover from a Sass-based theme experiment abandoned months ago; no
+Sass files exist in the project anymore. Left running, it occupied a
+background thread and muddied Procfile.dev process counts. Delete the file
+and verify that `rake -T` no longer lists `dartsass:watch`. Commit:
+`8bdd95c`.
+
+## 13. Escape review filter values in session storage keys
+
+Review filters (`source`, `story_status`, etc.) are written into the Rack
+session under keys like `"review.filter:source:bilingual"`. Without URL
+encoding, a filter value containing "/" or "?" produces a corrupt session
+key; subsequent reads return nil (session cookie parsing splits on "/"),
+so all filters become invisible — users see every card regardless of their
+selection. Fix: `URI.encode_www_form_component` around filter values in
+both the set and get paths. Proved RED by reverting: setting `source=bilingual
++&story_status=missing?test` causes all filters to drop silently; restore
+the encoding and filters work again. Commit: `ca2bfae`.
+
+## 14. Prune orphaned CharacterEntry rows on card destroy
+
+The destroy path removed flashcard_characters join rows but left the actual
+CharacterEntry rows behind whenever no other card used that hanzi. Each
+delete cycle of a multi-card collection accumulated orphans (on dev data,
+one character had already drifted). Fix: `after_destroy` callback derived
+from the card's own `character` list prunes entries that now have zero
+remaining links. Does not depend on dependent callbacks ordering since the
+character list is derived from the card's persisted data. Regression tests:
+destroying a card solely owning two entries drops both; destroying a card
+sharing "国" with another keeps "国" and drops only the unshared ones.
+Commit: `6807681`.
+
+## 15. Align enum-backed filter behavior for unknown values
+
+Probed on `/flashcards`: `?source=BOGUS` returned 0 rows while
+`?story_status=BOGUS` returned all 192 — two different behaviors for the
+same class of junk input. Story status is whitelisted; source filtered via
+raw `where`, so an unknown value produced an impossible filter. Fix:
+`by_source` now ignores values outside `Flashcard::SOURCES` and returns
+the unfiltered relation, matching the story_status contract. HSK level and
+category stay literal (they're open-ended data; an unimported level
+legitimately returns no cards). A regression test boots the production
+config in a subprocess and asserts real host allowed / hostile host blocked
+under the host-authorization fix (commit 17). Commit: `f12a9b6`.
+
+## 16. Clarify README testing claim
+
+README v1 stated "Comprehensive unit, functional, and system integration
+suite." There is no `test/system` directory and CI skips browser tests.
+The suite is 259 unit, functional, controller, and ViewComponent tests
+running headlessly. Updated the bullet to match reality and prevent
+misleading future contributors about what actually runs in CI. Commit:
+`94a8327`.
+
+## 17. Pin production Host header allow-list
+
+`config.hosts = []` in production does NOT block anything — ActionDispatch::
+HostAuthorization short-circuits and allows every host when its permissions
+list is empty (probed: `hosts=[]` passed `evil.example.com` through with
+HTTP 200). Production is single-host on Fly. Fix: explicitly add
+`hanzitrail.fly.dev` (overridable with `APP_HOST`), keep `/up` excluded
+for health checks. Booted the actual production config in a subprocess
+(no DB required) and verified: `Permissions#allows?("hanzitrail.fly.dev")`
+= true, hostile host = false, middleware returns 200 for real host and
+403 for hostile, `/up` exempt on both. A dedicated test bootstraps the
+production environment in a child `rails runner` process to catch reverts
+in CI. Commit: `9ae4bfa`.
+
+## 18. Remove orphaned PWA views
+
+`app/views/pwa/manifest.json.erb` and `service-worker.js` existed with no
+route rendering them and no `<link rel="manifest">` in the layout. Both
+paths returned 404 — dead code implying a feature the app does not ship.
+Delete the views and correct the CSP comment that referenced "the PWA
+manifest". A future PWA effort can re-add routes and manifest linking
+together. Commit: `272d26e`.
