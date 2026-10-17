@@ -1,5 +1,5 @@
 <% messages.each do |type, message| %>
-  <div class="flash-message flash-message--<%= type %>"
+  <div class="<%= flash_message_class(type) %>"
     data-controller="flash"
     data-flash-timeout-value="4000"
     role="alert"

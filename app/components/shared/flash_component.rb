@@ -13,5 +13,9 @@ module Shared
     def icon_for(type)
       type.to_s == "notice" ? "✓" : "!"
     end
+
+    def flash_message_class(type)
+      "flash-message flash-message--#{type}"
+    end
   end
 end
