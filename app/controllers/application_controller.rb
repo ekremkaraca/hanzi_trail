@@ -12,7 +12,7 @@ class ApplicationController < ActionController::Base
   # any gated action reached without the authn before_action.
   rescue_from ActionPolicy::Unauthorized do
     if Current.user.nil?
-      session[:return_to_after_authenticating] = request.url
+      session[:return_to_after_authenticating] = request.fullpath
       redirect_to new_session_path, alert: "Sign in to edit content."
     else
       redirect_back fallback_location: root_path, alert: "You are not allowed to do that."
