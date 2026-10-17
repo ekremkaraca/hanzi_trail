@@ -8,10 +8,13 @@ class StreakCalculator
   end
 
   def call
+    active = ReviewAttempt
+      .pluck(Arel.sql("(reviewed_at AT TIME ZONE 'UTC' AT TIME ZONE '#{Time.zone.name}')::date"))
+      .to_set
+
     streak = 0
     day = Date.current
-
-    while ReviewAttempt.where(reviewed_at: day.all_day).exists?
+    while active.include?(day)
       streak += 1
       day -= 1
     end
