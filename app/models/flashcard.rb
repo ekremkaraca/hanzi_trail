@@ -36,6 +36,12 @@ class Flashcard < ApplicationRecord
   # the importer used to make.
   after_save :relink_characters, if: :saved_change_to_character?
 
+  # Deleting a card removes its join rows but leaves the CharacterEntry rows it
+  # created stranded when no other card uses that hanzi (probed: destroying a
+  # two-hanzi card grew the orphan set). Entries are derived data, so prune the
+  # ones this card was the last user of.
+  after_destroy :prune_orphaned_character_entries
+
   scope(:due_for_review, -> {
     where("next_review_at <= ?", Time.current).order(:next_review_at, :id)
   })
@@ -116,6 +122,23 @@ class Flashcard < ApplicationRecord
 
   def relink_characters
     CharacterLinker.call(self)
+  end
+
+  # after_destroy runs once dependent: :destroy has removed this card's join
+  # rows, so any entry this card used that now has no links was used only by
+  # this card. The character list is derived from `character` (CharacterLinker
+  # links exactly the unique hanzi of that string), so this does not depend on
+  # callback ordering; scoping to those chars keeps pre-existing orphans from
+  # fixtures or earlier deletes untouched.
+  def prune_orphaned_character_entries
+    linked = character.to_s.each_char.uniq
+    return if linked.empty?
+
+    CharacterEntry
+      .where(character: linked)
+      .left_joins(:flashcard_characters)
+      .where(flashcard_characters: { id: nil })
+      .delete_all
   end
 
   def set_initial_review_time

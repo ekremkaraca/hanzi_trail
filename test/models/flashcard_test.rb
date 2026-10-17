@@ -430,4 +430,31 @@ class FlashcardTest < ActiveSupport::TestCase
 
     assert_equal link.id, card.reload.flashcard_characters.first.id
   end
+
+  # Regression: destroying a card left its CharacterEntry rows behind when no
+  # other card used them, accumulating orphans on every delete.
+  test "destroying a card prunes entries only it used" do
+    card = Flashcard.create!(character: "鑫淼", pinyin: "xīnmiǎo", meaning: "prosperous")
+
+    assert_difference("CharacterEntry.count", -2) do
+      card.destroy
+    end
+
+    assert_not CharacterEntry.exists?(character: "鑫")
+    assert_not CharacterEntry.exists?(character: "淼")
+  end
+
+  test "destroying a card keeps entries another card still uses" do
+    shared = Flashcard.create!(character: "中国", pinyin: "zhōngguó", meaning: "China")
+    other = Flashcard.create!(character: "美国", pinyin: "měiguó", meaning: "USA")
+    entry = CharacterEntry.find_by!(character: "国")
+
+    # Only 国 is shared; 中 and 美 are unique to their cards.
+    assert_difference("CharacterEntry.count", -1) do
+      shared.destroy
+    end
+
+    assert CharacterEntry.exists?(entry.id)
+    assert_includes other.reload.character_entries, entry
+  end
 end
