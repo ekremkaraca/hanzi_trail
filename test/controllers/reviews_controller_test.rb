@@ -446,4 +446,24 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
   end
+
+  # Regression: the session key joined raw values with "&"/"=", so a category
+  # value containing them produced the same key as a genuinely different filter
+  # set and the two filters shared one progress counter.
+  test "filters whose values contain & or = do not share a session key" do
+    crafted = flashcards(:network)
+    crafted.update!(next_review_at: 1.minute.ago, category: "a&source=hsk", source: "hsk")
+    plain = flashcards(:algorithm)
+    plain.update!(next_review_at: 1.minute.ago, source: "hsk", category: "a")
+
+    patch review_flashcard_path(crafted, category: "a&source=hsk"),
+      params: { review: { rating: "good" } }
+    assert_equal 1, session[:review_sessions].size
+
+    patch review_flashcard_path(plain, source: "hsk", category: "a"),
+      params: { review: { rating: "good" } }
+
+    assert_equal 2, session[:review_sessions].size,
+      "the crafted category collided with the {source: hsk, category: a} key"
+  end
 end

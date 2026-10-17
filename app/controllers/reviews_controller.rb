@@ -96,10 +96,14 @@ class ReviewsController < ApplicationController
 
   def review_session_key
     # Use the shared filter module so the session key is built from the
-    # same three keys the helper and redirect use.
+    # same three keys the helper and redirect use. Each part is URI-escaped
+    # before joining: a filter value can itself contain "&" or "="
+    # (?category=a%26source%3Db), which would otherwise produce the same key
+    # as a genuinely different filter set ({source: "b", category: "a"}) and
+    # collapse their progress counters.
     filter_params
       .sort
-      .map { |k, v| "#{k}=#{v}" }
+      .map { |k, v| "#{k}=#{Rack::Utils.escape(v)}" }
       .join("&")
       .presence || "all"
   end
