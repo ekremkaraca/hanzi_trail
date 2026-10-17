@@ -11,7 +11,7 @@
 #   'unsafe-inline'. importmap-rails attaches the nonce automatically.
 # - style-src 'self': the two former inline style attributes were moved
 #   to .gap-lg / .scroll-x utilities so no style exceptions are needed.
-# - img_src also allows data: for the PWA manifest and any inline SVG
+# - img_src also allows data: for the brand icon and any inline SVG
 #   data URIs.
 Rails.application.configure do
   config.content_security_policy do |policy|
