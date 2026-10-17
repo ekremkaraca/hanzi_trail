@@ -19,7 +19,7 @@ class ReviewVelocity
   # timestamp to the app's configured zone before extracting the date.
   def dates
     @dates ||= ReviewAttempt
-      .pluck(Arel.sql("DISTINCT (reviewed_at AT TIME ZONE 'UTC' AT TIME ZONE '#{Time.zone.name}')::date"))
+      .pluck(Arel.sql("DISTINCT (reviewed_at AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Istanbul')::date"))
   end
 
   def total_reviews

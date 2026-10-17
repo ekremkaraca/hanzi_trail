@@ -9,7 +9,7 @@ class StreakCalculator
 
   def call
     active = ReviewAttempt
-      .pluck(Arel.sql("(reviewed_at AT TIME ZONE 'UTC' AT TIME ZONE '#{Time.zone.name}')::date"))
+      .pluck(Arel.sql("(reviewed_at AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Istanbul')::date"))
       .to_set
 
     streak = 0
