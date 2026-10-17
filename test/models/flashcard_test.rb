@@ -181,6 +181,14 @@ class FlashcardTest < ActiveSupport::TestCase
     assert_equal Flashcard.count, Flashcard.by_source("").count
   end
 
+  # Regression: an unknown source filtered to an impossible row set (0 cards)
+  # while an unknown story_status was silently ignored (all cards) — two
+  # different behaviours for the same class of junk input. Enum-backed filters
+  # now agree: an unknown value behaves like no filter.
+  test "by_source scope ignores an unknown source instead of matching nothing" do
+    assert_equal Flashcard.count, Flashcard.by_source("BOGUS").count
+  end
+
   test "by_hsk_level scope filters by hsk level" do
     hsk_one = flashcards(:hsk_one)
     curated = flashcards(:network)

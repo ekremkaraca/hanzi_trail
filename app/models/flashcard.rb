@@ -46,7 +46,13 @@ class Flashcard < ApplicationRecord
     where("next_review_at <= ?", Time.current).order(:next_review_at, :id)
   })
 
-  scope :by_source, ->(source) { source.present? ? where(source: source) : all }
+  # Enum-backed filters ignore an unknown value rather than filtering to an
+  # impossible row set, so ?source=bogus behaves like ?story_status=bogus (both
+  # show everything) instead of one showing all and the other showing nothing
+  # (probed inconsistency). hsk_level and category are open-ended data, so they
+  # always match literally — a level that is not imported yet legitimately
+  # returns no cards.
+  scope :by_source, ->(source) { SOURCES.include?(source) ? where(source: source) : all }
   scope :by_hsk_level, ->(hsk_level) { hsk_level.present? ? where(hsk_level: hsk_level) : all }
   scope :by_category, ->(category) { category.present? ? where(category: category) : all }
   scope :by_story_status, ->(story_status) { story_status.present? ? where(story_status: story_status) : all }
