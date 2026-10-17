@@ -17,5 +17,10 @@ namespace :users do
     else
       abort user.errors.full_messages.join(", ")
     end
+  rescue ActiveRecord::RecordNotUnique
+    # The uniqueness validation closes the normal path; this covers the rare
+    # check-then-insert race so the operator still gets a readable message
+    # instead of a PG backtrace (the DB index is the real guard).
+    abort "An account with that email already exists."
   end
 end

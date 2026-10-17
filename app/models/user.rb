@@ -6,5 +6,11 @@ class User < ApplicationRecord
   # the security guide leaves minimum length to us.
   validates :password, length: { minimum: 10 }, on: :create
 
+  # The DB has a unique index but no model rule, so a duplicate (or blank)
+  # email surfaced as a raw PG::UniqueViolation from bin/rails users:create
+  # instead of a validation message — probed: the task died with a full
+  # backtrace and `if user.save` never reached its errors branch.
+  validates :email_address, presence: true, uniqueness: true
+
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 end
