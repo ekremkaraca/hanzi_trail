@@ -9,6 +9,12 @@ class CharacterLinker
 
   def call
     FlashcardCharacter.transaction do
+      # Capture the entries this card used before wiping its links, so any
+      # entry that ends up with no remaining links can be pruned (entries are
+      # derived data, not curator-owned records). Mirrors Flashcard's destroy
+      # pruning so editing a card's character no longer orphans stale rows.
+      previously_linked = flashcard.flashcard_characters.includes(:character_entry).map(&:character_entry)
+
       flashcard.flashcard_characters.destroy_all
       linked_characters = {}
 
@@ -23,6 +29,15 @@ class CharacterLinker
         )
 
         linked_characters[char] = true
+      end
+
+      # Prune entries that lost all links during this relink. Guard with
+      # deletable? so an entry still referenced by another card's character
+      # string is never removed.
+      previously_linked.each do |entry|
+        entry.reload
+        next unless entry.flashcard_characters.none?
+        entry.destroy if entry.deletable?
       end
     end
   end

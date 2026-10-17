@@ -178,7 +178,57 @@ Prevents misleading future contributors about coverage.
 | 8 | Empty config.hosts security hole | ✅ Resolved | `9ae4bfa` |
 | 9 | README overstating test coverage | ✅ Resolved | `94a8327` |
 
-All nine findings from this audit pass have been resolved. Current state:
+### Finding 10 — Orphaned CharacterEntry rows on card edit
+
+**Category:** Data integrity
+
+`CharacterLinker` wiped and rebuilt a card's join rows whenever `character`
+changed, but never pruned the `CharacterEntry` rows that were left with zero
+remaining links. Editing a card's character therefore accumulated orphaned
+entries (the destroy path already pruned them; the edit path did not).
+
+**Fix applied:** `CharacterLinker#call` now captures the entries linked before
+the wipe and destroys any that end up with no remaining links, guarded by
+`CharacterEntry#deletable?` so entries still referenced by another card's
+character string are preserved.
+
+**Commit:** (this commit)
+
+---
+
+### Finding 11 — Missing `authorize!` on `FlashcardsController#edit`
+
+**Category:** Authorization consistency
+
+Every other write action on `FlashcardsController` called `authorize!`, but
+`edit` only relied on the coarse `require_authentication` before_action. With
+a single curator role this is not exploitable today, but it diverges from the
+documented controller contract and would become a real gap once roles land.
+
+**Fix applied:** `edit` now calls `authorize! @flashcard`, matching `update`,
+`destroy`, and the character-entry controller.
+
+**Commit:** (this commit)
+
+---
+
+## Status Summary
+
+| # | Finding | Status | Commit |
+|---|---------|--------|--------|
+| 1 | Orphaned CharacterEntry on destroy | ✅ Resolved | `6807681` |
+| 2 | Unescaped review filter keys | ✅ Resolved | `ca2bfae` |
+| 3 | Inconsistent enum filter behavior | ✅ Resolved | `f12a9b6` |
+| 4 | Non-String query param coercion | ✅ Resolved | `c971e02` |
+| 5 | PostgreSQL 500 on invalid email | ✅ Resolved | `99298e8` |
+| 6 | Dead dartsass:watch rake task | ✅ Resolved | `8bdd95c` |
+| 7 | Orphaned PWA view files | ✅ Resolved | `272d26e` |
+| 8 | Empty config.hosts security hole | ✅ Resolved | `9ae4bfa` |
+| 9 | README overstating test coverage | ✅ Resolved | `94a8327` |
+| 10 | Orphaned CharacterEntry on edit | ✅ Resolved | (this commit) |
+| 11 | Missing authorize! on FlashcardsController#edit | ✅ Resolved | (this commit) |
+
+All findings from this audit pass have been resolved. Current state:
 - Tests: 259 runs, 742 assertions, 0 failures, 0 errors, 0 skips
 - Rubocop: 161 files inspected, 0 offenses
 - Brakeman: 0 security warnings

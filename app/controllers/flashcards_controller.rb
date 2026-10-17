@@ -29,7 +29,9 @@ class FlashcardsController < ApplicationController
     @flashcard = Flashcard.new
   end
 
-  def edit; end
+  def edit
+    authorize! @flashcard
+  end
 
   def create
     authorize! Flashcard
