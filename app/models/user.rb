@@ -10,7 +10,8 @@ class User < ApplicationRecord
   # email surfaced as a raw PG::UniqueViolation from bin/rails users:create
   # instead of a validation message — probed: the task died with a full
   # backtrace and `if user.save` never reached its errors branch.
-  validates :email_address, presence: true, uniqueness: true
+  validates :email_address, presence: true, uniqueness: true,
+            format: { with: URI::MailTo::EMAIL_REGEXP }
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 end
