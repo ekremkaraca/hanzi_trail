@@ -34,10 +34,14 @@ module Authentication
     end
 
     def request_authentication
-      # Store only the path, not the full URL, so a spoofed Host header can
-      # never turn this into an open redirect (host is pinned in prod anyway).
+      # Store only the path, not the full URL, so a spoofed Host
+      # header can never turn this into an open redirect (host is
+      # pinned in prod anyway). This is the only definition of the
+      # method: a former ApplicationController override duplicated
+      # it with request.url, silently reintroducing the full-URL
+      # storage that the path-only version was written to remove.
       session[:return_to_after_authenticating] = request.fullpath
-      redirect_to new_session_path
+      redirect_to new_session_path, alert: "Sign in to edit content."
     end
 
     def after_authentication_url

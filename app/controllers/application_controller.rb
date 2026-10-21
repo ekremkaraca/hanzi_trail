@@ -21,13 +21,6 @@ class ApplicationController < ActionController::Base
 
   private
 
-  # Keep the generated return-to bounce, but tell visitors why they landed
-  # on the sign-in page.
-  def request_authentication
-    session[:return_to_after_authenticating] = request.url
-    redirect_to new_session_path, alert: "Sign in to edit content."
-  end
-
   def current_user
     Current.user
   end
