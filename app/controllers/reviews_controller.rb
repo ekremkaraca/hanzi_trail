@@ -59,6 +59,13 @@ class ReviewsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     redirect_to review_path(filter_params),
       alert: "That card is not in the current review filter."
+  rescue ActiveRecord::RecordInvalid
+    # The scheduler's update!/create! only writes
+    # server-controlled fields, so this should be
+    # unreachable — but a failed save inside the lock
+    # must not surface as a 500 mid-review.
+    redirect_to review_path(filter_params),
+      alert: "Could not save the review. Try again."
   end
 
   def preferences

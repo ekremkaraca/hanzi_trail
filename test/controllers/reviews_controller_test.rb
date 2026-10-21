@@ -359,6 +359,29 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "That card is not in the current review filter.", flash[:alert]
   end
 
+  test "redirects with an alert when saving the review fails validation" do
+    flashcard = flashcards(:network)
+    flashcard.update!(next_review_at: 1.minute.ago)
+
+    # Simulate the scheduler's update!/create! raising
+    # RecordInvalid inside its lock (Minitest 6 dropped
+    # Object#stub, so swap call and restore afterwards).
+    call = Review::Scheduler.instance_method(:call)
+    Review::Scheduler.define_method(:call) do
+      raise ActiveRecord::RecordInvalid.new(Flashcard.new)
+    end
+
+    begin
+      patch review_flashcard_path(flashcard),
+        params: { review: { rating: "good" } }
+
+      assert_redirected_to review_path
+      assert_equal "Could not save the review. Try again.", flash[:alert]
+    ensure
+      Review::Scheduler.define_method(:call, call)
+    end
+  end
+
   test "reset route restarts the reviewed counter" do
     flashcard = flashcards(:network)
     flashcard.update!(next_review_at: 1.minute.ago)
