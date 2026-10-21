@@ -1,6 +1,13 @@
 class ReviewsController < ApplicationController
   allow_unauthenticated_access
 
+  # One session[:review_sessions] key is created per filter
+  # combination ever reviewed. Left unbounded that hash grows
+  # with every distinct filter visited and can outgrow the
+  # ~4 KB session cookie, raising CookieOverflow. Keep only the
+  # most recent counters; older filters simply restart at 0.
+  REVIEW_SESSION_LIMIT = 20
+
   def show
     # Queue owns filter-aware card selection; the controller only exposes view data.
     @review_queue = Review::Queue.new(
@@ -114,8 +121,13 @@ class ReviewsController < ApplicationController
   end
 
   def increment_reviewed_count
-    session[:review_sessions] ||= {}
-    session[:review_sessions][review_session_key] = reviewed_count + 1
+    sessions = session[:review_sessions] ||= {}
+    # Re-insert so the active filter counts as most recently used.
+    sessions.delete(review_session_key)
+    sessions[review_session_key] = reviewed_count + 1
+    # Bound the hash (see REVIEW_SESSION_LIMIT) so the session
+    # cookie cannot overflow.
+    session[:review_sessions] = sessions.last(REVIEW_SESSION_LIMIT).to_h if sessions.size > REVIEW_SESSION_LIMIT
   end
 
   def reset_reviewed_count
