@@ -71,4 +71,26 @@ class CharacterLinkerTest < ActiveSupport::TestCase
     assert_equal [ "人" ], card.character_entries.order("flashcard_characters.position").pluck(:character)
     assert_equal 1, card.flashcard_characters.count
   end
+
+  test "relink recovers when a concurrent process inserts the same character" do
+    card = flashcards(:network) # 网, whose entry already exists
+
+    # Simulate another request winning the insert race for
+    # 网: the SELECT misses and the INSERT hits the unique
+    # index, which must not poison the relink transaction.
+    # (Minitest 6 dropped Object#stub, so swap the finder
+    # explicitly and restore it afterwards.)
+    finder = CharacterEntry.method(:find_or_create_by!)
+    CharacterEntry.define_singleton_method(:find_or_create_by!) do |_attrs|
+      raise ActiveRecord::RecordNotUnique.new("stub insert race")
+    end
+
+    begin
+      assert_nothing_raised { CharacterLinker.call(card) }
+    ensure
+      CharacterEntry.define_singleton_method(:find_or_create_by!, finder)
+    end
+
+    assert_equal [ "网" ], card.character_entries.order("flashcard_characters.position").pluck(:character)
+  end
 end

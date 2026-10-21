@@ -21,7 +21,7 @@ class CharacterLinker
       flashcard.character.each_char.with_index do |char, index|
         next if linked_characters.key?(char)
 
-        entry = CharacterEntry.find_or_create_by!(character: char)
+        entry = find_or_create_character_entry(char)
 
         flashcard.flashcard_characters.create!(
           character_entry: entry,
@@ -45,4 +45,18 @@ class CharacterLinker
   private
 
   attr_reader :flashcard
+
+  # Concurrent relinks of the same new hanzi both miss the
+  # find_or_create_by SELECT and race on the INSERT. The
+  # loser's unique violation would poison the surrounding
+  # transaction, so the check-then-insert runs under a
+  # savepoint: the failed INSERT rolls back to it and the
+  # row the winner created is reused.
+  def find_or_create_character_entry(char)
+    CharacterEntry.transaction(requires_new: true) do
+      CharacterEntry.find_or_create_by!(character: char)
+    end
+  rescue ActiveRecord::RecordNotUnique
+    CharacterEntry.find_by!(character: char)
+  end
 end

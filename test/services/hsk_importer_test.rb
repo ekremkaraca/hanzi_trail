@@ -145,4 +145,36 @@ class HskImporterTest < ActiveSupport::TestCase
   ensure
     File.delete(path) if File.exist?(path)
   end
+
+  test "treats a character a concurrent import just inserted as already imported" do
+    path = Rails.root.join("tmp/hsk_race.json")
+    File.write(path, [
+      {
+        "simplified" => "赛",
+        "forms" => [
+          { "transcriptions" => { "pinyin" => "sài" }, "meanings" => [ "compete" ] }
+        ]
+      }
+    ].to_json)
+
+    # Simulate a concurrent import inserting 赛 between
+    # our SELECT and INSERT: the INSERT loses the unique
+    # race and must not poison the whole import.
+    # (Minitest 6 dropped Object#stub, so swap save!
+    # explicitly and restore it afterwards.)
+    save = Flashcard.instance_method(:save!)
+    Flashcard.define_method(:save!) do |*|
+      raise ActiveRecord::RecordNotUnique.new("stub insert race")
+    end
+
+    begin
+      assert_no_difference "Flashcard.count" do
+        assert_nothing_raised { HskImporter.import!(path: path, hsk_level: "old-1") }
+      end
+    ensure
+      Flashcard.define_method(:save!, save)
+    end
+  ensure
+    File.delete(path) if File.exist?(path)
+  end
 end

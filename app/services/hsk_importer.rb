@@ -53,8 +53,14 @@ class HskImporter
       next_review_at: Time.current
     )
 
-    flashcard.save!
-    # Character links are created by Flashcard's after_save relink callback.
+    # Concurrent imports of the same character both miss the
+    # find_or_initialize_by SELECT and race on INSERT. The
+    # loser's unique violation must not poison the whole
+    # import transaction, so save under a savepoint and
+    # treat a lost race as "already imported".
+    Flashcard.transaction(requires_new: true) { flashcard.save! }
+  rescue ActiveRecord::RecordNotUnique
+    nil
   end
 
   def parse_json
