@@ -60,4 +60,29 @@ class StatsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select ".activity-item", minimum: 1
   end
+
+  test "week count buckets by calendar day, not a rolling 7x24h window" do
+    freeze_time do
+      ReviewAttempt.delete_all
+
+      # An hour into this week's first calendar day counts...
+      ReviewAttempt.create!(
+        flashcard: flashcards(:network),
+        rating: "good",
+        reviewed_at: 6.days.ago.beginning_of_day + 1.hour
+      )
+      # ...but the hour before it does not, even though a
+      # rolling 7x24h window would still include it.
+      ReviewAttempt.create!(
+        flashcard: flashcards(:algorithm),
+        rating: "good",
+        reviewed_at: 6.days.ago.beginning_of_day - 1.hour
+      )
+
+      get stats_url
+    end
+
+    assert_response :success
+    assert_match(/Last 7 days.{0,200}?<strong[^>]*>1<\/strong>/m, response.body)
+  end
 end
