@@ -15,11 +15,25 @@ class ApplicationController < ActionController::Base
       session[:return_to_after_authenticating] = request.fullpath
       redirect_to new_session_path, alert: "Sign in to edit content."
     else
-      redirect_back fallback_location: root_path, alert: "You are not allowed to do that."
+      redirect_to same_host_referer || root_path,
+        alert: "You are not allowed to do that."
     end
   end
 
   private
+
+  # redirect_back follows the Referer header without checking its
+  # host, so any site that links to a gated action can bounce a
+  # forbidden visitor to its own URL. Only return to our own host;
+  # anything else (or an unparsable value) lands on the root.
+  def same_host_referer
+    referer = request.referer
+    return unless referer
+
+    URI.parse(referer).host == request.host ? referer : nil
+  rescue URI::InvalidURIError
+    nil
+  end
 
   def current_user
     Current.user
