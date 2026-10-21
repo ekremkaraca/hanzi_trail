@@ -32,4 +32,29 @@ class DifficultCardsTest < ActiveSupport::TestCase
       assert_equal 1, cards.second.difficult_review_count.to_i
     end
   end
+
+  test "ignores difficult ratings older than the window" do
+    freeze_time do
+      ReviewAttempt.delete_all
+
+      ReviewAttempt.create!(
+        flashcard: flashcards(:network),
+        rating: "again",
+        reviewed_at: Time.current
+      )
+
+      # This struggle is older than the window, so
+      # the card is no longer counted as difficult.
+      ReviewAttempt.create!(
+        flashcard: flashcards(:algorithm),
+        rating: "hard",
+        reviewed_at: 91.days.ago
+      )
+
+      cards = DifficultCards.call(limit: 10).to_a
+
+      assert_equal [ flashcards(:network) ], cards
+      assert_equal 1, cards.first.difficult_review_count.to_i
+    end
+  end
 end
