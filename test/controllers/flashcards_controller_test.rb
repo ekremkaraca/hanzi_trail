@@ -283,29 +283,56 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "No flashcards matched your filter"
   end
 
-  test "index caps at 200 cards and orders deterministically" do
-    220.times do |i|
+  test "index paginates cards in deterministic order" do
+    120.times do |i|
       Flashcard.create!(
         character: "溢#{format("%03d", i)}",
         pinyin: "yì",
-        meaning: "limitmarker",
-        category: "limit_test",
+        meaning: "paginationmarker",
+        category: "pagination_test",
         source: "curated"
       )
     end
 
-    get flashcards_path, params: { category: "limit_test" }
-    first_cards = response.body.scan(/flashcard-character-link" href="\/flashcards\/\d+">([^<]+)</).flatten
+    card_links = -> {
+      response.body.scan(/flashcard-character-link" href="\/flashcards\/\d+">([^<]+)</).flatten
+    }
+    page_link = ->(page) { flashcards_path(category: "pagination_test", page: page) }
 
-    assert_equal 200, first_cards.size
-    assert_equal first_cards, first_cards.sort
-    assert_equal "溢000", first_cards.first
-    assert_equal "溢199", first_cards.last
+    get flashcards_path, params: { category: "pagination_test" }
+    page_one = card_links.call
 
-    get flashcards_path, params: { category: "limit_test" }
-    second_cards = response.body.scan(/flashcard-character-link" href="\/flashcards\/\d+">([^<]+)</).flatten
+    assert_equal 50, page_one.size
+    assert_equal "溢000", page_one.first
+    assert_equal "溢049", page_one.last
+    assert_select "a[href=?]", page_link.call(2), text: "Next →"
+    assert_select "a[href=?]", page_link.call(0), text: "← Previous", count: 0
 
-    assert_equal first_cards, second_cards
+    get flashcards_path, params: { category: "pagination_test", page: 2 }
+    page_two = card_links.call
+
+    assert_equal 50, page_two.size
+    assert_equal "溢050", page_two.first
+    assert_equal "溢099", page_two.last
+
+    get flashcards_path, params: { category: "pagination_test", page: 3 }
+    page_three = card_links.call
+
+    assert_equal 20, page_three.size
+    assert_equal "溢100", page_three.first
+    assert_equal "溢119", page_three.last
+    # Last page: no Next link; Previous returns to page 2.
+    assert_select "a[href=?]", page_link.call(4), text: "Next →", count: 0
+    assert_select "a[href=?]", page_link.call(2), text: "← Previous"
+  end
+
+  test "index treats a bogus page value as the first page" do
+    %w[bogus -3 0].each do |page|
+      get flashcards_path, params: { page: page }
+
+      assert_response :success, "?page=#{page.inspect} should render"
+      assert_select ".flashcard-character-link", minimum: 1
+    end
   end
 
   # Regression: raw query-string values that are not Strings reached a

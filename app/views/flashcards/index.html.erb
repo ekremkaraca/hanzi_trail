@@ -1,1 +1,6 @@
-<%= render Flashcards::Index::PageComponent.new(flashcards: @flashcards, params: params) %>
+<%= render Flashcards::Index::PageComponent.new(
+  flashcards: @flashcards,
+  params: params,
+  current_page: @current_page,
+  has_more: @has_more_flashcards
+) %>

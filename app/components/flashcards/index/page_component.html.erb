@@ -25,4 +25,19 @@
       <%= render Flashcards::EmptyStateComponent.new(story_status: story_status) %>
     <% end %>
   </div>
+
+  <% if show_previous? || has_more %>
+    <nav class="flashcards-pagination flex flex--gap mt-4">
+      <% if show_previous? %>
+        <%= link_to "← Previous",
+              flashcards_path(page_params(current_page - 1)),
+              class: "btn btn--sm btn--ghost" %>
+      <% end %>
+      <% if has_more %>
+        <%= link_to "Next →",
+              flashcards_path(page_params(current_page + 1)),
+              class: "btn btn--sm btn--ghost" %>
+      <% end %>
+    </nav>
+  <% end %>
 </main>

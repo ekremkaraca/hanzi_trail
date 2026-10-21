@@ -5,13 +5,17 @@ class FlashcardsController < ApplicationController
   before_action :require_authentication, except: %i[index show]
   before_action :set_flashcard, only: %i[show edit update destroy]
 
-  FLASHCARDS_LIMIT = 200.freeze
+  # The index is paginated: one page of cards per request,
+  # with the filter parameters carried onto the page links.
+  PER_PAGE = 50
 
   def index
-    # Scrub every filter through QueryParam: a raw params value can be an Array,
-    # a nested Hash, or carry a NUL byte, each of which 500s a String-only scope
-    # (probed: ?query[]=a, ?query=%00).
-    @flashcards = Flashcard
+    page = current_page
+
+    # Load one row past the page so the view can offer a
+    # "Next" link without a second count query, then hand
+    # the page exactly PER_PAGE cards.
+    cards = Flashcard
       .all
       .by_source(QueryParam.scalar(params[:source]))
       .by_hsk_level(QueryParam.scalar(params[:hsk_level]))
@@ -19,7 +23,13 @@ class FlashcardsController < ApplicationController
       .with_story_filter(QueryParam.scalar(params[:story_status]))
       .search(QueryParam.scalar(params[:query]))
       .order(:character)
-      .limit(FLASHCARDS_LIMIT)
+      .limit(PER_PAGE + 1)
+      .offset((page - 1) * PER_PAGE)
+      .to_a
+
+    @has_more_flashcards = cards.size > PER_PAGE
+    @flashcards = cards.first(PER_PAGE)
+    @current_page = page
   end
 
   def show; end
@@ -63,6 +73,13 @@ class FlashcardsController < ApplicationController
   end
 
   private
+
+  # Page numbers arrive via the query string, so they are
+  # scrubbed like every other untrusted value; anything
+  # below 1 (or non-numeric) lands on the first page.
+  def current_page
+    [ QueryParam.scalar(params[:page]).to_i, 1 ].max
+  end
 
   def set_flashcard
     # QueryParam.scalar keeps an Array/Hash id (?id[]=1) from reaching find,
