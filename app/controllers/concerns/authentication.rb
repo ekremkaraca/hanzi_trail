@@ -30,7 +30,12 @@ module Authentication
     end
 
     def find_session_by_cookie
-      Session.find_by(id: cookies.signed[:session_id]) if cookies.signed[:session_id]
+      # Expired sessions stay invisible even while their
+      # cookie still holds the id; the purge task deletes
+      # the rows.
+      return unless cookies.signed[:session_id]
+
+      Session.active.find_by(id: cookies.signed[:session_id])
     end
 
     def request_authentication
@@ -49,9 +54,23 @@ module Authentication
     end
 
     def start_new_session_for(user)
-      user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
+      # The cookie expires with the session's server-side
+      # TTL so the browser drops it at the same time the
+      # row becomes inert (not the 20-year permanent default).
+      expires_at = Session::SESSION_TTL.from_now
+
+      user.sessions.create!(
+        user_agent: request.user_agent,
+        ip_address: request.remote_ip,
+        expires_at: expires_at
+      ).tap do |session|
         Current.session = session
-        cookies.signed.permanent[:session_id] = { value: session.id, httponly: true, same_site: :lax }
+        cookies.signed[:session_id] = {
+          value: session.id,
+          expires: expires_at,
+          httponly: true,
+          same_site: :lax
+        }
       end
     end
 
