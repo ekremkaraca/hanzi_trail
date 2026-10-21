@@ -9,7 +9,7 @@ class StreakCalculator
 
   def call
     active = ReviewAttempt
-      .pluck(Arel.sql("(reviewed_at AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Istanbul')::date"))
+      .pluck(Arel.sql("(reviewed_at AT TIME ZONE 'UTC' AT TIME ZONE #{app_zone_sql})::date"))
       .to_set
 
     streak = 0
@@ -20,5 +20,15 @@ class StreakCalculator
     end
 
     streak
+  end
+
+  private
+
+  # The zone identifier is read from the configured time zone rather
+  # than hardcoded, so the SQL day boundaries can never drift from the
+  # Ruby-side boundaries (Date.current, Time.current.all_day) used by
+  # the "reviewed today" counters and the stats page.
+  def app_zone_sql
+    @app_zone_sql ||= ApplicationRecord.connection.quote(Time.zone.name)
   end
 end
