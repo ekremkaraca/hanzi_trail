@@ -93,4 +93,25 @@ class CharacterLinkerTest < ActiveSupport::TestCase
 
     assert_equal [ "网" ], card.character_entries.order("flashcard_characters.position").pluck(:character)
   end
+
+  test "prunes entries that only this card used after a relink" do
+    card = Flashcard.create!(
+      character: "田由",
+      pinyin: "tiányóu",
+      meaning: "field and reason"
+    )
+
+    assert_not_nil CharacterEntry.find_by(character: "田")
+    assert_not_nil CharacterEntry.find_by(character: "由")
+
+    card.update!(character: "中国")
+
+    # 田 and 由 lost their only links and no other card's
+    # character string references them, so the relink prunes
+    # them while wiring the new characters.
+    assert_nil CharacterEntry.find_by(character: "田")
+    assert_nil CharacterEntry.find_by(character: "由")
+    assert_not_nil CharacterEntry.find_by(character: "中")
+    assert_not_nil CharacterEntry.find_by(character: "国")
+  end
 end

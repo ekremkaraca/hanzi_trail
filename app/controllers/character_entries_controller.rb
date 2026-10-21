@@ -7,7 +7,7 @@ class CharacterEntriesController < ApplicationController
     @flashcard_characters =
       @character_entry.flashcard_characters
                       .includes(:flashcard)
-                      .sort_by(&:position)
+                      .order(:position)
   end
 
   def edit

@@ -33,10 +33,17 @@ class CharacterLinker
 
       # Prune entries that lost all links during this relink. Guard with
       # deletable? so an entry still referenced by another card's character
-      # string is never removed.
+      # string is never removed. The link counts come from one grouped
+      # query instead of a reload per entry (the entries' in-memory link
+      # lists are stale after destroy_all).
+      link_counts = FlashcardCharacter
+        .where(character_entry_id: previously_linked.map(&:id))
+        .group(:character_entry_id)
+        .count
+
       previously_linked.each do |entry|
-        entry.reload
-        next unless entry.flashcard_characters.none?
+        next if link_counts.fetch(entry.id, 0).positive?
+
         entry.destroy if entry.deletable?
       end
     end
