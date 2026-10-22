@@ -362,6 +362,16 @@ header {
 .btn--sm { font-size: 0.85rem; padding: 0.3rem 0.6rem; }
 .btn--block { display: block; width: 100%; }
 
+/* Icon + label button: the base .btn is inline-block, so an SVG would sit on
+   the text baseline instead of centring against the label. */
+.btn--icon {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.45rem;
+}
+
+.btn--icon .icon { flex: none; }
+
 /* Filled semantic variants (rating actions) */
 .btn--danger { background: var(--hanzi-danger); border-color: transparent; color: #ffffff; }
 .btn--danger:hover { background: #f87171; color: #ffffff; }

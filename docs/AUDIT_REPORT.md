@@ -261,6 +261,27 @@ with computed geometry: `/` footer now ends exactly at the viewport bottom
 
 ---
 
+### Finding 14 — Speak button used a platform emoji glyph
+
+**Category:** UI — consistency
+
+`🔊 Speak` was the only emoji-as-icon control in the app. Emoji ignore
+`color`/`currentColor`, so the glyph stayed full-colour while the button it sat
+in was themed, rendered at the OS's own size (shifting the label baseline), and
+looked different on every platform — unlike every other control, which is
+themed text or CSS-drawn.
+
+**Fix applied:** replaced with an inline `stroke="currentColor"` SVG speaker
+plus a `.btn--icon` helper (the base `.btn` is `inline-block`, which would drop
+the glyph onto the text baseline). `aria-hidden`/`focusable="false"` keep the
+accessible name as exactly "Speak". Verified by an element screenshot: the icon
+takes the button's muted colour and centres against the label; component and
+controller suites still assert the Speak wiring (40 runs, 0 failures).
+
+**Commit:** (this commit)
+
+---
+
 ## Status Summary
 
 | # | Finding | Status | Commit |
@@ -278,6 +299,7 @@ with computed geometry: `/` footer now ends exactly at the viewport bottom
 | 11 | Missing authorize! on FlashcardsController#edit | ✅ Resolved | (this commit) |
 | 12 | Stats grid orphaned the fifth card | ✅ Resolved | (this commit) |
 | 13 | Footer floated mid-viewport on short pages | ✅ Resolved | (this commit) |
+| 14 | Speak button used a platform emoji glyph | ✅ Resolved | (this commit) |
 
 All findings from this audit pass have been resolved. Current state:
 - Tests: 259 runs, 742 assertions, 0 failures, 0 errors, 0 skips

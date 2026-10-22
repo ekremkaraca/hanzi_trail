@@ -16,13 +16,22 @@
       @click="window.dispatchEvent(new Event('review:toggle'))"
       x-text="answerVisible ? 'Hide answer' : 'Show answer'"
     ></button>
+    <%# Inline SVG instead of an emoji: 🔊 rendered as a full-colour OS glyph
+        that ignored the button's text colour and shifted size per platform.
+        stroke="currentColor" keeps it in the btn--dark palette, and
+        aria-hidden stops a screen reader announcing a second, redundant label. %>
     <button
       type="button"
-      class="btn btn--dark"
+      class="btn btn--dark btn--icon"
       data-review-target="speakButton"
       data-action="click->review#speak"
     >
-      🔊 Speak
+      <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M11 5 6.5 9H3v6h3.5L11 19V5Z" />
+        <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+        <path d="M18.5 5.5a9 9 0 0 1 0 13" />
+      </svg>
+      Speak
     </button>
   </div>
 
