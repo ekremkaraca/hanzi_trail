@@ -303,6 +303,25 @@ reveals the body; computed caret colour is `rgb(174, 184, 199)`.
 
 ---
 
+### Finding 16 — Anonymous CTA was styled as a secondary button
+
+**Category:** UI — consistency
+
+The header slot on `/flashcards` renders "New flashcard" with `btn--primary`
+for a curator, but "Sign in to create" with `btn--ghost` for everyone else —
+so the same slot changed visual weight with auth state, and the only action
+available to an anonymous visitor looked disabled next to the page title.
+
+**Fix applied:** the anonymous branch now uses `btn--primary`, matching the
+signed-in branch. `.btn--ghost` stays for genuinely secondary actions
+(Cancel, Clear, pagination, Edit). Verified by element screenshot: the button
+renders in the primary blue with the explanatory caption beneath it, and
+`flashcards_controller_test.rb` still asserts the link (33 runs, 0 failures).
+
+**Commit:** (this commit)
+
+---
+
 ## Status Summary
 
 | # | Finding | Status | Commit |
@@ -322,6 +341,7 @@ reveals the body; computed caret colour is `rgb(174, 184, 199)`.
 | 13 | Footer floated mid-viewport on short pages | ✅ Resolved | (this commit) |
 | 14 | Speak button used a platform emoji glyph | ✅ Resolved | (this commit) |
 | 15 | Collapsible caret was a 3.5:1 text glyph | ✅ Resolved | (this commit) |
+| 16 | Anonymous CTA was styled as a secondary button | ✅ Resolved | (this commit) |
 
 All findings from this audit pass have been resolved. Current state:
 - Tests: 259 runs, 742 assertions, 0 failures, 0 errors, 0 skips
