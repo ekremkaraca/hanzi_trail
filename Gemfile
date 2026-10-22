@@ -16,6 +16,9 @@ gem "thruster", "~> 0.1.21", require: false
 gem "turbo-rails", "~> 2.0", ">= 2.0.23"
 gem "tzinfo-data", "~> 1.2026", ">= 1.2026.2", platforms: %i[ windows jruby ]
 gem "view_component", "~> 4"
+gem "action_policy"
+gem "bcrypt", "~> 3.1"
+gem "faraday", ">= 2.15", require: false
 
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
@@ -35,6 +38,3 @@ group :test do
   gem "selenium-webdriver"
   gem "simplecov", "~> 1.1", require: false
 end
-gem "action_policy"
-
-gem "bcrypt", "~> 3.1"
