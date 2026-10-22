@@ -410,6 +410,42 @@ Flashcards suites green (50 runs, 0 failures).
 
 ---
 
+### Finding 21 — Voice-unavailable hint was unstyled, centred prose
+
+**Category:** UI — consistency / accessibility
+
+`.review-voice-hint` had **no stylesheet rule at all** — the class existed only
+as a Stimulus hook, and everything about its look came from the utility classes
+on it plus the `text-align: center` inherited from `.review-prompt`. So the
+platform instructions rendered as a centred bullet list: ragged on both edges,
+the macOS line floating away from its own bullet, at 13.6px dim text, with the
+native `▼` disclosure marker sitting off-baseline. It also read as orphaned
+caption text rather than the explanation for the disabled Speak button beside
+it, and nothing associated the two, so a screen-reader user on the button got
+only its `title`.
+
+**Fix applied:** promoted it to a real callout — a bordered `--hanzi-radius`
+panel capped at 34rem and centred as a block, with a two-column grid: a
+warning-coloured speaker-off SVG icon and a left-aligned body. The bullet list
+became a `<dl>` so each OS name is a scannable label column beside its path
+(stacking to one column under 600px), the native marker is replaced by the same
+themed chevron used on the collapsible panels (rotating on `details[open]`, with
+a `:focus-visible` ring), and the trailing period after the `<code>` chip —
+which had rendered as "espeak-ng ." — is gone. The Speak button now carries
+`aria-describedby="review-voice-hint"`, so the reason is announced with the
+disabled control; while the hint is hidden the reference resolves to nothing,
+which is correct because the button is enabled then.
+
+Measured: `text-align` center → left, width 650px → 544px (the 34rem cap),
+font-size 13.6px → 14px, `<dl>` tracks 63px/405px at 1280px and a single
+241px track at 390px with `dt`/`dd` stacked, no horizontal overflow at either
+width. Suites green (320 runs, 0 failures — two new component tests cover the
+description link and the labelled rows), RuboCop clean.
+
+**Commit:** (this commit)
+
+---
+
 ## Status Summary
 
 | # | Finding | Status | Commit |
@@ -434,6 +470,7 @@ Flashcards suites green (50 runs, 0 failures).
 | 18 | Curation shortcut pills collided with the filter caption | ✅ Resolved | (this commit) |
 | 19 | Every page nested a second `<main>` landmark | ✅ Resolved | (this commit) |
 | 20 | `/flashcards` scrolled horizontally on phones | ✅ Resolved | (this commit) |
+| 21 | Voice-unavailable hint was unstyled, centred prose | ✅ Resolved | (this commit) |
 
 All findings from this audit pass have been resolved. Current state:
 - Tests: 259 runs, 742 assertions, 0 failures, 0 errors, 0 skips

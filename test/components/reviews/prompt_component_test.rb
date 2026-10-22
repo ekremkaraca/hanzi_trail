@@ -18,7 +18,26 @@ module Reviews
       assert_selector "[data-review-target='voiceHint']",
         text: "This browser has no Mandarin voice", visible: false
       assert_selector "[data-review-target='voiceHint']",
-        text: "How to add one", visible: false
+        text: "How to add one", visible: :all
+    end
+
+    test "names the hint as the description of the Speak button" do
+      render_inline(PromptComponent.new(flashcard: flashcards(:network), show_pinyin: false))
+
+      # The hint ships hidden, so the reference only resolves once the
+      # controller reveals it — which is when the disabled button needs it.
+      assert_selector "button[data-review-target='speakButton'][aria-describedby='review-voice-hint']"
+      assert_selector "#review-voice-hint[hidden]", visible: :all
+    end
+
+    test "lists each platform as a labelled row instead of a centred bullet" do
+      render_inline(PromptComponent.new(flashcard: flashcards(:network), show_pinyin: false))
+
+      assert_selector "#review-voice-hint details dl", count: 1, visible: :all
+      %w[macOS Windows Linux].each do |platform|
+        assert_selector "#review-voice-hint dt", text: platform, visible: :all
+      end
+      assert_no_selector "#review-voice-hint ul", visible: :all
     end
   end
 end

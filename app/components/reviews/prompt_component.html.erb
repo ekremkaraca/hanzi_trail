@@ -25,6 +25,7 @@
       class="btn btn--dark btn--icon"
       data-review-target="speakButton"
       data-action="click->review#speak"
+      aria-describedby="review-voice-hint"
     >
       <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
         <path d="M11 5 6.5 9H3v6h3.5L11 19V5Z" />
@@ -37,18 +38,47 @@
 
   <%# Revealed by the Stimulus controller when the browser has no Mandarin
       voice: hanzi read by a non-Chinese voice is mispronounced, so the
-      button is disabled and the reason is explained instead. %>
-  <div class="review-voice-hint text-dim fs-7 mt-3" data-review-target="voiceHint" hidden>
-    <p class="mb-1">
-      This browser has no Mandarin voice, so characters cannot be spoken.
-    </p>
-    <details>
-      <summary>How to add one</summary>
-      <ul class="mt-1">
-        <li>macOS: System Settings → Accessibility → Spoken Content → System Voices → Chinese</li>
-        <li>Windows: Settings → Time &amp; language → Language &amp; region → Chinese → Language options → Speech</li>
-        <li>Linux: install a Chinese speech-dispatcher voice (for example <code>speech-dispatcher-espeak-ng</code>)</li>
-      </ul>
-    </details>
+      button is disabled and the reason is explained instead. The hint ships
+      hidden, so the aria-describedby link only resolves once it is shown —
+      which is exactly when the disabled button needs the explanation. %>
+  <div
+    class="review-voice-hint"
+    id="review-voice-hint"
+    data-review-target="voiceHint"
+    hidden
+  >
+    <svg class="review-voice-hint-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      <path d="M11 5 6.5 9H3v6h3.5L11 19V5Z" />
+      <path d="m16 9.5 5 5" />
+      <path d="m21 9.5-5 5" />
+    </svg>
+
+    <div>
+      <p class="review-voice-hint-title">
+        This browser has no Mandarin voice, so characters cannot be spoken.
+      </p>
+
+      <details class="review-voice-hint-steps">
+        <summary>
+          <span>How to add one</span>
+          <svg class="review-voice-hint-caret" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="m4 6 4 4 4-4" />
+          </svg>
+        </summary>
+
+        <%# Two-column definition list: the OS name becomes a scannable left
+            column instead of a centred bullet with a ragged path after it. %>
+        <dl>
+          <dt>macOS</dt>
+          <dd>System Settings → Accessibility → Spoken Content → System Voices → Chinese</dd>
+
+          <dt>Windows</dt>
+          <dd>Settings → Time &amp; language → Language &amp; region → Chinese → Language options → Speech</dd>
+
+          <dt>Linux</dt>
+          <dd>Install a Chinese speech-dispatcher voice, e.g. <code>speech-dispatcher-espeak-ng</code></dd>
+        </dl>
+      </details>
+    </div>
   </div>
 </div>

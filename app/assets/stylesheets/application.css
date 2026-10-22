@@ -1025,6 +1025,91 @@ button.collapsible-header:hover,
   color: #ffffff;
 }
 
+/* Voice hint — the callout that explains a disabled Speak button. It used to
+   carry no rule at all, so a centred bullet list of OS paths inherited the
+   card's text-align: center and read as leftover caption text. */
+.review-voice-hint {
+  align-items: start;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--hanzi-border);
+  border-radius: var(--hanzi-radius);
+  color: var(--hanzi-text-soft);
+  display: grid;
+  font-size: 0.875rem;
+  gap: 0.6rem;
+  grid-template-columns: auto 1fr;
+  margin-top: 1rem;
+  margin-inline: auto;
+  max-width: 34rem;
+  padding: 0.85rem 1rem;
+  text-align: left;
+}
+
+.review-voice-hint-icon {
+  color: var(--hanzi-warning);
+  margin-top: 0.1rem;
+}
+
+.review-voice-hint-title {
+  color: var(--hanzi-text);
+  font-weight: 600;
+  margin: 0;
+}
+
+.review-voice-hint-steps {
+  margin-top: 0.5rem;
+}
+
+.review-voice-hint-steps summary {
+  align-items: center;
+  color: var(--hanzi-text-soft);
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 600;
+  gap: 0.35rem;
+  list-style: none; /* the native marker is replaced by the themed caret */
+}
+
+.review-voice-hint-steps summary::-webkit-details-marker { display: none; }
+
+.review-voice-hint-steps summary:hover { color: var(--hanzi-text); }
+
+.review-voice-hint-steps summary:focus-visible {
+  border-radius: 0.25rem;
+  outline: 2px solid var(--hanzi-blue);
+  outline-offset: 2px;
+}
+
+.review-voice-hint-caret { transition: transform 0.18s ease; }
+
+.review-voice-hint-steps[open] .review-voice-hint-caret {
+  transform: rotate(180deg);
+}
+
+/* OS name in a fixed left column, path beside it, so the three instructions
+   scan as rows. Stacks below 600px where the paths need the full width. */
+.review-voice-hint-steps dl {
+  display: grid;
+  gap: 0.35rem 0.75rem;
+  grid-template-columns: auto 1fr;
+  margin: 0.6rem 0 0;
+}
+
+.review-voice-hint-steps dt {
+  color: var(--hanzi-text);
+  font-weight: 700;
+}
+
+.review-voice-hint-steps dd { margin: 0; }
+
+.review-voice-hint-steps code {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 0.3rem;
+  color: var(--hanzi-text);
+  font-size: 0.85em;
+  padding: 0.1rem 0.35rem;
+}
+
 .review-character {
   color: #ffffff;
   font-size: clamp(4rem, 12vw, 8rem);
@@ -1655,6 +1740,13 @@ button.collapsible-header:hover,
   }
 
   .review-card { padding: 1.25rem; }
+
+  .review-voice-hint-steps dl {
+    gap: 0.1rem;
+    grid-template-columns: 1fr;
+  }
+
+  .review-voice-hint-steps dt { margin-top: 0.4rem; }
 
   .review-mode-bar {
     gap: 0.4rem;
