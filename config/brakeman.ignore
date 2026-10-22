@@ -1,0 +1,9 @@
+{
+  "ignored_warnings": [
+    {
+      "check": "SQL",
+      "fingerprint": "2d0fb541767eff8902faa98d763d347f48637ab73ac6bc78923cae5de43cb264",
+      "note": "False positive: the only interpolated value is app_zone_sql, which is ApplicationRecord.connection.quote(Time.zone.name) — a configuration-derived, SQL-quoted zone identifier, never user input (see ReviewVelocity#app_zone_sql). No parameter reaches this string."
+    }
+  ]
+}
