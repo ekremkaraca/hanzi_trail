@@ -254,3 +254,44 @@ Verified in a live browser: with no voices the Speak button renders
 disabled and the hint visible; with a zh-CN voice present the button
 re-enables and the hint disappears; no console or page errors. Commit:
 `83bf999`.
+
+## 20. Supply character-entry pinyin from a dictionary
+
+CharacterEntry carried a pinyin column that nothing ever filled. The
+linker derives entries from a card's character string and leaves the
+reading blank, so 235 of the 236 entries rendered "Pinyin not added
+yet" and only a curator typing each one could change that.
+
+Candidate sources were compared against the real data rather than on
+reputation. The `pinyin` gem (last released 2009) and `chinese_pinyin`
+were rejected — the latter's own README shows `广州 → "yan zhou"`, and
+its polyphone handling needs a manual `Words.dat` override. `pinyin-pro`
+(JS) is the most accurate library but the app has no node toolchain and
+a 950 KB client bundle is the wrong shape for a server-side backfill.
+Unihan is authoritative but multi-file; `mozillazg/pinyin-data` already
+merges it into one plain-text file, `U+4E00: yī  # 一`, MIT licensed and
+actively maintained.
+
+Chosen: `pinyin-data`'s `pinyin.txt`. It covers 235 of the 235 missing
+entries — every one — which removes the need for a syllable segmenter
+or any positional guesswork. Cross-checking it against the curated card
+pinyin gives independent confidence: 83 of 86 single-character cards
+match a dictionary reading exactly, and of 209 per-character readings
+across the multi-character cards, 205 match the dictionary's primary
+reading, 4 match an alternative, and 0 conflict. The three outliers
+are our own card-data bugs (`电=diànhuà`, `鑫=xīnmiǎo`, and `喂=wéi`,
+an interjection reading the dictionary does not list).
+
+Two decisions shape the storage. Readings are stored comma-separated
+with the primary first (`cháng,zhǎng`) — 119 of the 235 entries are
+polyphonic, so a single value would lose the alternatives; the entry
+page renders the primary with the alternates as a secondary note, and
+the card page shows only the primary. Provenance is tracked in a new
+`pinyin_source` column (`manual` / `dictionary`): the importer fills
+blanks only, `FORCE=1` re-imports only values a previous dictionary run
+wrote, and a curator editing the pinyin marks it manual — so curated
+values and entries of unknown provenance are never overwritten.
+
+Ships as `bin/rails character_entries:fill_pinyin[path/to/pinyin.txt]`,
+following the HSK importer's import-by-path workflow, with `DRY_RUN=1`
+to preview. Commits: `cd8c196` (import), `c17859c` (display).
