@@ -19,6 +19,17 @@ class HskReimporterTest < ActiveSupport::TestCase
     assert_equal "shū", report.updated.first.pinyin_to
   end
 
+  test "dry run reports the repair without writing it" do
+    create_hsk_card(character: "书", pinyin: "Shū", meaning: "abbr. for 书经")
+
+    report = HskReimporter.call(path: @path, dry_run: true)
+    card = Flashcard.find_by!(character: "书")
+
+    assert_equal [ "书" ], report.updated.map(&:character)
+    assert_equal "Shū", card.pinyin
+    assert_equal "abbr. for 书经", card.meaning
+  end
+
   test "leaves a curator-edited card alone" do
     create_hsk_card(character: "书", pinyin: "shū", meaning: "a book the curator wrote")
     # Values that match neither the headword nor the common sense cannot

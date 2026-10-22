@@ -12,12 +12,13 @@ class HskReimporter
   Report = Struct.new(:updated, :edited, :missing, :unchanged, keyword_init: true)
   Change = Struct.new(:character, :pinyin_from, :pinyin_to, :meaning_from, :meaning_to, keyword_init: true)
 
-  def self.call(path:)
-    new(path: path).call
+  def self.call(path:, dry_run: false)
+    new(path: path, dry_run: dry_run).call
   end
 
-  def initialize(path:)
+  def initialize(path:, dry_run: false)
     @path = path
+    @dry_run = dry_run
   end
 
   def call
@@ -26,10 +27,14 @@ class HskReimporter
     report = Report.new(updated: [], edited: [], missing: [], unchanged: [])
     entries = index_entries(parse_json)
 
+    # A dry run applies the same writes and rolls them back, so the
+    # preview cannot drift from what a real run would do.
     Flashcard.transaction do
       Flashcard.where(source: "hsk").find_each do |card|
         repair(card, entries[card.character], report)
       end
+
+      raise ActiveRecord::Rollback if dry_run
     end
 
     report
@@ -39,7 +44,7 @@ class HskReimporter
 
   private
 
-  attr_reader :path
+  attr_reader :path, :dry_run
 
   def repair(card, entry, report)
     if entry.nil?
@@ -61,14 +66,16 @@ class HskReimporter
       return
     end
 
-    card.update!(pinyin: pinyin, meaning: meaning)
-    report.updated << Change.new(
+    change = Change.new(
       character: card.character,
-      pinyin_from: card.pinyin_before_last_save,
+      pinyin_from: card.pinyin,
       pinyin_to: pinyin,
-      meaning_from: card.meaning_before_last_save,
+      meaning_from: card.meaning,
       meaning_to: meaning
     )
+
+    card.update!(pinyin: pinyin, meaning: meaning)
+    report.updated << change
   end
 
   def pristine?(card, entry)
