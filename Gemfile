@@ -19,6 +19,7 @@ gem "view_component", "~> 4"
 gem "action_policy"
 gem "bcrypt", "~> 3.1"
 gem "faraday", ">= 2.15", require: false
+gem "lograge", ">= 0.15.1"
 
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"

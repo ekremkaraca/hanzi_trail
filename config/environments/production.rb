@@ -37,6 +37,27 @@ Rails.application.configure do
   config.log_tags = [ :request_id ]
   config.logger   = ActiveSupport::TaggedLogging.logger(STDOUT)
 
+  # One line per request in key=value form, so a request can be scanned
+  # and filtered by status, path or duration in a single pass. Rails'
+  # multi-line Started/Processing/Rendered/Completed output is replaced,
+  # not added to.
+  config.lograge.enabled = true
+  config.lograge.log_level = :info
+  # lograge strips the query string from the path and logs no params on
+  # its own, so the search text is added back; no other param is worth
+  # a token leaking into the stream.
+  config.lograge.custom_options = lambda do |event|
+    query = event.payload.dig(:params, "query")
+    query ? { query: query } : {}
+  end
+  # Which account made the request: the difference between an error line
+  # you can act on and one you cannot reproduce.
+  config.lograge.custom_payload do
+    { user: Current.user&.id }.compact
+  end
+  # The health check would otherwise add a line every few seconds.
+  config.lograge.ignore_custom = ->(event) { event.payload[:path] == "/up" }
+
   # Change to "debug" to log everything (including potentially personally-identifiable information!).
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
 
