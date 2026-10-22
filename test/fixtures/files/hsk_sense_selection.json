@@ -1,0 +1,41 @@
+[
+  {
+    "simplified": "书",
+    "forms": [
+      {
+        "transcriptions": { "pinyin": "Shū" },
+        "meanings": ["abbr. for 书经"]
+      },
+      {
+        "transcriptions": { "pinyin": "shū" },
+        "meanings": ["book", "letter"]
+      }
+    ]
+  },
+  {
+    "simplified": "那",
+    "forms": [
+      {
+        "transcriptions": { "pinyin": "Nā" },
+        "meanings": ["surname Na"]
+      },
+      {
+        "transcriptions": { "pinyin": "nǎ" },
+        "meanings": ["variant of 哪"]
+      },
+      {
+        "transcriptions": { "pinyin": "nà" },
+        "meanings": ["that"]
+      }
+    ]
+  },
+  {
+    "simplified": "中国",
+    "forms": [
+      {
+        "transcriptions": { "pinyin": "Zhōng guó" },
+        "meanings": ["China"]
+      }
+    ]
+  }
+]

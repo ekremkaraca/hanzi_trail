@@ -95,6 +95,48 @@ class HskImporterTest < ActiveSupport::TestCase
     assert_raises(HskImporter::ImportError) { importer.call }
   end
 
+  test "imports the common-sense form instead of the capitalized headword" do
+    importer = HskImporter.new(
+      path: Rails.root.join("test/fixtures/files/hsk_sense_selection.json"),
+      hsk_level: "old-1"
+    )
+
+    importer.call
+
+    flashcard = Flashcard.find_by!(character: "书")
+
+    assert_equal "shū", flashcard.pinyin
+    assert_equal "book; letter", flashcard.meaning
+  end
+
+  test "honors an explicit preferred reading over the first common-sense form" do
+    importer = HskImporter.new(
+      path: Rails.root.join("test/fixtures/files/hsk_sense_selection.json"),
+      hsk_level: "old-1"
+    )
+
+    importer.call
+
+    flashcard = Flashcard.find_by!(character: "那")
+
+    assert_equal "nà", flashcard.pinyin
+    assert_equal "that", flashcard.meaning
+  end
+
+  test "keeps the headword when it is the entry's only form" do
+    importer = HskImporter.new(
+      path: Rails.root.join("test/fixtures/files/hsk_sense_selection.json"),
+      hsk_level: "old-1"
+    )
+
+    importer.call
+
+    flashcard = Flashcard.find_by!(character: "中国")
+
+    assert_equal "Zhōng guó", flashcard.pinyin
+    assert_equal "China", flashcard.meaning
+  end
+
   test "raises descriptively when entry has an empty forms array" do
     importer = HskImporter.new(
       path: Rails.root.join("test/fixtures/files/hsk_empty_forms.json"),
