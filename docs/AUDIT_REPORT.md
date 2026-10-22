@@ -342,6 +342,25 @@ subtitle, filters, card — with the count box as the only right-hand element.
 
 ---
 
+### Finding 18 — Curation shortcut pills collided with the filter caption
+
+**Category:** UI — alignment
+
+`.flashcard-filters-header` used `justify-content: space-between`, pushing the
+curation shortcut pills to the right edge on the same row as the "Filter
+imported and curated flashcards." caption. At 1280px the four pills were within
+a few pixels of the caption text, and at narrower widths they wrapped into it.
+
+**Fix applied:** the header is now a flex column (`align-items: flex-start`,
+0.9rem gap) so the caption and the pill row each own a line, left-aligned with
+the field grid below them; the redundant `margin-top` on `.curation-shortcuts`
+dropped in favour of the gap. Verified by element screenshot: caption, pill
+row, then fields, all on one axis. Flashcards suites green (50 runs, 0 failures).
+
+**Commit:** (this commit)
+
+---
+
 ## Status Summary
 
 | # | Finding | Status | Commit |
@@ -363,6 +382,7 @@ subtitle, filters, card — with the count box as the only right-hand element.
 | 15 | Collapsible caret was a 3.5:1 text glyph | ✅ Resolved | (this commit) |
 | 16 | Anonymous CTA was styled as a secondary button | ✅ Resolved | (this commit) |
 | 17 | Review page stacked three alignment axes | ✅ Resolved | (this commit) |
+| 18 | Curation shortcut pills collided with the filter caption | ✅ Resolved | (this commit) |
 
 All findings from this audit pass have been resolved. Current state:
 - Tests: 259 runs, 742 assertions, 0 failures, 0 errors, 0 skips

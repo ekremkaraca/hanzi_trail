@@ -1201,10 +1201,10 @@ button.collapsible-header:hover,
 }
 
 .flashcard-filters-header {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
-  gap: 1rem;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 0.9rem;
   margin-bottom: 1.25rem;
 }
 
@@ -1268,7 +1268,6 @@ button.collapsible-header:hover,
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-top: 1rem;
 }
 
 .flashcard-filter-grid {
