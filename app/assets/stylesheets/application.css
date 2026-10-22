@@ -871,12 +871,16 @@ button.collapsible-header:hover,
 }
 
 .collapsible-caret {
-  color: #6b7280;
-  display: inline-block;
-  font-size: 1rem;
-  line-height: 1;
+  align-items: center;
+  /* --hanzi-text-soft (#aeb8c7) instead of #6b7280: the old grey measured
+     3.5:1 against the panel, under the 4.5:1 floor for the small
+     non-text affordance that signals "this row opens". Now 8.4:1. */
+  color: var(--hanzi-text-soft);
+  display: inline-flex;
   transition: transform 0.18s ease;
 }
+
+.collapsible-header:hover .collapsible-caret { color: var(--hanzi-text); }
 
 .collapsible-caret--open { transform: rotate(180deg); }
 

@@ -282,6 +282,27 @@ controller suites still assert the Speak wiring (40 runs, 0 failures).
 
 ---
 
+### Finding 15 — Collapsible caret was a 3.5:1 text glyph
+
+**Category:** UI — consistency / accessibility
+
+The collapse affordance was the character `▾` at `#6b7280` — 3.5:1 against the
+panel, under the 4.5:1 floor for a small non-text indicator, and rendered at
+whatever size the font chose for that glyph, so it read as stray punctuation
+rather than a control. (The header row itself was already a real `<button>`
+with `aria-expanded`, so the hit target was never the problem.)
+
+**Fix applied:** inline SVG chevron (16px, `stroke="currentColor"`) inside the
+existing `.collapsible-caret` span, recoloured to `--hanzi-text-soft` (8.4:1)
+and brightened to full text on hover. The span keeps `aria-hidden`, so the
+accessible state still comes only from `aria-expanded`. Verified live: clicking
+the header flips `aria-expanded` false→true, rotates the caret 180°, and
+reveals the body; computed caret colour is `rgb(174, 184, 199)`.
+
+**Commit:** (this commit)
+
+---
+
 ## Status Summary
 
 | # | Finding | Status | Commit |
@@ -300,6 +321,7 @@ controller suites still assert the Speak wiring (40 runs, 0 failures).
 | 12 | Stats grid orphaned the fifth card | ✅ Resolved | (this commit) |
 | 13 | Footer floated mid-viewport on short pages | ✅ Resolved | (this commit) |
 | 14 | Speak button used a platform emoji glyph | ✅ Resolved | (this commit) |
+| 15 | Collapsible caret was a 3.5:1 text glyph | ✅ Resolved | (this commit) |
 
 All findings from this audit pass have been resolved. Current state:
 - Tests: 259 runs, 742 assertions, 0 failures, 0 errors, 0 skips

@@ -17,7 +17,15 @@
       <% if show_badge? %>
         <%= badge %>
       <% end %>
-      <span class="collapsible-caret" :class="open && 'collapsible-caret--open'" aria-hidden="true">▾</span>
+      <%# Inline chevron instead of the "▾" text glyph: the character rendered
+          at the font's own size/weight and could not be scaled or stroked
+          consistently. aria-hidden stays — the button's aria-expanded already
+          carries the state. %>
+      <span class="collapsible-caret" :class="open && 'collapsible-caret--open'" aria-hidden="true">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m4 6 4 4 4-4" />
+        </svg>
+      </span>
     </div>
   </button>
 
