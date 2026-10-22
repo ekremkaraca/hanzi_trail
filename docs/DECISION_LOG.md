@@ -403,7 +403,8 @@ logs -j` already delivers every line as JSON with `level`, `message`
 and `timestamp` when a machine-readable view is wanted. Keeping the
 default left the four-lines-per-request problem unsolved.
 
-Chosen: lograge, enabled only in production. One `method=… path=…
+Chosen: lograge — in production first, widened to every environment
+once the format proved out. One `method=… path=…
 status=… duration=…` line per request keeps the request-id tag, so a
 request is still one `grep` while a whole incident becomes one
 `grep -v status=200`. The parts lograge drops are added back on purpose:
@@ -414,12 +415,15 @@ reproduce. `/up` is ignored explicitly - `silence_healthcheck_path`
 stopped covering it once Rails' request subscriber was detached.
 Exceptions keep their status and `error="…"` in the line with the
 backtrace still logged by the exceptions middleware, and development
-keeps the verbose multi-line log, which remains the better debugging
-tool locally.
+keeps its debug-level SQL underneath the request line in
+log/development.log, which is what still makes that file worth reading
+for query work.
 
 Verified by booting in production mode and publishing a synthetic
 `process_action` event, since production config cannot run under the
-test environment. The ActiveStorage warning went with it.
+test environment, and by driving a real development request through
+Puma once the config moved to an initializer. The ActiveStorage warning
+went with it.
 
-Commits: `d9853a3` (lograge), `bb4067f` (variant processor), this one
-(docs).
+Commits: `d9853a3` (lograge), `bb4067f` (variant processor),
+`a301adb` (all environments), this one (docs).

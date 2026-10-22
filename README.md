@@ -47,19 +47,20 @@ bin/dev            # Rails + Caddy -> https://hanzitrail.localhost:8443
 - Curator accounts are provisioned via CLI (no public signup):
   `bin/rails users:create[you@example.com]`
 
-### Reading production logs
+### Reading logs
 
-Production logs one line per request (lograge), tagged with the request
-id, instead of Rails' multi-line Started/Processing/Rendered/Completed
-block; development keeps the verbose default in `log/development.log`.
+Every environment logs one line per request (lograge), tagged with the
+request id, instead of Rails' multi-line Started/Processing/Rendered/
+Completed block. Development additionally keeps its debug-level SQL
+underneath, in `log/development.log`.
 
 ```text
-[6e50b91f-38b2-4a07-97d7-4af38e8fe99b] method=GET path=/flashcards format=html controller=flashcards action=index status=200 allocations=6 duration=48.0 view=32.3 db=18.2 query=水 user=3
+[6e50b91f-38b2-4a07-97d7-4af38e8fe99b] method=GET path=/flashcards format=html controller=FlashcardsController action=index status=200 allocations=6 duration=48.0 view=32.3 db=18.2 query=水 user=3
 ```
 
 `query` and `user` appear only when present, `/up` health checks are not
 logged, and a failing request carries `status=500 error="SomeError: …"`
-on its own line. Browsing with the `fly` CLI:
+on its own line. Browsing production with the `fly` CLI:
 
 ```bash
 fly logs                          # live tail of the stream
