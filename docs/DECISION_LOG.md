@@ -220,6 +220,37 @@ in CI. Commit: `9ae4bfa`.
 `app/views/pwa/manifest.json.erb` and `service-worker.js` existed with no
 route rendering them and no `<link rel="manifest">` in the layout. Both
 paths returned 404 — dead code implying a feature the app does not ship.
-Delete the views and correct the CSP comment that referenced "the PWA
-manifest". A future PWA effort can re-add routes and manifest linking
+Delete the views and correct the CSP comment that referenced the PWA
+manifest. A future PWA effort can re-add routes and manifest linking
 together. Commit: `272d26e`.
+
+## 19. Speak button requires a Mandarin voice
+
+The review "Speak" button set `utterance.lang = "zh-CN"` but left
+`utterance.voice` unset, so a browser with no Chinese voice read hanzi
+with its default (usually English) voice — the "Chinese letter" effect the
+controller's own comment described. The only signal was a console warning
+("No Mandarin/Chinese voice found. Using default voice."), so the user
+heard a wrong pronunciation and had no idea why.
+
+The warning was also frequently a false negative: `getVoices()` is
+asynchronous, the list was read once at connect, and the handler was
+assigned as `speechSynthesis.onvoiceschanged` — replacing any other handler
+on the shared object and re-binding on every Turbo navigation. Clicking
+before the browser populated the list reported "no Chinese voice" on
+machines that have one.
+
+Decision: never substitute a non-Chinese voice for hanzi. Voice discovery
+moved to `app/javascript/speech/voices.js` and resolves the list
+asynchronously (a `voiceschanged` listener plus polling, with a 1s
+timeout), so "no voice" now means no voice. The controller tracks
+availability as unknown / available / missing: the button stays usable
+while unknown (a slow voice list never blocks audio), and on missing it is
+disabled with an explanatory title while a hint appears with per-OS steps
+to install a Mandarin voice. The Speak action re-checks the live list at
+click time, since voices can finish loading after the page rendered.
+
+Verified in a live browser: with no voices the Speak button renders
+disabled and the hint visible; with a zh-CN voice present the button
+re-enables and the hint disappears; no console or page errors. Commit:
+`83bf999`.
