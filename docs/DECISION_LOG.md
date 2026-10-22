@@ -295,3 +295,56 @@ values and entries of unknown provenance are never overwritten.
 Ships as `bin/rails character_entries:fill_pinyin[path/to/pinyin.txt]`,
 following the HSK importer's import-by-path workflow, with `DRY_RUN=1`
 to preview. Commits: `cd8c196` (import), `c17859c` (display).
+
+## 21. Repair the card data the pinyin findings exposed
+
+The dictionary cross-check in §20 flagged three cards. Digging into all
+41 cards whose pinyin begins with a capital letter turned one defect
+into four, split cleanly by the card's source field.
+
+The imported twelve were wrong twice over. `complete-hsk-vocabulary`
+marks proper nouns with a capitalized pinyin and lists the headword
+sense first, so `forms.first` imports a surname or abbreviation: the
+first form of 书 is "Shū" / "abbr. for 书经", with the word the app
+teaches ("shū", "book") in a later form. The capitalisation was the
+visible symptom of the wrong sense. The thirty curated cards starting
+with a capital are correct and stay: 中国, 北京 and friends are proper
+nouns, the dataset capitalises them, and the upstream entry has a
+single form.
+
+The importer now prefers the first form whose pinyin is fully
+lowercase — the dataset's own marker for a common sense — with one
+explicit preference for 那, where the first lowercase form is still the
+wrong reading. Since the importer never rewrites an existing card,
+`HskReimporter` re-derives `source=hsk` cards from the same file, and
+repairs a card only when both values still equal what the old rule
+wrote: Flashcard has no provenance column, so "matches the known past
+import" is the only line separating curated edits from bad imports.
+Eleven cards changed, 137 were already correct, none were edited by a
+curator, and 汉语 keeps its capitalised headword because its entry has
+only that form.
+
+Two curated data bugs needed no disassembly: the 电 card held
+"diànhuà" and "telephone" — 电话's reading and gloss — while separate
+cards covered 电脑, 电视 and 电影, so the character field was the wrong
+part and the card became 电话 through the model, keeping the entry
+relink that gives 话 an entry and 电 to the four cards that still read
+it. 鑫 lost the two-syllable typo "xīnmiǎo" to "xīn". Both repairs are
+conditional migrations, so a card a curator fixed first keeps its.
+
+The remaining 40 spacing mismatches were a data bug in the other
+direction — curated multi-character cards have no syllable separator,
+imported cards do, so a learner saw two conventions. Fixing them needs
+a syllable segmentation, which the dictionary supplies: `segment`
+splits a toned transcript one syllable per character, tone-marked
+candidates must split on real tonic readings (a base-form comparison
+would call "Xīān" the syllable 先 xiān) and the character count
+disambiguates where greedy matching misfires ("Háng" + "uó" before
+"Hán" + "guó"). The audit is report-only elsewhere: it uses the
+dictionary to say which readings are simply wrong, which differ in
+tone, and which are the neutral tones the dictionary writes with a
+mark — and it does not rewrite any of those, because a card may hold a
+reading the dictionary omits (喂 "wéi").
+
+Commits: `aeb0d96` (common sense), `3d9e087` (`hsk:reimport`),
+`60dff07` (dry run), `fef2c80` (电/鑫), `d6cbc51` (audit + spacing).
