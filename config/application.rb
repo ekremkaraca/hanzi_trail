@@ -21,6 +21,10 @@ module HanziTrail
     # image_processing gem.
     config.active_storage.variant_processor = :disabled
 
+    # Tag every log line with the request id so one request stays one
+    # grep in any environment (lograge renders the line, this labels it).
+    config.log_tags = [ :request_id ]
+
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
