@@ -1288,6 +1288,10 @@ button.collapsible-header:hover,
   gap: 0.35rem;
   letter-spacing: 0.02em;
   margin: 0;
+  /* Flex items default to min-width: auto, which refuses to shrink below the
+     child input's intrinsic preferred width — on a 390px viewport that pushed
+     the field row to 385px inside a 321px grid and scrolled the whole page. */
+  min-width: 0;
 }
 
 .flashcard-filter-grid > .filter-search-field { flex: 2 1 14rem; }
@@ -1301,7 +1305,9 @@ button.collapsible-header:hover,
 .flashcard-filter-grid select {
   height: 2.6rem;
   margin: 0;
+  min-width: 0;
   padding: 0 0.85rem;
+  width: 100%;
 }
 
 .flashcard-filter-grid select { padding-right: 2.25rem; }

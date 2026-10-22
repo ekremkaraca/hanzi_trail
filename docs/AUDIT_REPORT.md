@@ -385,6 +385,31 @@ the footer pinned. Full suite green (318 runs, 0 failures).
 
 ---
 
+### Finding 20 — `/flashcards` scrolled horizontally on phones
+
+**Category:** UI — responsive bug
+
+At a 390px viewport the page scrolled sideways (`scrollWidth` 420 vs 390). The
+filter grid's labels are flex items, and flex items default to
+`min-width: auto`, so a label could not shrink below the intrinsic preferred
+width of the `<input>` inside it: the search field measured 385px inside a
+321px grid. The `<select>`s shrank fine, which is why only the text fields
+broke. Desktop had been absorbing the same problem invisibly — the inputs'
+intrinsic width was overriding the declared `flex-basis`, so the fields were
+wider than their own rules asked for.
+
+**Fix applied:** `min-width: 0` on `.flashcard-filter-grid > label` plus
+`width: 100%; min-width: 0` on the grid's inputs and selects, so children fill
+the label instead of dictating its size. Verified by measurement: at 390px
+`scrollWidth === innerWidth` (420 → 390) and every field fits the 321px grid;
+at 1280px the five fields now respect their declared bases and share one row
+with Filter/Clear wrapping beneath, replacing the old overflow-driven widths.
+Flashcards suites green (50 runs, 0 failures).
+
+**Commit:** (this commit)
+
+---
+
 ## Status Summary
 
 | # | Finding | Status | Commit |
@@ -408,6 +433,7 @@ the footer pinned. Full suite green (318 runs, 0 failures).
 | 17 | Review page stacked three alignment axes | ✅ Resolved | (this commit) |
 | 18 | Curation shortcut pills collided with the filter caption | ✅ Resolved | (this commit) |
 | 19 | Every page nested a second `<main>` landmark | ✅ Resolved | (this commit) |
+| 20 | `/flashcards` scrolled horizontally on phones | ✅ Resolved | (this commit) |
 
 All findings from this audit pass have been resolved. Current state:
 - Tests: 259 runs, 742 assertions, 0 failures, 0 errors, 0 skips
