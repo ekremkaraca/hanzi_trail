@@ -239,6 +239,28 @@ overflow. Labels stay on one line at the narrower width.
 
 ---
 
+### Finding 13 — Footer floated mid-viewport on short pages
+
+**Category:** UI — layout consistency
+
+The footer had no sticky-footer mechanism, so each page component faked one by
+setting `min-height: calc(100vh - 3.25rem)` on its own wrapper — five copies of
+the same magic number (`.review-page`, `.flashcards-page`,
+`.flashcard-show-page`, `.character-entry-page`, `.stats-page`). The home page
+never got the rule, so its footer sat at y≈405 of a 631px viewport with dead
+space below it, and any new page would inherit the bug by omission.
+
+**Fix applied:** the layout owns it once — `body` is a flex column and
+`main.container` grows with `flex: 1 0 auto` while `footer` keeps
+`flex-shrink: 0`. The five per-page `min-height` hacks are deleted. Verified
+with computed geometry: `/` footer now ends exactly at the viewport bottom
+(631px, no scroll); `/flashcards` (4779px), `/review` (950px) and `/stats`
+(847px) still scroll normally with the footer after the content.
+
+**Commit:** (this commit)
+
+---
+
 ## Status Summary
 
 | # | Finding | Status | Commit |
@@ -255,6 +277,7 @@ overflow. Labels stay on one line at the narrower width.
 | 10 | Orphaned CharacterEntry on edit | ✅ Resolved | (this commit) |
 | 11 | Missing authorize! on FlashcardsController#edit | ✅ Resolved | (this commit) |
 | 12 | Stats grid orphaned the fifth card | ✅ Resolved | (this commit) |
+| 13 | Footer floated mid-viewport on short pages | ✅ Resolved | (this commit) |
 
 All findings from this audit pass have been resolved. Current state:
 - Tests: 259 runs, 742 assertions, 0 failures, 0 errors, 0 skips

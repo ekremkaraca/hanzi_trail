@@ -39,6 +39,8 @@ html {
 }
 
 body {
+  display: flex;
+  flex-direction: column;
   margin: 0;
   min-height: 100vh;
   background:
@@ -298,8 +300,14 @@ progress::-moz-progress-bar {
 /* ── Layout ── */
 .container {
   margin-inline: auto;
+  /* Sticky footer: the body is a flex column, so the content area grows to
+     fill any leftover height and the footer sits at the bottom of short
+     pages instead of floating mid-viewport. flex-basis auto + no shrink
+     keeps long pages scrolling normally. */
+  flex: 1 0 auto;
   max-width: 60rem;
   padding: 1.5rem 1rem 2rem;
+  width: 100%;
 }
 
 header {
@@ -727,6 +735,7 @@ progress.progress--info { accent-color: var(--hanzi-info); }
 /* ── Footer ── */
 footer {
   border-top: 1px solid var(--hanzi-border);
+  flex-shrink: 0;
   padding-block: 1.25rem;
   text-align: center;
 }
@@ -939,7 +948,8 @@ button.collapsible-header:hover,
 }
 
 /* ── Review page ── */
-.review-page { min-height: calc(100vh - 3.25rem); }
+/* Per-page `min-height: calc(100vh - 3.25rem)` rules used to live here as a
+   sticky-footer workaround; the layout now handles it once in .container. */
 
 .review-count-box {
   background: rgba(255, 255, 255, 0.04);
@@ -1149,7 +1159,6 @@ button.collapsible-header:hover,
 }
 
 /* ── Flashcards index ── */
-.flashcards-page { min-height: calc(100vh - 3.25rem); }
 
 .flashcards-header {
   align-items: center;
@@ -1316,7 +1325,6 @@ button.collapsible-header:hover,
 }
 
 /* ── Flashcard show ── */
-.flashcard-show-page { min-height: calc(100vh - 3.25rem); }
 
 .flashcard-show-card {
   background:
@@ -1504,7 +1512,6 @@ button.collapsible-header:hover,
 }
 
 /* ── Character entry page ── */
-.character-entry-page { min-height: calc(100vh - 3.25rem); }
 
 .character-entry-card {
   background:
@@ -1584,7 +1591,6 @@ button.collapsible-header:hover,
 }
 
 /* ── Stats page ── */
-.stats-page { min-height: calc(100vh - 3.25rem); }
 
 .stats-card-label {
   color: var(--hanzi-text-soft);
