@@ -1,5 +1,5 @@
 <%# DRY: header holds the title + remaining count (hidden on mobile). The mode bar lives in its own component so it stays visible everywhere. %>
-<main class="review-page pb-6">
+<div class="review-page pb-6">
   <%= render Reviews::HeaderComponent.new(remaining_due_count: remaining_due_count) %>
   <%= render Reviews::ModeBarComponent.new(filter_params: filter_params) %>
 
@@ -36,4 +36,4 @@
       title: empty_state_title
     ) %>
   <% end %>
-</main>
+</div>

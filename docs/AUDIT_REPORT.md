@@ -361,6 +361,30 @@ row, then fields, all on one axis. Flashcards suites green (50 runs, 0 failures)
 
 ---
 
+### Finding 19 — Every page nested a second `<main>` landmark
+
+**Category:** Accessibility / HTML validity
+
+The layout wraps the yield in `<main class="container">`, and ten page
+templates then opened another `<main>` inside it (`home/index`, `sessions/new`,
+`flashcards/new`, `flashcards/edit`, `character_entries/edit`, and the
+`flashcards/index`, `flashcards/show`, `reviews`, `stats`,
+`character_entries/page` components). A document may have only one `main`
+landmark, so screen-reader landmark navigation offered two nested "main"
+regions per page and the markup failed validation.
+
+**Fix applied:** the ten page-level wrappers are now `<div>` elements with the
+same classes (`stats-page`, `review-page`, …) — every rule that styled them is
+class-based, and no CSS or JS selector targeted the `main` element, so the
+demotion is purely structural. Verified live: `document.querySelectorAll('main').length === 1`
+classed `container`, the page wrapper survives as `div.flashcard-show-page`, the
+container still measures 960px, and the home page renders pixel-identical with
+the footer pinned. Full suite green (318 runs, 0 failures).
+
+**Commit:** (this commit)
+
+---
+
 ## Status Summary
 
 | # | Finding | Status | Commit |
@@ -383,6 +407,7 @@ row, then fields, all on one axis. Flashcards suites green (50 runs, 0 failures)
 | 16 | Anonymous CTA was styled as a secondary button | ✅ Resolved | (this commit) |
 | 17 | Review page stacked three alignment axes | ✅ Resolved | (this commit) |
 | 18 | Curation shortcut pills collided with the filter caption | ✅ Resolved | (this commit) |
+| 19 | Every page nested a second `<main>` landmark | ✅ Resolved | (this commit) |
 
 All findings from this audit pass have been resolved. Current state:
 - Tests: 259 runs, 742 assertions, 0 failures, 0 errors, 0 skips
