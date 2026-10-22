@@ -434,7 +434,11 @@ progress.progress--info { accent-color: var(--hanzi-info); }
 
 /* ── Layout helpers ── */
 .grid { display: grid; gap: 1rem; }
-.grid--stats { grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
+/* Five stat cards must land on one row inside the 60rem container:
+   5 × 10.5rem + 4 × 1rem gap = 904px fits the 928px content box, while the
+   previous 13rem floor forced a 4 + 1 split that orphaned "Current streak".
+   Narrow viewports still collapse to fewer columns via auto-fit. */
+.grid--stats { grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr)); }
 .grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .span-full { grid-column: 1 / -1; }
 

@@ -212,6 +212,33 @@ documented controller contract and would become a real gap once roles land.
 
 ---
 
+## UI pass — live production review (2026-10-22)
+
+Findings 12+ come from a visual pass over the deployed app at
+`https://hanzitrail.fly.dev` (1280×631 viewport, screenshots plus computed
+layout), verified against a local server before each commit.
+
+---
+
+### Finding 12 — Stats grid orphaned the fifth card
+
+**Category:** UI — alignment
+
+`.grid--stats` used `repeat(auto-fit, minmax(13rem, 1fr))`. Inside the 60rem
+container's 928px content box, five 13rem cards plus gaps need 1104px, so only
+four tracks fitted and "Current streak" dropped to a second row beside three
+empty cells — the only asymmetric block in an otherwise uniform page.
+
+**Fix applied:** floor lowered to `minmax(10.5rem, 1fr)`, which fits all five
+cards on one row (5 × 172.8px + 4 × 16px = 928px) with no orphan. Verified by
+computed layout: desktop renders five equal 173px tracks on one row; at 390px
+`auto-fit` still collapses to two per row with no clipping and no horizontal
+overflow. Labels stay on one line at the narrower width.
+
+**Commit:** (this commit)
+
+---
+
 ## Status Summary
 
 | # | Finding | Status | Commit |
@@ -227,6 +254,7 @@ documented controller contract and would become a real gap once roles land.
 | 9 | README overstating test coverage | ✅ Resolved | `94a8327` |
 | 10 | Orphaned CharacterEntry on edit | ✅ Resolved | (this commit) |
 | 11 | Missing authorize! on FlashcardsController#edit | ✅ Resolved | (this commit) |
+| 12 | Stats grid orphaned the fifth card | ✅ Resolved | (this commit) |
 
 All findings from this audit pass have been resolved. Current state:
 - Tests: 259 runs, 742 assertions, 0 failures, 0 errors, 0 skips
