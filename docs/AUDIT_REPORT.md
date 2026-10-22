@@ -322,6 +322,26 @@ renders in the primary blue with the explanatory caption beneath it, and
 
 ---
 
+### Finding 17 — Review page stacked three alignment axes
+
+**Category:** UI — alignment
+
+The header block was left-aligned, the "Remaining" count box was right-aligned
+in the same row, and the mode pills were centred below them
+(`.review-mode-bar { justify-content: center }`). Three unrelated axes made the
+pills look detached from the filter state they control, and the eye had no
+single column to scan down.
+
+**Fix applied:** the pill bar now starts on the header's left axis
+(`justify-content: flex-start`), so the page reads as one column — title,
+subtitle, filters, card — with the count box as the only right-hand element.
+`flex-wrap` still handles narrow viewports. Verified by viewport screenshot at
+1280px; review component suite green (11 runs, 0 failures).
+
+**Commit:** (this commit)
+
+---
+
 ## Status Summary
 
 | # | Finding | Status | Commit |
@@ -342,6 +362,7 @@ renders in the primary blue with the explanatory caption beneath it, and
 | 14 | Speak button used a platform emoji glyph | ✅ Resolved | (this commit) |
 | 15 | Collapsible caret was a 3.5:1 text glyph | ✅ Resolved | (this commit) |
 | 16 | Anonymous CTA was styled as a secondary button | ✅ Resolved | (this commit) |
+| 17 | Review page stacked three alignment axes | ✅ Resolved | (this commit) |
 
 All findings from this audit pass have been resolved. Current state:
 - Tests: 259 runs, 742 assertions, 0 failures, 0 errors, 0 skips

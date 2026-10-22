@@ -999,7 +999,10 @@ button.collapsible-header:hover,
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  justify-content: center;
+  /* Left-aligned to share the header's axis. Centred pills sat on a third
+     axis between the left title block and the right "Remaining" box, so the
+     page read as three unrelated columns. */
+  justify-content: flex-start;
   margin-bottom: 2rem;
 }
 
