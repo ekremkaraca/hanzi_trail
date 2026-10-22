@@ -9,7 +9,17 @@ module CharacterEntries
     attr_reader :character_entry
 
     def pinyin_text
-      character_entry.pinyin.presence || "Pinyin not added yet"
+      character_entry.primary_pinyin.presence || "Pinyin not added yet"
+    end
+
+    # Polyphonic characters carry the primary reading first and the
+    # alternatives after it ("cháng,zhǎng"); the alternates are shown
+    # as a secondary line rather than a comma list.
+    def alternate_pinyin_text
+      alternates = character_entry.alternate_pinyin
+      return if alternates.empty?
+
+      "also #{alternates.join(", ")}"
     end
 
     def meaning_text

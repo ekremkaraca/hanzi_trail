@@ -5,6 +5,9 @@
 
   <p class="text-soft mt-3">
     <%= pinyin_text %>
+    <% if alternate_pinyin_text %>
+      <span class="text-dim">(<%= alternate_pinyin_text %>)</span>
+    <% end %>
   </p>
 
   <p class="mt-4">

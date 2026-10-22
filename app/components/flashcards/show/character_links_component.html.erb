@@ -9,8 +9,10 @@
       <%= link_to character_entry_path(entry), class: "character-link-card" do %>
         <span class="character-link-symbol"><%= entry.character %></span>
 
-        <% if entry.pinyin.present? %>
-          <span class="character-link-pinyin"><%= entry.pinyin %></span>
+        <%# Only the primary reading: the alternates live on the
+            character entry page, where they have context. %>
+        <% if entry.primary_pinyin.present? %>
+          <span class="character-link-pinyin"><%= entry.primary_pinyin %></span>
         <% end %>
 
         <small>

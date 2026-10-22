@@ -49,5 +49,15 @@ module CharacterEntries
 
       assert_text "Meaning not added yet"
     end
+
+    test "shows the primary reading with the alternates for a polyphonic character" do
+      character_entry = character_entries(:one)
+      character_entry.pinyin = "chóng,zhǎng"
+
+      render_inline(HeaderComponent.new(character_entry: character_entry))
+
+      assert_text "chóng"
+      assert_text "also zhǎng"
+    end
   end
 end
