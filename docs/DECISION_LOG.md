@@ -382,3 +382,44 @@ Ships as: every pinyin task now runs bare
 (`character_entries:fill_pinyin`, `hsk:reimport`,
 `flashcards:audit_pinyin`) with the optional path argument unchanged.
 Commits: `70eb96f` (fetcher), this one (docs).
+
+## 23. One log line per request in production
+
+Production log browsing was a snapshot of fly's prefixed stream saved
+into `tmp/`, and reading it was slow for reasons visible in any single
+request: four to six lines per request, each repeating ~60 characters
+of prefix (timestamp, machine, region, level, request id), the
+timestamp written twice, and the one line carrying status and duration
+— "Completed 200 OK in 233ms" — omitting the path, so answering "which
+requests were slow or failed" needed multi-line regex. Health-check
+lines, Solid Queue chatter and the ActiveStorage warning about a
+missing `image_processing` gem (nothing attaches files anywhere in
+`app/`) shared the same stream.
+
+Three directions were compared. Slimming Rails' default format with a
+hand-written formatter reimplements what lograge already maintains.
+Structured JSON inside the app optimizes for machines, while `fly
+logs -j` already delivers every line as JSON with `level`, `message`
+and `timestamp` when a machine-readable view is wanted. Keeping the
+default left the four-lines-per-request problem unsolved.
+
+Chosen: lograge, enabled only in production. One `method=… path=…
+status=… duration=…` line per request keeps the request-id tag, so a
+request is still one `grep` while a whole incident becomes one
+`grep -v status=200`. The parts lograge drops are added back on purpose:
+its query-string stripping removes the search text, so a whitelisted
+`query` param comes back; and `user` (from `Current.user`) is appended,
+because an error line without an account is an error nobody can
+reproduce. `/up` is ignored explicitly - `silence_healthcheck_path`
+stopped covering it once Rails' request subscriber was detached.
+Exceptions keep their status and `error="…"` in the line with the
+backtrace still logged by the exceptions middleware, and development
+keeps the verbose multi-line log, which remains the better debugging
+tool locally.
+
+Verified by booting in production mode and publishing a synthetic
+`process_action` event, since production config cannot run under the
+test environment. The ActiveStorage warning went with it.
+
+Commits: `d9853a3` (lograge), `bb4067f` (variant processor), this one
+(docs).
