@@ -15,6 +15,12 @@ module HanziTrail
     # owner's local midnight, not UTC midnight.
     config.time_zone = "Europe/Istanbul"
 
+    # No model attaches files (no has_one_attached anywhere in app/), so
+    # variants are never generated. Disabling the processor keeps every
+    # console and rake run from warning about the missing
+    # image_processing gem.
+    config.active_storage.variant_processor = :disabled
+
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
