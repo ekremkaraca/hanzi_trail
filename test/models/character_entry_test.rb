@@ -48,4 +48,25 @@ class CharacterEntryTest < ActiveSupport::TestCase
     # A '%' entry must not match every card via the LIKE pattern.
     assert_empty CharacterEntry.new(character: "%").required_by_cards
   end
+
+  test "marks the pinyin source manual when a curator changes the pinyin" do
+    entry = CharacterEntry.create!(character: "河", pinyin: "hé")
+
+    assert_equal "manual", entry.pinyin_source
+
+    # Saving without touching the pinyin keeps the current source.
+    entry.update!(pinyin_source: "dictionary")
+    assert_equal "dictionary", entry.pinyin_source
+
+    entry.update!(pinyin: "hè")
+    assert_equal "manual", entry.pinyin_source
+  end
+
+  test "splits readings into a primary reading and alternates" do
+    entry = CharacterEntry.new(character: "重", pinyin: "chóng,zhǎng")
+
+    assert_equal [ "chóng", "zhǎng" ], entry.pinyin_readings
+    assert_equal "chóng", entry.primary_pinyin
+    assert_equal [ "zhǎng" ], entry.alternate_pinyin
+  end
 end

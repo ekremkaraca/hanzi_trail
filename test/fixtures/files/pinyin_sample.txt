@@ -1,0 +1,5 @@
+# version: 0.15.0
+# source: https://github.com/mozillazg/pinyin-data
+U+7F51: wǎng  # 网
+U+91CD: chóng,zhǎng  # 重
+U+6C5F: jiāng  # 江
