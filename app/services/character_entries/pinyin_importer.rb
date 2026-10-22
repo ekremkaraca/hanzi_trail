@@ -31,13 +31,14 @@ module CharacterEntries
     end
 
     def import!
-      raise ArgumentError, "Pinyin dictionary not found: #{path}" unless File.file?(path)
-
-      dictionary = parse
+      # DRY: file parsing, the per-character lookup and the missing-file
+      # error now live in PinyinDictionary, shared with the card audit
+      # that needs the same readings plus a syllable inventory.
+      dictionary = PinyinDictionary.load(path)
       report = Report.new(filled: 0, uncovered: 0, skipped: 0)
 
       target_scope.find_each do |entry|
-        reading = dictionary[entry.character]
+        reading = dictionary.raw_for(entry.character)
 
         if reading.blank?
           report.uncovered += 1
@@ -75,33 +76,6 @@ module CharacterEntries
       return CharacterEntry.where(pinyin_source: DICTIONARY_SOURCE) if force
 
       CharacterEntry.where(pinyin: [ nil, "" ])
-    end
-
-    # "U+4E00: yī  # 一" -> { "一" => "yī" }
-    def parse
-      readings = {}
-
-      File.foreach(path) do |line|
-        codepoint, value = line.split("#", 2)
-        next if value.blank?
-
-        codepoint, value = codepoint.split(":", 2)
-        next if codepoint.blank? || value.blank?
-
-        character = character_for(codepoint)
-        next if character.nil?
-
-        readings[character] = value.strip
-      end
-
-      readings
-    end
-
-    def character_for(codepoint)
-      match = codepoint.strip.match(/\AU\+([0-9A-F]{4,6})\z/)
-      return if match.nil?
-
-      match[1].to_i(16).chr(Encoding::UTF_8)
     end
   end
 end
