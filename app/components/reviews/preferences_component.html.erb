@@ -1,5 +1,10 @@
-<div class="text-center mt-4 hidden-mobile">
-  <%= form_with url: "/review/preferences", method: :patch, class: "pure-form d-inline-block" do |form| %>
+<%# The preference row must stay reachable on every viewport: it used to carry
+   hidden-mobile, which made the only control for "show pinyin before answer"
+   display:none below 768px, so phones could never change a curator-set
+   session value. The route helper is used instead of the literal path so the
+   form cannot drift from routes.rb (review_reset_path already does this). %>
+<div class="review-preferences text-center mt-4">
+  <%= form_with url: review_preferences_path, method: :patch, class: "pure-form" do |form| %>
     <label class="checkbox fs-7 text-dim mr-2">
       <%= form.check_box :show_pinyin, checked: show_pinyin %>
       Show pinyin before answer

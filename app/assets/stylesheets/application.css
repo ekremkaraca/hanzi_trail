@@ -1025,6 +1025,16 @@ button.collapsible-header:hover,
   color: #ffffff;
 }
 
+/* Preference row: it is no longer desktop-only, so the label and Save button
+   wrap onto a second line instead of overflowing the card on narrow screens. */
+.review-preferences .pure-form {
+  align-items: center;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  justify-content: center;
+}
+
 /* Voice hint — the callout that explains a disabled Speak button. It used to
    carry no rule at all, so a centred bullet list of OS paths inherited the
    card's text-align: center and read as leftover caption text. */

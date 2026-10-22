@@ -446,6 +446,38 @@ description link and the labelled rows), RuboCop clean.
 
 ---
 
+### Finding 22 — The show-pinyin preference was unreachable on phones
+
+**Category:** UI — bug (feature invisible, not just ugly)
+
+`Reviews::PreferencesComponent` wrapped the whole form in
+`text-center mt-4 hidden-mobile`, and `.hidden-mobile` is
+`display: none !important` below 768px. The checkbox stayed in the DOM — which
+is why a `get count` probe returns 2 — but it had a 0×0 box, was not
+focusable, and never appeared in the interactive snapshot. So on any phone or
+small window there was **no way to change "Show pinyin before answer"**; the
+setting only worked because it persists in the session, so a value saved on a
+desktop silently followed the user everywhere with no way to alter it. The form
+also posted to the literal `"/review/preferences"` while the named
+`review_preferences_path` helper exists (and the sibling reset action already
+uses its helper), so routes could move without this form noticing.
+
+**Fix applied:** dropped `hidden-mobile`, gave the wrapper a semantic
+`.review-preferences` class, switched the form action to
+`review_preferences_path`, and added a wrap-friendly inline-flex rule so the
+label and Save button share a line at desktop width and reflow cleanly at 390px
+instead of overflowing. Verified end-to-end at 390px: the control now appears
+in the interactive snapshot, unchecking it and saving persists the session
+(checkbox reads back `checked=false`) and the pinyin line disappears from the
+prompt, with no horizontal overflow; desktop rendering is unchanged. New
+`preferences_component_test.rb` locks the three properties that regressed —
+no `hidden-mobile`, named route action, and filter values carried through.
+Full suite green (323 runs, 0 failures).
+
+**Commit:** (this commit)
+
+---
+
 ## Status Summary
 
 | # | Finding | Status | Commit |
@@ -471,6 +503,7 @@ description link and the labelled rows), RuboCop clean.
 | 19 | Every page nested a second `<main>` landmark | ✅ Resolved | (this commit) |
 | 20 | `/flashcards` scrolled horizontally on phones | ✅ Resolved | (this commit) |
 | 21 | Voice-unavailable hint was unstyled, centred prose | ✅ Resolved | (this commit) |
+| 22 | Show-pinyin preference was unreachable on phones | ✅ Resolved | (this commit) |
 
 All findings from this audit pass have been resolved. Current state:
 - Tests: 259 runs, 742 assertions, 0 failures, 0 errors, 0 skips
