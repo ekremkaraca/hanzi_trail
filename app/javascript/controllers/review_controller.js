@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus";
+import { chineseVoice, voicesReady } from "speech/voices";
 
 // Connects to data-controller="review"
 //
@@ -7,11 +8,39 @@ import { Controller } from "@hotwired/stimulus";
 // Pure show/hide state lives in the Alpine `reviewCard()` component; this
 // controller stays in sync with it via the `review:visibility-changed` event.
 export default class extends Controller {
-  static targets = ["character"];
+  static targets = ["character", "speakButton", "voiceHint"];
 
   connect() {
     this.answerVisible = false;
-    this.loadVoices();
+    // null = not known yet, true = a Chinese voice is available, false =
+    // the browser has none. The button stays enabled until we know, so a
+    // slow voice list never blocks audio on a machine that has a voice.
+    this.voiceAvailable = null;
+    this.refreshVoiceState();
+  }
+
+  // The browser's voice list fills in asynchronously, so the state is
+  // resolved here and applied once it is known.
+  async refreshVoiceState() {
+    const voices = await voicesReady();
+
+    this.voiceAvailable = Boolean(chineseVoice(voices));
+    this.renderVoiceState();
+  }
+
+  renderVoiceState() {
+    const missing = this.voiceAvailable === false;
+
+    if (this.hasSpeakButtonTarget) {
+      this.speakButtonTarget.disabled = missing;
+      this.speakButtonTarget.title = missing
+        ? "No Mandarin voice is available in this browser."
+        : "";
+    }
+
+    if (this.hasVoiceHintTarget) {
+      this.voiceHintTarget.hidden = !missing;
+    }
   }
 
   handleVisibilityChanged(event) {
@@ -67,51 +96,41 @@ export default class extends Controller {
     );
   }
 
-  speak() {
+  async speak() {
     if (!("speechSynthesis" in window)) {
-      console.warn("Speech synthesis is not supported in this browser.");
+      this.voiceAvailable = false;
+      this.renderVoiceState();
       return;
     }
 
-    const text = this.speechText();
-    const utterance = new SpeechSynthesisUtterance(text);
+    // Voices can finish loading after the page rendered, so re-check
+    // the live list before giving up on the cached one.
+    let voice = chineseVoice(window.speechSynthesis.getVoices());
+    if (!voice) {
+      voice = chineseVoice(await voicesReady());
+    }
 
-    utterance.lang = "zh-CN";
+    if (!voice) {
+      // No Mandarin voice: reading hanzi with a non-Chinese voice
+      // mangles the pronunciation, which is worse than silence for a
+      // language app. Disable the button and explain instead.
+      this.voiceAvailable = false;
+      this.renderVoiceState();
+      return;
+    }
+
+    this.voiceAvailable = true;
+    this.renderVoiceState();
+
+    const utterance = new SpeechSynthesisUtterance(this.speechText());
+
+    utterance.voice = voice;
+    utterance.lang = voice.lang;
     utterance.rate = 0.85;
     utterance.pitch = 1;
 
-    const voice = this.findChineseVoice();
-
-    if (voice) {
-      utterance.voice = voice;
-    } else {
-      console.warn("No Mandarin/Chinese voice found. Using default voice.");
-    }
-
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
-  }
-
-  loadVoices() {
-    this.voices = window.speechSynthesis?.getVoices() || [];
-
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.onvoiceschanged = () => {
-        this.voices = window.speechSynthesis.getVoices();
-      };
-    }
-  }
-
-  findChineseVoice() {
-    const voices =
-      this.voices.length > 0 ? this.voices : window.speechSynthesis.getVoices();
-
-    return (
-      voices.find((voice) => voice.lang === "zh-CN") ||
-      voices.find((voice) => voice.lang?.toLowerCase().startsWith("zh")) ||
-      voices.find((voice) => voice.name.toLowerCase().includes("mandarin")) ||
-      voices.find((voice) => voice.name.toLowerCase().includes("chinese"))
-    );
   }
 
   speechText() {

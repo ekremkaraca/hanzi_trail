@@ -16,8 +16,30 @@
       @click="window.dispatchEvent(new Event('review:toggle'))"
       x-text="answerVisible ? 'Hide answer' : 'Show answer'"
     ></button>
-    <button type="button" class="btn btn--dark" data-action="click->review#speak">
+    <button
+      type="button"
+      class="btn btn--dark"
+      data-review-target="speakButton"
+      data-action="click->review#speak"
+    >
       🔊 Speak
     </button>
+  </div>
+
+  <%# Revealed by the Stimulus controller when the browser has no Mandarin
+      voice: hanzi read by a non-Chinese voice is mispronounced, so the
+      button is disabled and the reason is explained instead. %>
+  <div class="review-voice-hint text-dim fs-7 mt-3" data-review-target="voiceHint" hidden>
+    <p class="mb-1">
+      This browser has no Mandarin voice, so characters cannot be spoken.
+    </p>
+    <details>
+      <summary>How to add one</summary>
+      <ul class="mt-1">
+        <li>macOS: System Settings → Accessibility → Spoken Content → System Voices → Chinese</li>
+        <li>Windows: Settings → Time &amp; language → Language &amp; region → Chinese → Language options → Speech</li>
+        <li>Linux: install a Chinese speech-dispatcher voice (for example <code>speech-dispatcher-espeak-ng</code>)</li>
+      </ul>
+    </details>
   </div>
 </div>
