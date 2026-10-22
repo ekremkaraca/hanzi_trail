@@ -63,7 +63,7 @@ What this looks like in practice, from the current history: the Pico/Sass → Pu
 
 Vocabulary baselines are built upon the [complete-hsk-vocabulary](https://github.com/drkameleon/complete-hsk-vocabulary) project by drkameleon, utilized under the MIT license. All specialized technical categorizations, mnemonics, and custom story layers were designed specifically for HanziTrail.
 
-Per-character pinyin readings come from the [pinyin-data](https://github.com/mozillazg/pinyin-data) map by mozillazg (MIT), which is derived from the Unicode Consortium's Unihan database. Download `pinyin.txt` and import it with `bin/rails character_entries:fill_pinyin[path/to/pinyin.txt]`; the import only fills blank entries, and values a curator has typed are never overwritten.
+Per-character pinyin readings come from the [pinyin-data](https://github.com/mozillazg/pinyin-data) map by mozillazg (MIT), which is derived from the Unicode Consortium's Unihan database. Import it with `bin/rails character_entries:fill_pinyin[path/to/pinyin.txt]`; without a path the maintained upstream file is fetched over the network, so production environments work without a local copy. The import only fills blank entries, and values a curator has typed are never overwritten.
 
 ## MVP Architectural Boundaries & Warnings
 

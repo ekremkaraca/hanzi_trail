@@ -348,3 +348,37 @@ reading the dictionary omits (喂 "wéi").
 
 Commits: `aeb0d96` (common sense), `3d9e087` (`hsk:reimport`),
 `60dff07` (dry run), `fef2c80` (电/鑫), `d6cbc51` (audit + spacing).
+
+## 22. Let pinyin tasks fetch their source when no path is given
+
+§21's repairs all import a source file by path: the handwritten
+workflow was download, then run, which is obvious on a laptop and
+impossible on a deployed machine that has no shared disk — the first
+production run aborted with `Pinyin dictionary not found: pinyin.txt`.
+
+Three ways out were compared. Vendoring the two source files into the
+repo (985 KB of `pinyin.txt`, 9.8 MB of `complete.json`) makes every
+task runnable anywhere with zero argument, and dictionary bumps become
+reviewed diffs. Copying the files onto the fly machine keeps zero code
+changes but is manual per environment and evaporates on the next image
+deploy. Fetching at run time introduces network into a mutating tool.
+
+Chosen: fetch at run time with Faraday (the user added the gem), when
+the task is run without a path — `SourceFetcher.open` hands the block
+either the fetched tempfile or a plain path it was handed, which keeps
+the "download and point at it" workflow working locally and makes the
+no-argument form the one production needs. The tempfile is produced
+inside the run and deleted after the block, so runs leave no bytes
+behind; HTTP-status and connection failures raise with the URL so a
+console run names what it tried to read.
+
+The remaining drift risk is upstream changing under a run's feet; the
+sources are versioned upstream and the audit is read-only, so the one
+mutating task (fill_pinyin) only ever fills blanks. If drift ever
+becomes observable, pinning a released tag or vendoring a copy remains
+the smaller change left open rather than the default.
+
+Ships as: every pinyin task now runs bare
+(`character_entries:fill_pinyin`, `hsk:reimport`,
+`flashcards:audit_pinyin`) with the optional path argument unchanged.
+Commits: `70eb96f` (fetcher), this one (docs).
