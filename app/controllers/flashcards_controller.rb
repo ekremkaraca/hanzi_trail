@@ -9,6 +9,11 @@ class FlashcardsController < ApplicationController
   # with the filter parameters carried onto the page links.
   PER_PAGE = 50
 
+  # ?page=999999999 still costs the database a walk over every skipped
+  # row before returning an empty page, so deep pages clamp here. Far
+  # above what the dataset can fill: 500 pages x 50 cards.
+  MAX_PAGE = 500
+
   def index
     page = current_page
 
@@ -75,10 +80,11 @@ class FlashcardsController < ApplicationController
   private
 
   # Page numbers arrive via the query string, so they are
-  # scrubbed like every other untrusted value; anything
-  # below 1 (or non-numeric) lands on the first page.
+  # scrubbed like every other untrusted value: anything below
+  # 1 (or non-numeric) lands on the first page, anything past
+  # MAX_PAGE clamps to the deepest page worth asking for.
   def current_page
-    [ QueryParam.scalar(params[:page]).to_i, 1 ].max
+    [ [ QueryParam.scalar(params[:page]).to_i, 1 ].max, MAX_PAGE ].min
   end
 
   def set_flashcard

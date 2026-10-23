@@ -335,6 +335,13 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "index clamps an absurdly deep page instead of walking the offset" do
+    get flashcards_path, params: { page: "999999999" }
+
+    assert_response :success
+    assert_equal FlashcardsController::MAX_PAGE, assigns(:current_page)
+  end
+
   # Regression: raw query-string values that are not Strings reached a
   # String-only scope and 500ed a public page with no auth required. A NUL byte
   # is rejected by PostgreSQL, and an Array/nested Hash raised NoMethodError
