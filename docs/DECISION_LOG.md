@@ -427,3 +427,43 @@ went with it.
 
 Commits: `d9853a3` (lograge), `bb4067f` (variant processor),
 `a301adb` (all environments), this one (docs).
+
+## 24. Act on the external audit of 2026-10-23
+
+An outside audit (`tmp/audit_261023_ling31flash.txt`) re-examined the
+app and its claims were re-run against this checkout before anything
+was changed: brakeman reports 0 warnings with exactly one entry in
+`config/brakeman.ignore`, bundle-audit reports no vulnerabilities, and
+the suite is green — its "323 tests" reconciled once the phone and
+voice fixes from the previous night were accounted for, since the run
+that said 318 here predated them. Its clean list matched this repo's
+own phase-1 findings line by line.
+
+Two of its suggestions were taken. Review writes get a rate limit:
+`preferences` and `reset` only touch the caller's own session and need
+none, but `update` mutates shared card state under a lock and appends a
+ReviewAttempt row, and `rate_limit` existed only on sign-in. 60 per
+minute sits far above human review pace so a session cannot trip it,
+while every scripted row now has a budget. Rails skips limiting when
+the store's increment returns nil, which is what lets the test
+environment's null store keep every other controller test untouched;
+the tests swap increment on that store and restore it with `ensure`.
+The flashcard index gets a page cap: `current_page` bounded the bottom
+but not the top, so `?page=999999999` made PostgreSQL walk the offset
+before returning nothing, and `MAX_PAGE` now clamps beside the existing
+lower bound.
+
+Three suggestions were declined on this data. The pg_trgm index on
+`flashcards.character` backs only `required_by_cards`, which runs on a
+curator's destroy — and the audit passed over `search`, which uses the
+identical unindexable pattern on the hot path, which is the clearest
+sign that table scale, not the query shape, is the real answer: both
+are noise at 194 cards and stay noise at 11,000. The Queue's separate
+LIMIT 1 and COUNT save one count over a small filtered relation per
+page view. The stats pluck was reported for the second time: the
+`DISTINCT ... AT TIME ZONE` pluck grows with distinct calendar days
+rather than attempts, as its own comment documents, and was already
+deferred once for exactly that reason.
+
+Commits: `753a805` (rate limit), `b9723cf` (page cap), this one
+(docs).
