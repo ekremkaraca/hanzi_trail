@@ -358,6 +358,11 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     # Treated as no filter, so the full (capped) list renders.
     assert_select ".flashcard-character-link", minimum: 1
+    # And the form field must not echo the Array's to_s back as its value:
+    # the raw-param render bug the QueryParam.scalar guard in the index
+    # components closes (HTML-escaped, so the quotes arrive as &quot;).
+    refute_includes response.body, "[&quot;a&quot;]"
+    assert_select "input[name=query]:not([value])", count: 1
   end
 
   test "index treats a nested-hash filter as absent instead of 500ing" do

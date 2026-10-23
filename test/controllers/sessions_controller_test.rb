@@ -31,6 +31,18 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_empty cookies[:session_id]
   end
 
+  test "new survives an array-valued email_address query without echoing it" do
+    # Regression: new read raw params[:email_address] into the field's
+    # value, so ?email_address[]=a rendered the Array's to_s (["a"],
+    # HTML-escaped) as a prefilled email. QueryParam.scalar treats the
+    # non-String shape as absent, same as create's credential guard.
+    get new_session_path, params: { email_address: [ "a" ] }
+
+    assert_response :success
+    refute_includes response.body, "[&quot;a&quot;]"
+    assert_select "input[name=\"email_address\"]:not([value])", count: 1
+  end
+
   # Regression: an array-valued credential (?email_address[]=a) reached
   # authenticate_by and raised ArgumentError, 500ing the public sign-in form.
   test "create survives array-valued credentials" do

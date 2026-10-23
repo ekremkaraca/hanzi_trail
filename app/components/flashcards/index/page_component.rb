@@ -16,8 +16,11 @@ module Flashcards
         flashcards.any?
       end
 
+      # The empty-state title keys off this, and the value is re-read from
+      # the query string, so it gets the controllers' scalar guard: an
+      # Array is absent, not a title key.
       def story_status
-        params[:story_status]
+        QueryParam.scalar(params[:story_status])
       end
 
       def show_previous?

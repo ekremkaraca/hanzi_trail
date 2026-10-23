@@ -6,7 +6,10 @@
     <%= form_with url: session_path, class: "pure-form pure-form-stacked session-form" do |form| %>
       <label class="field">
         Email
-        <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "you@example.com", value: params[:email_address] %>
+        <%# QueryParam.scalar: /session?email_address[]=x would otherwise echo
+            the array's to_s (["x"]) back into the value attribute.
+        %>
+        <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "you@example.com", value: QueryParam.scalar(params[:email_address]) %>
       </label>
       <label class="field">
         Password
