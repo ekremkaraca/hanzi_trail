@@ -54,6 +54,49 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_operator @flashcard.next_review_at, :>, Time.current
   end
 
+  # REQUIRE_AUTH_FOR_REVIEWS gates the only endpoint that moves shared
+  # card state; both directions are pinned so the flag can never
+  # silently stop working (gate inverted) or silently break anonymous
+  # practice (gate always on).
+  test "anonymous review writes pass when REQUIRE_AUTH_FOR_REVIEWS is unset" do
+    assert_not ReviewsController.writes_require_authentication?
+
+    assert_difference -> { ReviewAttempt.count }, 1 do
+      patch review_flashcard_url(@flashcard), params: { review: { rating: "good" } }
+    end
+
+    assert_redirected_to review_url
+  end
+
+  test "anonymous review writes bounce to sign-in when the flag is on" do
+    ENV["REQUIRE_AUTH_FOR_REVIEWS"] = "1"
+
+    assert_no_difference -> { ReviewAttempt.count } do
+      patch review_flashcard_url(@flashcard), params: { review: { rating: "good" } }
+    end
+
+    assert_redirected_to new_session_path
+    assert_equal "Sign in to edit content.", flash[:alert]
+    assert_equal review_flashcard_path(@flashcard),
+      session[:return_to_after_authenticating]
+  ensure
+    ENV.delete("REQUIRE_AUTH_FOR_REVIEWS")
+  end
+
+  test "signed-in review writes pass when the flag is on" do
+    ENV["REQUIRE_AUTH_FOR_REVIEWS"] = "1"
+    sign_in_as users(:one)
+
+    assert_difference -> { ReviewAttempt.count }, 1 do
+      patch review_flashcard_url(@flashcard), params: { review: { rating: "good" } }
+    end
+
+    assert_redirected_to review_url
+    assert_equal "Review saved.", flash[:notice]
+  ensure
+    ENV.delete("REQUIRE_AUTH_FOR_REVIEWS")
+  end
+
   test "review writes past the rate limit are refused with an alert" do
     store = ActionController::Base.cache_store
     # NullStore keeps nothing, so no other test can trip a limit (Rails

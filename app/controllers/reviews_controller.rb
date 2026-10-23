@@ -1,11 +1,31 @@
 class ReviewsController < ApplicationController
   allow_unauthenticated_access
 
-  # Anonymous practice is the design: preferences and reset only touch
-  # the caller's own session. update is different - it mutates shared
-  # card state under a lock and appends a ReviewAttempt row, so a
-  # scripted flood must cost something. 60 per minute is far above
-  # human review pace and still bounds how fast rows can be written.
+  # Anonymous practice is the design, but review updates mutate shared
+  # card state (difficulty, review_count, next_review_at) under a public
+  # endpoint. When the deployment outgrows a trusted-visitor MVP, set
+  # REQUIRE_AUTH_FOR_REVIEWS=1 and only signed-in users can move those
+  # numbers; the queue, prefs, and reset stay anonymous because they
+  # touch no shared state.
+  #
+  # ENV is read per request, not at class-load: tests flip it without
+  # reloading the controller, and the flag takes effect on the next
+  # request after a fly secret change (no rebuild).
+  def self.writes_require_authentication?
+    ActiveModel::Type::Boolean.new.cast(ENV["REQUIRE_AUTH_FOR_REVIEWS"])
+  end
+
+  # Runs before rate_limit: with the flag on, an anonymous flood is
+  # bounced to sign-in (zero writes, zero limiter state) instead of
+  # burning 60/min of budget on actions that will never execute.
+  before_action :require_authentication,
+    if: -> { self.class.writes_require_authentication? }, only: :update
+
+  # preferences and reset only touch the caller's own session and need
+  # no limit; update appends a ReviewAttempt row and moves the shared
+  # scheduling state, so a scripted flood must cost something even with
+  # the auth flag off. 60 per minute is far above human review pace and
+  # still bounds how fast rows can be written.
   rate_limit to: 60, within: 1.minute, only: :update,
     with: -> { redirect_to review_path(filter_params), alert: "Too many reviews, please slow down." }
 
