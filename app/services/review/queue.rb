@@ -1,5 +1,12 @@
 module Review
   class Queue
+    # Upper bound on the due cards a single page view reads. One bounded
+    # query feeds both next_card and remaining_count, so the count can no
+    # longer be an unbounded COUNT over the filtered due set: past the cap
+    # remaining_count reports the cap (still exact below it, and the app's
+    # whole table is far under it today).
+    DUE_READ_CAP = 500
+
     attr_reader :filters, :session
 
     def initialize(filters:, session:)
@@ -8,11 +15,11 @@ module Review
     end
 
     def next_card
-      due_cards.first
+      due_page.first
     end
 
     def remaining_count
-      due_cards.count
+      due_page.size
     end
 
     def scope
@@ -25,9 +32,12 @@ module Review
 
     private
 
-    def due_cards
-      # DueFlashcards preserves the existing order and due-date cutoff behavior.
-      @due_cards ||= DueFlashcards.call(scope:)
+    # One LIMIT read per queue instance, shared by next_card and
+    # remaining_count. The old shape asked the database twice per page
+    # view - a LIMIT 1 for the card and a separate full COUNT for the
+    # number - and the COUNT had no bound at all.
+    def due_page
+      @due_page ||= DueFlashcards.call(scope:).limit(DUE_READ_CAP).to_a
     end
   end
 end

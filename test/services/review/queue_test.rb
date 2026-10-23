@@ -115,4 +115,50 @@ class Review::QueueTest < ActiveSupport::TestCase
     assert_equal short_story_card, queue.next_card
     assert_equal 1, queue.remaining_count
   end
+
+  test "the card and its count come from one bounded read" do
+    %i[algorithm network hsk_one].each do |tag|
+      flashcards(tag).update!(next_review_at: 1.hour.ago)
+    end
+
+    queue = Review::Queue.new(filters: {}, session: {})
+
+    reads = 0
+    counter = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
+      reads += 1 if payload[:sql].include?(%q(FROM "flashcards"))
+    end
+
+    assert_equal 3, queue.remaining_count
+    assert queue.next_card
+    # next_card and remaining_count share one materialized page, so the
+    # second call must not ask the database again.
+    assert_equal 1, reads
+  ensure
+    ActiveSupport::Notifications.unsubscribe(counter)
+  end
+
+  test "the due-card read is bounded by a LIMIT" do
+    # The cap bounds the rows a page view can load; the LIMIT is asserted
+    # in the issued SQL rather than simulated with a tiny cap, since the
+    # fixtures can never reach 500 cards.
+    flashcards(:algorithm).update!(next_review_at: 1.hour.ago)
+    queue = Review::Queue.new(filters: {}, session: {})
+
+    sqls = []
+    counter = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
+      sqls << [ payload[:sql], payload[:binds]&.map { |b| b.value rescue b } ] if payload[:sql].include?(%q(FROM "flashcards"))
+    end
+
+    assert_equal flashcards(:algorithm), queue.next_card
+  ensure
+    ActiveSupport::Notifications.unsubscribe(counter)
+    assert_equal 1, sqls.size
+    # The adapter parameterizes the LIMIT (LIMIT $2), so the cap is read
+    # back from the binds rather than the SQL text.
+    sql, binds = sqls.first
+    assert_includes sql, "LIMIT $"
+    assert_includes binds, Review::Queue::DUE_READ_CAP,
+      "expected the bounded read to carry LIMIT #{Review::Queue::DUE_READ_CAP}, binds: #{binds.inspect}"
+    assert_not_includes sql, "COUNT(*)"
+  end
 end
