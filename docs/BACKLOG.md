@@ -30,6 +30,11 @@ Known deferred work, each item citing where it came from.
   point at the Caddy/prod https origin. CLI reset works meanwhile.
 - **Login throttle observability** — rate limiting returns a redirect
   today; consider a flash counter or metrics after a real login exists.
+- **Flip REQUIRE_AUTH_FOR_REVIEWS** — the gate exists (`60bd009`) and
+  is off by default, so shared card state still moves under anonymous
+  practice. Decide when the deployment outgrows trusted visitors, then
+  set it as a fly secret; a signed-in-only review flow (user-scoped
+  queues, per-user stats) would replace it, not just enable it.
 
 ## SRS / learning quality
 

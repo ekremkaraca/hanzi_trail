@@ -467,3 +467,80 @@ deferred once for exactly that reason.
 
 Commits: `753a805` (rate limit), `b9723cf` (page cap), this one
 (docs).
+
+## 25. Act on the follow-up audit of 2026-10-23 (Pi round)
+
+A second outside audit re-ran the tooling (326 tests green, brakeman 0
+with one ignored entry, bundle-audit clean, rubocop Security,Lint clean)
+and matched this repo's own §24 findings on the security side - no open
+redirects, mass assignment, CSRF/CORS gaps - then went after scheduling,
+scaling and consistency. Every claim was again checked against the
+checkout before anything changed. One finding was wrong as stated:
+`Flashcard#last_reviewed_at` was reported as unused; it is the show
+page's "Last reviewed" line. It is fine where it lives, so it got a
+guard-rail comment (`6afdd90`) instead of a rewrite.
+
+Eight commits, one per fix:
+
+- `db0da91` scheduled the session purge. The rake task existed but
+  nothing ran it while the auth concern's comment claimed it did - so
+  expired rows, each with an IP and user agent, accumulated forever.
+  `purge_expired_sessions` now runs daily on solid_queue; the rake task
+  stays for operators. The backlog's "Session sweep" item retired.
+- `60bd009` added REQUIRE_AUTH_FOR_REVIEWS, the escape hatch §24's
+  rate limit implied but never shipped. Anonymous practice stays the
+  default; the flag makes the one shared-state write endpoint
+  sign-in-only, checked per request so a fly secret flip is enough.
+  The gate runs ahead of the limiter - a bounced flood costs zero
+  writes and zero limiter budget.
+- `0357c1d` bounded the day-bucketing plucks to WINDOW_DAYS = 366,
+  reversing §24's second deferral once the fix got cheap: a streak
+  longer than its own window is unreachable from inside it, and both
+  sides of velocity's ratio move to the window together so the average
+  cannot deflate. The boundary is 367 calendar days because
+  local-midnight -366 counts whole; tests pin the gap case and the cap.
+- `296a261` shipped the pg_trgm indexes §24 declined, but only after a
+  probe settled what §24 had assumed. The trigram tokenizer does serve
+  CJK on this database (show_trgm of "网络" yields 3 tokens;
+  "character" ~~* '%网络%' is an Index Cond on a trgm GIN scan with
+  enable_seqscan=off), and at 194 rows the planner correctly still
+  seqscans (~20 vs ~2100). The indexes are inert-but-correct today,
+  automatic tomorrow, which beats building them under a growing table.
+  The probe also cleaned up after itself: dev DB back to plpgsql only,
+  no stray indexes, before the migration wrote itself.
+- `90ff2aa` carried QueryParam.scalar to the render path. Controllers
+  had guarded scope inputs since `c971e02`, but the filter bar, the
+  index empty state, and the sign-in email echo re-read raw params, so
+  ?query[]=a painted the Array's to_s back into a field. No XSS - ERB
+  escapes - just the last unguarded corner of the same input story.
+- `9a6f798` stopped the refused character destroy from asking the same
+  LIKE scan twice (deletable?'s none?, then required_by_cards.count for
+  the message). One loaded list answers both; the test now counts LIKE
+  scans through the SQL notification and pins the exact alert number,
+  verified 2-against-the-old-code, 1-with-it.
+- `969c258` cached the stats aggregates as one bundle for a minute -
+  the seven day-granularity reads §24 left alone when they were
+  unbounded and costlier; measured 11 review_attempts reads per stats
+  view down to 4 inside the window. The recent-activity feed stays out
+  deliberately: it is the stat that answers "what just happened". The
+  suite's NullStore cannot prove a cache, so the test swaps a
+  MemoryStore in and restores it, the way the rate-limit tests swap
+  increment.
+- `aec77fc` merged the queue's LIMIT 1 and separate unbounded COUNT
+  into one bounded read of at most 500 ordered rows feeding both
+  next_card and remaining_count - §24 declined a narrower version of
+  this complaint, and the fix takes both queries out instead of
+  trimming one. Below the cap the number stays exact (the whole table
+  is 194 cards); above it remaining_count is a documented lower bound.
+
+Two traps the tests hit and recorded rather than worked around: the pg
+adapter parameterizes both LIKE values and LIMIT counts, so SQL
+notification counters must match the placeholder shape
+(`character LIKE $1`) and read bind values, never literal SQL text -
+the first draft of each counting test failed honestly before the
+matcher learned that.
+
+Full suite: 336 runs, 1016 assertions, 0 failures; coverage stays
+~98%.
+
+Commits: the eight above, this one (docs).
