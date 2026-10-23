@@ -34,4 +34,20 @@ class ReviewVelocityTest < ActiveSupport::TestCase
       assert_equal 2.0, ReviewVelocity.call
     end
   end
+
+  test "attempts outside the window are excluded from both sides of the ratio" do
+    # An old dense day must not inflate the numerator or the active-day
+    # denominator: the average stays the one computed inside the window.
+    freeze_time do
+      ReviewAttempt.delete_all
+      card = flashcards(:network)
+
+      2.times { ReviewAttempt.create!(flashcard: card, rating: "good", reviewed_at: Time.current) }
+      # Outside the 366-day window: without the bound this day would add
+      # one to dates.size and two to the total, changing 2.0 to 1.6.
+      2.times { ReviewAttempt.create!(flashcard: card, rating: "good", reviewed_at: (StreakCalculator::WINDOW_DAYS + 1).days.ago) }
+
+      assert_equal 2.0, ReviewVelocity.call
+    end
+  end
 end
