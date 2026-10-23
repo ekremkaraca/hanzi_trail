@@ -28,9 +28,6 @@ Known deferred work, each item citing where it came from.
 - **Password-reset mailer** — the Rails generator's mailer was removed
   (no SMTP on Fly). Restore it with `SMTP_*` config; reset links must
   point at the Caddy/prod https origin. CLI reset works meanwhile.
-- **Session sweep** — recurring job deleting stale `Session` rows
-  (server-side expiry per the Rails security guide); solid_queue +
-  `config/recurring.yml` are already wired.
 - **Login throttle observability** — rate limiting returns a redirect
   today; consider a flash counter or metrics after a real login exists.
 

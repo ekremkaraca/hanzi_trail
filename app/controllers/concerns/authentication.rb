@@ -32,7 +32,8 @@ module Authentication
     def find_session_by_cookie
       # Expired sessions stay invisible even while their
       # cookie still holds the id; the purge task deletes
-      # the rows.
+      # the rows (daily via recurring.yml, manually via
+      # `rake sessions:purge`).
       return unless cookies.signed[:session_id]
 
       Session.active.find_by(id: cookies.signed[:session_id])
