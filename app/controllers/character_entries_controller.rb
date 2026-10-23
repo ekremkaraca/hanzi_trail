@@ -30,10 +30,17 @@ class CharacterEntriesController < ApplicationController
     # Refuse to delete an entry any card still needs: the card's character list
     # is derived from its character string and would be corrupted with no way to
     # repair it (see CharacterEntry#deletable?).
-    unless @character_entry.deletable?
+    #
+    # Load the required cards once: the gate and the alert message need the
+    # same rows, and going through the relation twice (deletable? then
+    # required_by_cards.count) ran the unindexable LIKE scan twice per
+    # refused delete. deletable? itself - a none? check the view uses - stays
+    # the model's answer for "is this safe to remove".
+    required = @character_entry.required_by_cards.to_a
+    if required.any?
       return redirect_to @character_entry,
         alert: "#{@character_entry.character} is still part of " \
-               "#{@character_entry.required_by_cards.count} card(s); " \
+               "#{required.size} card(s); " \
                "delete or edit those cards first."
     end
 

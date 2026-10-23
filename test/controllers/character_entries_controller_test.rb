@@ -114,14 +114,28 @@ class CharacterEntriesControllerTest < ActionDispatch::IntegrationTest
     card = flashcards(:network)
     card.flashcard_characters.create!(character_entry: entry, position: 0)
 
+    # The adapter parameterizes the LIKE value (character LIKE $1), so match
+    # the predicate shape, not the literal hanzi.
+    like_scans = 0
+    counter = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
+      like_scans += 1 if payload[:sql].include?("character LIKE")
+    end
+
     assert_no_difference("CharacterEntry.count") do
       delete character_entry_path(entry)
     end
 
     assert_redirected_to character_entry_path(entry)
-    assert_match(/still part of/, flash[:alert])
+    # Exact count pins the message path: it must still carry the number.
+    assert_equal "网 is still part of 1 card(s); delete or edit those cards first.",
+      flash[:alert]
+    # Gate and message read the same rows now: one LIKE scan for both, not
+    # deletable?'s none? plus required_by_cards.count (two scans).
+    assert_equal 1, like_scans
     assert card.reload.persisted?
     assert_includes card.reload.character_entries, entry
+  ensure
+    ActiveSupport::Notifications.unsubscribe(counter) if counter
   end
 
   test "curator destroys an entry no card needs" do
