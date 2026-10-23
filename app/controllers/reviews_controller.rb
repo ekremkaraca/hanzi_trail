@@ -1,6 +1,14 @@
 class ReviewsController < ApplicationController
   allow_unauthenticated_access
 
+  # Anonymous practice is the design: preferences and reset only touch
+  # the caller's own session. update is different - it mutates shared
+  # card state under a lock and appends a ReviewAttempt row, so a
+  # scripted flood must cost something. 60 per minute is far above
+  # human review pace and still bounds how fast rows can be written.
+  rate_limit to: 60, within: 1.minute, only: :update,
+    with: -> { redirect_to review_path(filter_params), alert: "Too many reviews, please slow down." }
+
   # One session[:review_sessions] key is created per filter
   # combination ever reviewed. Left unbounded that hash grows
   # with every distinct filter visited and can outgrow the

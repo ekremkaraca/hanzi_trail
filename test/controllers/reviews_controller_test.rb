@@ -54,6 +54,52 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_operator @flashcard.next_review_at, :>, Time.current
   end
 
+  test "review writes past the rate limit are refused with an alert" do
+    store = ActionController::Base.cache_store
+    # NullStore keeps nothing, so no other test can trip a limit (Rails
+    # skips limiting when increment returns nil), and Minitest 6 has no
+    # stub - swap increment on the store and restore it afterwards.
+    store.define_singleton_method(:increment) { |*| 61 }
+    review_count = @flashcard.reload.review_count
+
+    assert_no_changes -> { ReviewAttempt.count } do
+      patch review_flashcard_url(@flashcard), params: {
+        review: { rating: "good" }
+      }
+    end
+
+    assert_redirected_to review_url
+    assert_equal "Too many reviews, please slow down.", flash[:alert]
+    assert_equal review_count, @flashcard.reload.review_count,
+      "a limited request must not mutate card state"
+  ensure
+    if store&.singleton_class&.instance_methods(false)&.include?(:increment)
+      store.singleton_class.send(:remove_method, :increment)
+    end
+  end
+
+  test "the rate limit counts review writes only, and passes them while under the limit" do
+    store = ActionController::Base.cache_store
+    calls = 0
+    store.define_singleton_method(:increment) { |*| calls += 1 }
+
+    get review_url
+    assert_equal 0, calls, "reading the review page must not spend the budget"
+
+    assert_difference -> { ReviewAttempt.count }, 1 do
+      patch review_flashcard_url(@flashcard), params: {
+        review: { rating: "good" }
+      }
+    end
+
+    assert_equal 1, calls, "one write under the limit goes through and is counted"
+    assert_equal "Review saved.", flash[:notice]
+  ensure
+    if store&.singleton_class&.instance_methods(false)&.include?(:increment)
+      store.singleton_class.send(:remove_method, :increment)
+    end
+  end
+
   test "should redirect on invalid rating" do
     patch review_flashcard_url(@flashcard), params: {
       review: { rating: "invalid" }
