@@ -19,4 +19,13 @@ production:
   # query as `rake sessions:purge`; see lib/tasks/sessions.rake.
   purge_expired_sessions:
     command: "Session.expired.delete_all"
-    schedule: daily
+    # Must parse to a Fugit::Cron: solid_queue's ensure_schedule_supported
+    # rejects anything else, and bare `daily` parses to nil - only
+    # "every day"-style phrasings or explicit cron resolve. A rejected
+    # schedule is fatal at boot, not a warning (see
+    # test/config/recurring_schedule_test.rb, which exists because `daily`
+    # shipped once and crash-looped prod with SOLID_QUEUE_IN_PUMA).
+    # No zone in the string, so SolidQueue's default (UTC) applies: 03:00
+    # UTC is 06:00 in the app's Istanbul zone, clear of the low-traffic
+    # evening hours.
+    schedule: every day at 3am
