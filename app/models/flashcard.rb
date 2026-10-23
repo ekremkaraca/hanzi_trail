@@ -115,6 +115,10 @@ class Flashcard < ApplicationRecord
     end
   end
 
+  # Aggregate per call: one SELECT MAX over this card's attempts. Safe on
+  # a single-card page (the show view, its only caller today); looping it
+  # over a list would be one query per card, so list views should select
+  # the maximum grouped by flashcard_id instead of calling this.
   def last_reviewed_at
     review_attempts.maximum(:reviewed_at)
   end
