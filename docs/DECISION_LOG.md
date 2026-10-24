@@ -638,6 +638,19 @@ Alpine attribute syntax) annotate PRs without failing the build.
 Commits: `1bfc110` (tab href), `e5447e5` (lint scope), `ad34942`
 (CI), this one (docs).
 
+## 31. Review answer tabs move off Alpine
+
+Third cluster of the five. Tabs now use a Stimulus tabs
+controller: click handlers live in JS, panels use the hidden
+attribute with an initial hidden state on non-default tabs, and
+ARIA (aria-selected, tabindex) stays in sync. The template
+drops x-data/x-show/@click Alpine directives; a small
+erb-output-in-attribute-position fix keeps the hidden attribute
+using control-flow ERB. The existing keyboard shortcut gating in
+the review Stimulus controller remains unchanged.
+
+Commits: `548d84b` (migration), this one (docs).
+
 ## 30. Navbar moves off Alpine
 
 Second cluster of the five. The nav now uses a Stimulus
