@@ -51,9 +51,9 @@ Known deferred work, each item citing where it came from.
 - **Upload body cap mirror** — if uploads ever land, add
   `request_body max_size` to the Caddyfile (comment marks the spot) and
   a Rack-level limiter for prod. Origin: Caddy §8.
-- **CSP report endpoint / tightening** — drop `'unsafe-eval'` only by
-  moving Alpine to its CSP build (template-based; not worth it now).
-  Origin: CSP §5.
+- **CSP report endpoint** — add a `report-uri`/Reporting sink if
+  violation reports should surface. The `'unsafe-eval'` tightening
+  shipped with the Alpine removal (decision log §34). Origin: CSP §5.
 - **CJK font note** — headless/CI browsers without CJK fonts render
   tofu boxes; real devices are fine. Cosmetic for screenshot tooling
   only. Origin: browser audit passes.

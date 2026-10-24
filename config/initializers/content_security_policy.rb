@@ -1,14 +1,15 @@
 # Application-wide Content Security Policy.
 #
 # The app is fully same-origin: vendored Pure CSS, Propshaft-served JS
-# (importmap), Alpine + Stimulus, Turbo. No third-party scripts, fonts,
+# (importmap), Stimulus, Turbo. No third-party scripts, fonts,
 # or images, so the policy stays tight:
 #
-# - script-src 'self' 'unsafe-eval': Alpine compiles x-data/x-show
-#   expressions with new Function, which requires 'unsafe-eval'. Inline
-#   script tags (the importmap JSON and the `import "application"`
-#   bootstrap) are covered by the per-request nonce below, not by
-#   'unsafe-inline'. importmap-rails attaches the nonce automatically.
+# - script-src 'self': inline script tags (the importmap JSON and the
+#   `import "application"` bootstrap) are covered by the per-request
+#   nonce below, not by 'unsafe-inline'. importmap-rails attaches the
+#   nonce automatically. 'unsafe-eval' was dropped together with
+#   Alpine, its only consumer (x-data expressions compiled through
+#   new Function); Stimulus and Turbo need no eval.
 # - style-src 'self': the two former inline style attributes were moved
 #   to .gap-lg / .scroll-x utilities so no style exceptions are needed.
 # - img_src also allows data: for the brand icon and any inline SVG
@@ -20,7 +21,7 @@ Rails.application.configure do
     policy.font_src    :self
     policy.img_src     :self, :data
     policy.object_src  :none
-    policy.script_src  :self, :unsafe_eval
+    policy.script_src  :self
     policy.style_src   :self
     policy.connect_src :self
     policy.form_action :self
