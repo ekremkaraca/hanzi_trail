@@ -8,7 +8,6 @@
       class="review-card review-session-card flex flex--col"
       data-controller="review"
       data-action="keydown@window->review#handleKeydown review:visibility-changed@window->review#handleVisibilityChanged"
-      x-data="reviewCard()"
     >
       <%= render Reviews::ProgressComponent.new(
         reviewed_count: reviewed_count,

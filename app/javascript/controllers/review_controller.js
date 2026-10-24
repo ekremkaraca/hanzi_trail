@@ -3,20 +3,37 @@ import { chineseVoice, voicesReady } from "speech/voices";
 
 // Connects to data-controller="review"
 //
-// Owns the side-effectful parts of the review card: Web Speech playback and
-// keyboard shortcuts (Space, 1–4) that delegate to the rating buttons.
-// Pure show/hide state lives in the Alpine `reviewCard()` component; this
-// controller stays in sync with it via the `review:visibility-changed` event.
+// Owns the side-effectful parts of the review card: answer visibility,
+// Web Speech playback and keyboard shortcuts (Space, 1–4) that delegate
+// to the rating buttons.
 export default class extends Controller {
-  static targets = ["character", "speakButton", "voiceHint"];
+  static targets = ["character", "speakButton", "voiceHint", "answerSection", "toggleButton"];
 
   connect() {
     this.answerVisible = false;
+    if (this.hasAnswerSectionTarget) {
+      this.answerSectionTarget.hidden = true;
+    }
+    this.updateToggleButton();
     // null = not known yet, true = a Chinese voice is available, false =
     // the browser has none. The button stays enabled until we know, so a
     // slow voice list never blocks audio on a machine that has a voice.
     this.voiceAvailable = null;
     this.refreshVoiceState();
+  }
+
+  toggleAnswer() {
+    this.answerVisible = !this.answerVisible;
+    if (this.hasAnswerSectionTarget) {
+      this.answerSectionTarget.hidden = !this.answerVisible;
+    }
+    this.updateToggleButton();
+  }
+
+  updateToggleButton() {
+    if (this.hasToggleButtonTarget) {
+      this.toggleButtonTarget.textContent = this.answerVisible ? "Hide answer" : "Show answer";
+    }
   }
 
   // The browser's voice list fills in asynchronously, so the state is
@@ -45,6 +62,10 @@ export default class extends Controller {
 
   handleVisibilityChanged(event) {
     this.answerVisible = !!event.detail?.visible;
+    if (this.hasAnswerSectionTarget) {
+      this.answerSectionTarget.hidden = !this.answerVisible;
+    }
+    this.updateToggleButton();
   }
 
   handleKeydown(event) {
@@ -54,7 +75,7 @@ export default class extends Controller {
       if (this.isInteractive(event.target)) return;
 
       event.preventDefault();
-      window.dispatchEvent(new Event("review:toggle"));
+      this.toggleAnswer();
       return;
     }
 

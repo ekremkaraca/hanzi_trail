@@ -13,8 +13,8 @@
     <button
       type="button"
       class="btn btn--primary"
-      @click="window.dispatchEvent(new Event('review:toggle'))"
-      x-text="answerVisible ? 'Hide answer' : 'Show answer'"
+      data-review-target="toggleButton"
+      data-action="click->review#toggleAnswer"
     ></button>
     <%# Inline SVG instead of an emoji: 🔊 rendered as a full-colour OS glyph
         that ignored the button's text colour and shifted size per platform.
