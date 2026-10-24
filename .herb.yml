@@ -1,1 +1,7 @@
 framework: "actionview"
+
+linter:
+  exclude:
+    # Rails' stock error pages ship a minified one-line SVG whose
+    # adjacent self-closing elements trip html-no-space-in-tag.
+    - 'public/**/*'
