@@ -29,7 +29,10 @@
     </div>
   </button>
 
-  <div id="<%= id %>-content" class="collapsible-body" data-collapsible-target="body"<%= " hidden" unless open %>>
+  <%# Control-flow ERB on purpose: an output tag here would sit in
+      attribute position, which herb's erb-no-output-in-attribute-position
+      rule forbids. %>
+  <div id="<%= id %>-content" class="collapsible-body" data-collapsible-target="body"<% unless open %> hidden<% end %>>
     <%= content %>
   </div>
 </article>
