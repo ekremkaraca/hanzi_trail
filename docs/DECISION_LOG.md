@@ -638,6 +638,22 @@ Alpine attribute syntax) annotate PRs without failing the build.
 Commits: `1bfc110` (tab href), `e5447e5` (lint scope), `ad34942`
 (CI), this one (docs).
 
+## 33. Review answer visibility moves off Alpine
+
+Fifth and final cluster of the five inventoried before the work
+started. Answer show/hide moves to the Stimulus review controller:
+the toggle button calls review#toggleAnswer, the answer section
+uses the hidden attribute and a target, and Space dispatches the
+controller action directly. x-data="reviewCard()", x-show/x-cloak
+from the answer section, and @click/x-text from the prompt button
+are removed; the controller still accepts the legacy
+review:visibility-changed event. Alpine is no longer used for
+local UI state in the app templates/controllers the migration
+touched, and the remaining [x-cloak] CSS rule can be dropped if
+no other Alpine surfaces remain.
+
+Commits: `fe8a7cb` (migration), `bff709f` (test), this one (docs).
+
 ## 32. Character counter moves off Alpine
 
 Fourth cluster of the five. A Stimulus char-counter controller
