@@ -544,3 +544,21 @@ Full suite: 336 runs, 1016 assertions, 0 failures; coverage stays
 ~98%.
 
 Commits: the eight above, this one (docs).
+
+## 26. Dockerfile Ruby pin guarded against .ruby-version drift
+
+A FROM tag cannot be derived from file contents, so the Dockerfile has
+to restate the Ruby version as an ARG; what can be automated is the
+agreement between the two. The guard COPYs .ruby-version into the base
+stage and fails the build naming both values whenever they disagree,
+which makes .ruby-version the single authority - mise and CI's
+setup-ruby already read it, and the ARG default stays so Fly's argless
+deploys keep working. Passing --build-arg at every invocation was
+rejected (every builder must remember it, and Kamal's own commented
+example shows the format trap); a CI grep was rejected as redundant
+once the build itself refuses to proceed. The local podman proof was
+skipped; the guard expression was verified directly in bash, both
+directions (match passes and cleans up, drift exits 1 naming both
+values).
+
+Commits: `6ac4036` (guard), this one (docs).
