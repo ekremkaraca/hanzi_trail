@@ -638,6 +638,16 @@ Alpine attribute syntax) annotate PRs without failing the build.
 Commits: `1bfc110` (tab href), `e5447e5` (lint scope), `ad34942`
 (CI), this one (docs).
 
+## 32. Character counter moves off Alpine
+
+Fourth cluster of the five. A Stimulus char-counter controller
+watches the textarea, updates the live count, and toggles a
+warning class when at or over the limit; the form component drops
+x-data, x-ref, :class and x-text directives. The Alpine.data
+registration is removed.
+
+Commits: `2326559` (migration), this one (docs).
+
 ## 31. Review answer tabs move off Alpine
 
 Third cluster of the five. Tabs now use a Stimulus tabs
