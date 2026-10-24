@@ -638,6 +638,45 @@ Alpine attribute syntax) annotate PRs without failing the build.
 Commits: `1bfc110` (tab href), `e5447e5` (lint scope), `ad34942`
 (CI), this one (docs).
 
+## 30. Navbar moves off Alpine
+
+Second cluster of the five. The nav now uses a Stimulus
+navbar controller: it tracks open/closed state on mobile, collapses
+a stale open menu when crossing the 600px breakpoint, and closes
+on nav link and sign-out clicks. The hamburger shows on mobile
+only, its bars animate via a .nav-open class toggled by the
+controller, and aria-expanded reflects the real state. CSS media
+queries continue to own the layout breakpoint; the links list uses
+the hidden attribute (with a [hidden] display:none guard added to
+the mobile rules). The dead Alpine.data("mobileNav") registration
+was removed, aria-label became sentence case, and the @click
+Alpine syntax is gone from the template and helper.
+
+Commits: `49027f7` (migration), this one (docs).
+
+## 31. Review answer tabs move off Alpine
+
+Third cluster of the five. Tabs now use a Stimulus tabs
+controller: click handlers live in JS, panels use the hidden
+attribute with an initial hidden state on non-default tabs, and
+ARIA (aria-selected, tabindex) stays in sync. The template
+drops x-data/x-show/@click Alpine directives; a small
+erb-output-in-attribute-position fix keeps the hidden attribute
+using control-flow ERB. The existing keyboard shortcut gating in
+the review Stimulus controller remains unchanged.
+
+Commits: `548d84b` (migration), this one (docs).
+
+## 32. Character counter moves off Alpine
+
+Fourth cluster of the five. A Stimulus char-counter controller
+watches the textarea, updates the live count, and toggles a
+warning class when at or over the limit; the form component drops
+x-data, x-ref, :class and x-text directives. The Alpine.data
+registration is removed.
+
+Commits: `2326559` (migration), this one (docs).
+
 ## 33. Review answer visibility moves off Alpine
 
 Fifth and final cluster of the five inventoried before the work
@@ -654,41 +693,26 @@ no other Alpine surfaces remain.
 
 Commits: `fe8a7cb` (migration), `bff709f` (test), this one (docs).
 
-## 32. Character counter moves off Alpine
+## 34. Alpine deleted; CSP drops unsafe-eval
 
-Fourth cluster of the five. A Stimulus char-counter controller
-watches the textarea, updates the live count, and toggles a
-warning class when at or over the limit; the form component drops
-x-data, x-ref, :class and x-text directives. The Alpine.data
-registration is removed.
+With every cluster on Stimulus (§27, §30-§33) the framework itself
+is removed: the vendored alpinejs.js copy, its importmap pin, the
+import/start bootstrap, the [x-cloak] rule, and stale comments
+crediting Alpine with UI state (including ARCHITECTURE.md). The
+review:visibility-changed bridge §33 kept as accepted legacy had
+zero dispatchers once Alpine's $watch was gone, so its listener
+and handler were deleted as dead code instead of remaining a
+compat path to nothing.
 
-Commits: `2326559` (migration), this one (docs).
+The CSP's own comment had called 'unsafe-eval' solely Alpine's
+(x-data expressions compile through new Function), so
+script-src is now just 'self' - the reason the §5 backlog item
+said to wait on a template-based CSP build never applies to
+deletion, and that backlog item narrows to the still-open report
+endpoint. Verified in a real browser under the tightened policy:
+root, /stats and /review load with empty console and error logs;
+collapsible toggles, the mobile menu opens and closes (media query
+plus hidden guard), the answer toggle reveals its tabs, and tab
+switching works.
 
-## 31. Review answer tabs move off Alpine
-
-Third cluster of the five. Tabs now use a Stimulus tabs
-controller: click handlers live in JS, panels use the hidden
-attribute with an initial hidden state on non-default tabs, and
-ARIA (aria-selected, tabindex) stays in sync. The template
-drops x-data/x-show/@click Alpine directives; a small
-erb-output-in-attribute-position fix keeps the hidden attribute
-using control-flow ERB. The existing keyboard shortcut gating in
-the review Stimulus controller remains unchanged.
-
-Commits: `548d84b` (migration), this one (docs).
-
-## 30. Navbar moves off Alpine
-
-Second cluster of the five. The nav now uses a Stimulus
-navbar controller: it tracks open/closed state on mobile, collapses
-a stale open menu when crossing the 600px breakpoint, and closes
-on nav link and sign-out clicks. The hamburger shows on mobile
-only, its bars animate via a .nav-open class toggled by the
-controller, and aria-expanded reflects the real state. CSS media
-queries continue to own the layout breakpoint; the links list uses
-the hidden attribute (with a [hidden] display:none guard added to
-the mobile rules). The dead Alpine.data("mobileNav") registration
-was removed, aria-label became sentence case, and the @click
-Alpine syntax is gone from the template and helper.
-
-Commits: `49027f7` (migration), this one (docs).
+Commits: `c77055a` (removal), `730dbc8` (CSP), this one (docs).
