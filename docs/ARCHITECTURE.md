@@ -86,8 +86,9 @@ signed in; `allow_unauthenticated_access` skips only the enforcement.
 
 importmap, no bundler. Turbo Drive for navigation; Stimulus owns
 side-effects (review keyboard/speech, flash auto-dismiss with an
-animationend-independent fallback); Alpine owns local UI state
-(`reviewCard`, `mobileNav`, `collapsible`, `textCounter`). Keyboard:
+animationend-independent fallback) and the collapsible-box state; Alpine
+owns the remaining local UI state (`reviewCard`, `mobileNav`,
+`textCounter`). Keyboard:
 Space toggles the answer (never hijacked by focused controls), 1–4 rate
 even with a button focused — the guards differ per key on purpose.
 

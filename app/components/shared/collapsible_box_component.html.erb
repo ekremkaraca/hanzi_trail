@@ -1,10 +1,10 @@
-<article id="<%= id %>" class="panel-card mb-5" x-data="{ open: <%= open %> }">
+<article id="<%= id %>" class="panel-card mb-5" data-controller="collapsible">
   <button
     type="button"
     class="collapsible-header"
-    :aria-expanded="open.toString()"
+    data-action="click->collapsible#toggle"
+    aria-expanded="<%= open %>"
     aria-controls="<%= id %>-content"
-    @click="open = !open"
   >
     <div class="collapsible-header-text">
       <% if show_eyebrow? %>
@@ -21,7 +21,7 @@
           at the font's own size/weight and could not be scaled or stroked
           consistently. aria-hidden stays — the button's aria-expanded already
           carries the state. %>
-      <span class="collapsible-caret" :class="open && 'collapsible-caret--open'" aria-hidden="true">
+      <span class="collapsible-caret<%= " collapsible-caret--open" if open %>" aria-hidden="true" data-collapsible-target="caret">
         <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="m4 6 4 4 4-4" />
         </svg>
@@ -29,7 +29,7 @@
     </div>
   </button>
 
-  <div id="<%= id %>-content" x-show="open" x-cloak class="collapsible-body">
+  <div id="<%= id %>-content" class="collapsible-body" data-collapsible-target="body"<%= " hidden" unless open %>>
     <%= content %>
   </div>
 </article>

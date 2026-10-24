@@ -25,10 +25,23 @@ module Shared
       assert_text "3"
     end
 
-    test "renders x-data with open state" do
+    test "starts closed with the Stimulus wiring" do
+      render_inline(CollapsibleBoxComponent.new(id: "test", title: "Details")) { "content" }
+
+      assert_selector "article[data-controller='collapsible']"
+      assert_selector "button.collapsible-header[data-action~='click->collapsible#toggle'][aria-expanded='false']"
+      assert_selector "#test-content.collapsible-body[data-collapsible-target='body'][hidden]", visible: false
+      assert_selector ".collapsible-caret[data-collapsible-target='caret']"
+      assert_no_selector ".collapsible-caret--open"
+    end
+
+    test "starts open when asked" do
       render_inline(CollapsibleBoxComponent.new(id: "test", title: "Details", open: true)) { "content" }
 
-      assert_selector "article[x-data*='open: true']"
+      assert_selector "button.collapsible-header[aria-expanded='true']"
+      assert_selector "#test-content.collapsible-body[data-collapsible-target='body']"
+      assert_no_selector "#test-content[hidden]"
+      assert_selector ".collapsible-caret--open[data-collapsible-target='caret']"
     end
   end
 end

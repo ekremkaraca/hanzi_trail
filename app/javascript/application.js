@@ -58,16 +58,6 @@ Alpine.data("textCounter", (limit) => ({
   },
 }))
 
-// Collapsible section. Default state is open=true; pass `:default-open="false"`
-// on the wrapper to start collapsed.
-Alpine.data("collapsible", (defaultOpen = true) => ({
-  open: defaultOpen,
-
-  toggle() {
-    this.open = !this.open
-  },
-}))
-
 // Mobile nav. `breakpoint` (in px) controls when the hamburger appears.
 // `open` only tracks the mobile disclosure; desktop visibility is derived
 // from isMobile in the template (x-show="!isMobile || open"), so resizing
