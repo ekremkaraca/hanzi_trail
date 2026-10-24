@@ -12,7 +12,11 @@
       <%= render Flashcards::ShortcutsComponent.new %>
     </div>
   </div>
-  <%= form_with url: flashcards_path, method: :get, local: true, class: "pure-form" do |form| %>
+  <%# Selects auto-submit on change (stimulus-components/auto-submit);
+     text fields deliberately do not — typing a query should not fire a
+     request per keystroke, Enter and the Filter button stay in charge. %>
+  <%= form_with url: flashcards_path, method: :get, local: true, class: "pure-form",
+        data: { controller: "auto-submit" } do |form| %>
     <div class="flashcard-filter-grid">
       <label class="filter-search-field">
         <%= form.label :query, "Search" %>
@@ -25,14 +29,16 @@
         <%= form.label :source %>
         <%= form.select :source,
               [["All", ""], ["HSK", "hsk"], ["Curated", "curated"]],
-              selected: source %>
+              { selected: source },
+              data: { action: "auto-submit#submit" } %>
       </label>
 
       <label>
         <%= form.label :hsk_level, "HSK" %>
         <%= form.select :hsk_level,
               [["All", ""], ["Old 1", "old-1"]],
-              selected: hsk_level %>
+              { selected: hsk_level },
+              data: { action: "auto-submit#submit" } %>
       </label>
 
       <label>
@@ -46,7 +52,8 @@
         <%= form.label :story_status, "Story" %>
         <%= form.select :story_status,
               [["All", ""], ["Missing", "missing"], ["Draft", "draft"], ["Curated", "curated"]],
-              selected: story_status %>
+              { selected: story_status },
+              data: { action: "auto-submit#submit" } %>
       </label>
 
       <div class="filter-actions">
