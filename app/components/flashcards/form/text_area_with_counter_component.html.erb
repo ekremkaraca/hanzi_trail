@@ -1,13 +1,15 @@
-<div x-data="textCounter(<%= char_limit %>)" class="field">
+<div data-controller="char-counter" data-char-counter-limit-value="<%= char_limit %>" class="field">
   <label for="<%= field_id %>"><%= attribute.to_s.humanize %></label>
   <%= form.text_area attribute,
         rows: rows,
         placeholder: placeholder,
-        "x-ref": "field" %>
+        id: field_id,
+        data: { "char-counter-target": "field" } %>
   <p
     class="char-counter text-right"
-    :class="overLimit && 'char-counter--warning'"
+    data-char-counter-target="count"
+    data-char-counter-warning-class="char-counter--warning"
   >
-    <span x-text="count"></span> / <%= char_limit %>
+    0 / <%= char_limit %>
   </p>
 </div>
