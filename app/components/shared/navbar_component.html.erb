@@ -1,8 +1,9 @@
 <nav
   class="hanzi-navbar"
   role="navigation"
-  aria-label="main navigation"
-  x-data="mobileNav(600)"
+  aria-label="Main navigation"
+  data-controller="navbar"
+  data-navbar-breakpoint-value="600"
 >
   <div class="hanzi-navbar-inner">
     <%= helpers.link_to root_path, class: "hanzi-brand" do %>
@@ -14,19 +15,18 @@
       type="button"
       class="hanzi-nav-toggle"
       aria-label="Toggle navigation"
-      :aria-expanded="open.toString()"
-      x-show="isMobile"
-      @click="toggle()"
+      data-navbar-target="toggle"
+      aria-expanded="false"
+      data-action="click->navbar#toggle"
     >
-      <span class="hanzi-nav-toggle-bar" :class="open && 'hanzi-nav-toggle-bar--open'"></span>
-      <span class="hanzi-nav-toggle-bar" :class="open && 'hanzi-nav-toggle-bar--open'"></span>
-      <span class="hanzi-nav-toggle-bar" :class="open && 'hanzi-nav-toggle-bar--open'"></span>
+      <span class="hanzi-nav-toggle-bar"></span>
+      <span class="hanzi-nav-toggle-bar"></span>
+      <span class="hanzi-nav-toggle-bar"></span>
     </button>
 
     <div
       class="hanzi-nav-links"
-      x-show="!isMobile || open"
-      x-cloak
+      data-navbar-target="links"
     >
       <%= nav_link("Cards",  flashcards_path) %>
       <%= nav_link("Review", review_path) %>
@@ -34,9 +34,7 @@
 
       <% if Current.user %>
         <span class="hanzi-nav-user"><%= Current.user.email_address %></span>
-        <%= button_to "Sign out", session_path, method: :delete, class: "btn btn--sm btn--ghost", "@click": "close()" %>
-      <% else %>
-        <%= nav_link("Sign in", new_session_path) %>
+        <%= button_to "Sign out", session_path, method: :delete, class: "btn btn--sm btn--ghost", data: { action: "click->navbar#close" } %>
       <% end %>
     </div>
   </div>
