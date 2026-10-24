@@ -583,7 +583,8 @@ pins the data-collapsible-target attributes because the browser pass
 caught a first draft that wired the controller without them - exactly
 the failure the old x-data assertion could not have seen.
 
-Commits: `a3adf0b` (migration), this one (docs).
+Commits: `a3adf0b` (migration), `49027f7` (navbar), this one
+(docs).
 
 ## 28. herb-lint triage and the first two fix waves
 
@@ -636,3 +637,19 @@ Alpine attribute syntax) annotate PRs without failing the build.
 
 Commits: `1bfc110` (tab href), `e5447e5` (lint scope), `ad34942`
 (CI), this one (docs).
+
+## 30. Navbar moves off Alpine
+
+Second cluster of the five. The nav now uses a Stimulus
+navbar controller: it tracks open/closed state on mobile, collapses
+a stale open menu when crossing the 600px breakpoint, and closes
+on nav link and sign-out clicks. The hamburger shows on mobile
+only, its bars animate via a .nav-open class toggled by the
+controller, and aria-expanded reflects the real state. CSS media
+queries continue to own the layout breakpoint; the links list uses
+the hidden attribute (with a [hidden] display:none guard added to
+the mobile rules). The dead Alpine.data("mobileNav") registration
+was removed, aria-label became sentence case, and the @click
+Alpine syntax is gone from the template and helper.
+
+Commits: `49027f7` (migration), this one (docs).
