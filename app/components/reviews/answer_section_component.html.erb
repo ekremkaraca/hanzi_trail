@@ -5,22 +5,23 @@
     <h2 class="meaning"><%= flashcard.meaning %></h2>
   </header>
 
-  <div x-data="{ activeTab: 0 }" class="review-tab-panels">
+  <div data-controller="tabs" data-tabs-default-index-value="0" class="review-tab-panels">
     <%# The component now builds tab controls directly so panel markup stays local. %>
     <ul class="tabs" role="tablist">
-      <% tabs.each do |tab| %>
+      <% tabs.each_with_index do |tab, index| %>
         <li
-          data-index="<%= tab.fetch(:index) %>"
-          @click="activeTab = <%= tab.fetch(:index) %>"
+          data-index="<%= index %>"
+          data-action="click->tabs#select"
         >
           <a
             role="tab"
-            href="#review-tab-<%= tab.fetch(:index) %>-panel"
-            id="review-tab-<%= tab.fetch(:index) %>-tab"
-            aria-controls="review-tab-<%= tab.fetch(:index) %>-panel"
-            tabindex="0"
-            :aria-selected="activeTab === <%= tab.fetch(:index) %>"
-            @click.prevent="activeTab = <%= tab.fetch(:index) %>"
+            href="#review-tab-<%= index %>-panel"
+            id="review-tab-<%= index %>-tab"
+            aria-controls="review-tab-<%= index %>-panel"
+            tabindex="<%= index == 0 ? 0 : -1 %>"
+            aria-selected="<%= index == 0 ? 'true' : 'false' %>"
+            data-tabs-target="tab"
+            data-action="click->tabs#select"
           >
             <%= tab.fetch(:label) %>
           </a>
@@ -28,13 +29,14 @@
       <% end %>
     </ul>
 
-    <% tabs.each do |tab| %>
+    <% tabs.each_with_index do |tab, index| %>
       <div
         class="review-tab-panel"
         role="tabpanel"
-        id="review-tab-<%= tab.fetch(:index) %>-panel"
-        aria-labelledby="review-tab-<%= tab.fetch(:index) %>-tab"
-        x-show="activeTab === <%= tab.fetch(:index) %>"
+        id="review-tab-<%= index %>-panel"
+        aria-labelledby="review-tab-<%= index %>-tab"
+        data-tabs-target="panel"
+        <% unless index == 0 %>hidden<% end %>
       >
         <%= render tab.fetch(:component).new(flashcard: flashcard) %>
       </div>
