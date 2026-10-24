@@ -1,15 +1,20 @@
-<div data-controller="char-counter" data-char-counter-limit-value="<%= char_limit %>" class="field">
+<%# Vendored stimulus-components/character-counter. countUnit "code-points"
+    matches Ruby's String#length used by the model validations, so the
+    counter can never disagree with the server (JS .length counts UTF-16
+    units — an astral char like 𠮷 would count as 2). maxlength mirrors the
+    server cap so the old over-limit warning state is unreachable by
+    construction. %>
+<div data-controller="character-counter"
+     data-character-counter-count-unit-value="code-points"
+     class="field">
   <label for="<%= field_id %>"><%= attribute.to_s.humanize %></label>
   <%= form.text_area attribute,
         rows: rows,
         placeholder: placeholder,
         id: field_id,
-        data: { "char-counter-target": "field" } %>
-  <p
-    class="char-counter text-right"
-    data-char-counter-target="count"
-    data-char-counter-warning-class="char-counter--warning"
-  >
-    0 / <%= char_limit %>
+        maxlength: char_limit,
+        data: { "character-counter-target": "input" } %>
+  <p class="char-counter text-right">
+    <span data-character-counter-target="counter">0</span> / <%= char_limit %>
   </p>
 </div>

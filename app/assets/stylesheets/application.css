@@ -894,10 +894,7 @@ button.collapsible-header:hover,
   color: #6b7280;
   font-variant-numeric: tabular-nums;
   margin-top: 0.35rem;
-  transition: color 0.15s ease;
 }
-
-.char-counter--warning { color: #d97706; font-weight: 600; }
 
 /* ── Forms ── */
 .form-card {
