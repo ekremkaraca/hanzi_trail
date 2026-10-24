@@ -7,12 +7,24 @@
 
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
-# Make sure RUBY_VERSION matches the Ruby version in .ruby-version
-ARG RUBY_VERSION=4.0.8
+# The Ruby pin lives in .ruby-version, which mise and CI read directly.
+# The FROM tag cannot be derived from a file, so the version is restated
+# here; the guard below fails the build when the two drift.
+ARG RUBY_VERSION=4.0.9
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
+
+# Re-declared so the stage body can reference the pre-FROM ARG.
+ARG RUBY_VERSION
 
 # Rails app lives here
 WORKDIR /rails
+
+# .ruby-version is the authority: refuse to build an image whose Ruby
+# disagrees with the version mise and CI use.
+COPY .ruby-version /tmp/.ruby-version
+RUN test "$(cat /tmp/.ruby-version)" = "$RUBY_VERSION" || \
+    { echo "Dockerfile ARG RUBY_VERSION=$RUBY_VERSION disagrees with .ruby-version ($(cat /tmp/.ruby-version))"; exit 1; } && \
+    rm /tmp/.ruby-version
 
 # Install base packages
 RUN apt-get update -qq && \
