@@ -562,3 +562,25 @@ directions (match passes and cleans up, drift exits 1 naming both
 values).
 
 Commits: `6ac4036` (guard), this one (docs).
+
+## 27. Collapsible boxes migrate off Alpine (cluster 1 of 5)
+
+The first of the five Alpine clusters inventoried before the work
+started. The box now renders its initial state from the server -
+aria-expanded on the header, the caret class, the body's hidden
+attribute - and a small Stimulus controller keeps the three in step on
+toggle. The DOM is the state: no connect hook, no values, and a closed
+box is closed before any JavaScript runs, which x-show plus x-cloak
+could never promise (there was always a pre-boot window). The dead
+Alpine.data("collapsible") registration was removed with it - no
+template ever used x-data="collapsible", the box had always rendered an
+inline object, and ARCHITECTURE.md had drifted into listing the
+registration as live. The [x-cloak] CSS rule stays until the remaining
+clusters land. Verified in a real browser on /stats: all five boxes
+start closed, a click opens (body shown, aria-expanded=true, caret
+rotated) and a second closes, console clean. The component test now
+pins the data-collapsible-target attributes because the browser pass
+caught a first draft that wired the controller without them - exactly
+the failure the old x-data assertion could not have seen.
+
+Commits: `a3adf0b` (migration), this one (docs).
