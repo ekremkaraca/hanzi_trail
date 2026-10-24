@@ -8,12 +8,6 @@ Known deferred work, each item citing where it came from.
   (`sync_story_status` only produces missing/curated; the form doesn't
   permit it), yet filters and badges offer it. Either wire a curation
   workflow that sets it or drop the status. Origin: audit §1.
-- **Index truncation notice / pagination** — `/flashcards` caps at 200
-  silently; dev data fits, full HSK import won't. Pagy or a visible
-  "showing first 200" note. Origin: audit §1.
-- **Session progress counter lifetime** — per-filter counters persist
-  across days and keys accumulate in the cookie. Consider day-scoping
-  the counter or pruning stale keys. Origin: audit §1.
 - **Per-user review attribution** — `review_attempts.user_id` (nullable)
   when multi-user stats matter; today all practice feeds global stats.
   Origin: auth design discussion.
