@@ -241,8 +241,6 @@ progress::-moz-progress-bar {
   border-radius: 999px;
 }
 
-[x-cloak] { display: none !important; }
-
 /* ── Pure CSS dark-theme bridge ──
    Pure ships light-skinned components; these overrides re-skin the
    pure-table / pure-form primitives we adopt onto the HanziTrail tokens
@@ -532,7 +530,7 @@ progress.progress--info { accent-color: var(--hanzi-info); }
 .ml-auto { margin-left: auto; }
 .pb-6 { padding-bottom: 2rem; }
 
-/* ── Tabs (Alpine-driven) ── */
+/* ── Tabs (Stimulus-driven) ── */
 .tabs {
   border-bottom: 1px solid var(--hanzi-border);
   display: flex;

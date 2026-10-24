@@ -60,14 +60,6 @@ export default class extends Controller {
     }
   }
 
-  handleVisibilityChanged(event) {
-    this.answerVisible = !!event.detail?.visible;
-    if (this.hasAnswerSectionTarget) {
-      this.answerSectionTarget.hidden = !this.answerVisible;
-    }
-    this.updateToggleButton();
-  }
-
   handleKeydown(event) {
     // Space natively activates focused buttons/links and toggles checkboxes,
     // so never hijack it while an interactive control has focus.
