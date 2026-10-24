@@ -83,12 +83,6 @@ I operate under a strict **Human-Accountable** engineering philosophy:
 
 What this looks like in practice, from the current history: the Pico/Sass → Pure CSS migration, the authentication + action_policy stack, and the security/CSP hardening were all AI-paired. Every commit carries a `Co-Authored-By` signature and a message that states the *why*, cites the failing evidence, and records the suite count. When an AI-authored fix regressed the rating shortcuts (`cb0e915` followed `ea14b67`), the regression was caught by a live browser pass, documented, and fixed in its own commit — not silently squashed. The decision trail lives in [`docs/DECISION_LOG.md`](docs/DECISION_LOG.md).
 
-## Data Sources
-
-Vocabulary baselines are built upon the [complete-hsk-vocabulary](https://github.com/drkameleon/complete-hsk-vocabulary) project by drkameleon, utilized under the MIT license. All specialized technical categorizations, mnemonics, and custom story layers were designed specifically for HanziTrail.
-
-Per-character pinyin readings come from the [pinyin-data](https://github.com/mozillazg/pinyin-data) map by mozillazg (MIT), which is derived from the Unicode Consortium's Unihan database. Import it with `bin/rails character_entries:fill_pinyin[path/to/pinyin.txt]`; without a path the maintained upstream file is fetched over the network, so production environments work without a local copy. The import only fills blank entries, and values a curator has typed are never overwritten.
-
 ## MVP Architectural Boundaries & Warnings
 
 Please note the current state of the application boundaries:
@@ -103,3 +97,11 @@ Please note the current state of the application boundaries:
 - [`docs/DECISION_LOG.md`](docs/DECISION_LOG.md) — append-only build & audit history; the
   `§N` markers in code comments and commit messages cite this file
 - [`docs/BACKLOG.md`](docs/BACKLOG.md) — known deferred work, each item citing its origin
+
+## Acknowledgements
+
+HanziTrail stands on the shoulders of a few excellent open-source projects:
+
+- **Vocabulary data** — the [complete-hsk-vocabulary](https://github.com/drkameleon/complete-hsk-vocabulary) project by drkameleon (MIT) provides the HSK word baselines. All specialized technical categorizations, mnemonics, and custom story layers were designed specifically for HanziTrail.
+- **Pinyin readings** — per-character pronunciations come from the [pinyin-data](https://github.com/mozillazg/pinyin-data) map by mozillazg (MIT), derived from the Unicode Consortium's Unihan database. Import it with `bin/rails character_entries:fill_pinyin[path/to/pinyin.txt]`; without a path the maintained upstream file is fetched over the network, so production environments work without a local copy. The import only fills blank entries, and values a curator has typed are never overwritten.
+- **Stimulus components** — some vendored Stimulus controllers come from the [stimulus-components](https://github.com/stimulus-components/stimulus-components) collection by Guillaume Briday and contributors (MIT), pinned in `vendor/javascript/stimulus-components/` with their license headers intact.
