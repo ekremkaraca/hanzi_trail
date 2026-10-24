@@ -616,3 +616,23 @@ before this cleanup would have gone red on all 33 errors.
 
 Commits: `68e0481` (attribute position), `6cdcc14` (newlines), this
 one (docs).
+
+## 29. herb-lint closes to zero errors
+
+The three remaining triage items from §28 land. The review tabs'
+role="tab" anchors had no href, so keyboard users could not focus
+them (html-anchor-require-href) - each anchor now links to the panel
+it controls, the id aria-controls already names; the existing
+@click.prevent keeps clicks from navigating, and the rest of the tab
+markup stays with the answer-tabs cluster. .herb.yml excludes
+public/, removing the ten html-no-space-in-tag false positives on
+Rails' stock minified-SVG error pages from every invocation, so the
+bare command no longer depends on a remembered path scope. CI's lint
+job runs herb after rubocop - setup-node, then npx
+@herb-tools/linter@0.11.1 --github, pinned to the version this
+triage used because the project carries no npm lockfile for it; the
+step exits nonzero on errors, and the eleven remaining warnings (the
+Alpine attribute syntax) annotate PRs without failing the build.
+
+Commits: `1bfc110` (tab href), `e5447e5` (lint scope), `ad34942`
+(CI), this one (docs).
