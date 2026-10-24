@@ -27,7 +27,10 @@ class FlashcardsController < ApplicationController
       .by_category(QueryParam.scalar(params[:category]))
       .with_story_filter(QueryParam.scalar(params[:story_status]))
       .search(QueryParam.scalar(params[:query]))
-      .order(:character)
+      # Codepoint order of the characters is meaningless to learners;
+      # toneless pinyin (see pinyin_sort_key) approximates dictionary
+      # order, with character as the deterministic tiebreaker.
+      .order(:pinyin_sort_key, :character)
       .limit(PER_PAGE + 1)
       .offset((page - 1) * PER_PAGE)
       .to_a

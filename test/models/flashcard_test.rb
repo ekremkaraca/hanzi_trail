@@ -490,6 +490,20 @@ class FlashcardTest < ActiveSupport::TestCase
     assert_not card.reload.has_character_links?
   end
 
+  test "normalize_pinyin strips tones and case" do
+    assert_equal "wangluo", Flashcard.normalize_pinyin("Wǎngluò")
+    assert_equal "shuju", Flashcard.normalize_pinyin("shǔjù")
+    assert_equal "", Flashcard.normalize_pinyin(nil)
+  end
+
+  test "pinyin_sort_key is maintained on create and update" do
+    card = Flashcard.create!(character: "数据", pinyin: "shùjù", meaning: "data")
+    assert_equal "shuju", card.pinyin_sort_key
+
+    card.update!(pinyin: "cèshì")
+    assert_equal "ceshi", card.reload.pinyin_sort_key
+  end
+
   private
 
   # Fails when the block issues any non-cached SQL.

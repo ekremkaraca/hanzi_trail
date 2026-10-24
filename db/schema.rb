@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_23_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_23_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -59,6 +59,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_180000) do
     t.string "story_status", default: "missing", null: false
     t.datetime "updated_at", null: false
     t.text "usage_note"
+    t.string "pinyin_sort_key", default: "", null: false
     t.index ["category"], name: "idx_flashcards_trgm_category", opclass: :gin_trgm_ops, using: :gin
     t.index ["category"], name: "index_flashcards_on_category"
     t.index ["character"], name: "idx_flashcards_trgm_character", opclass: :gin_trgm_ops, using: :gin
@@ -67,6 +68,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_180000) do
     t.index ["meaning"], name: "idx_flashcards_trgm_meaning", opclass: :gin_trgm_ops, using: :gin
     t.index ["next_review_at"], name: "index_flashcards_on_next_review_at"
     t.index ["pinyin"], name: "idx_flashcards_trgm_pinyin", opclass: :gin_trgm_ops, using: :gin
+    t.index ["pinyin_sort_key"], name: "index_flashcards_on_pinyin_sort_key"
     t.index ["source", "hsk_level"], name: "index_flashcards_on_source_and_hsk_level"
     t.index ["source"], name: "index_flashcards_on_source"
     t.index ["story_status"], name: "index_flashcards_on_story_status"

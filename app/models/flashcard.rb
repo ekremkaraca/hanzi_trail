@@ -29,6 +29,7 @@ class Flashcard < ApplicationRecord
 
   before_validation :set_initial_review_time, on: :create
   before_validation :sync_story_status, on: %i[ create update ]
+  before_save :set_pinyin_sort_key
 
   # Curators can now edit cards, so the character-entry links must follow
   # the character. Runs on create too (saved_change_to_character? is true
@@ -86,6 +87,12 @@ class Flashcard < ApplicationRecord
   scope :short_story, -> {
     where.not(story: [ nil, "" ]).where("LENGTH(story) < ?", SHORT_STORY_LENGTH)
   }
+
+  # Toneless lowercase pinyin used for browse ordering; see the migration
+  # note on why raw pinyin sorts wrong under the default collation.
+  def self.normalize_pinyin(pinyin)
+    pinyin.to_s.unicode_normalize(:nfd).gsub(/\p{Mn}/, "").downcase.strip
+  end
 
   def story_missing?
     story_status == "missing"
@@ -154,6 +161,10 @@ class Flashcard < ApplicationRecord
   end
 
   private
+
+  def set_pinyin_sort_key
+    self.pinyin_sort_key = self.class.normalize_pinyin(pinyin)
+  end
 
   def relink_characters
     CharacterLinker.call(self)

@@ -1,6 +1,7 @@
 network:
   character: 网
   pinyin: wǎng
+  pinyin_sort_key: wang
   meaning: network; web
   story: A web connects many nodes.
   category: technical
@@ -13,6 +14,7 @@ network:
 algorithm:
   character: 算
   pinyin: suàn
+  pinyin_sort_key: suan
   meaning: calculate; compute
   story: Algorithms calculate step by step.
   category: technical
@@ -25,6 +27,7 @@ algorithm:
 hsk_one:
   character: 我
   pinyin: wǒ
+  pinyin_sort_key: wo
   meaning: I; me
   story:
   category:
@@ -37,6 +40,7 @@ hsk_one:
 hsk_two:
   character: 你
   pinyin: nǐ
+  pinyin_sort_key: ni
   meaning: you
   story:
   category:
@@ -49,6 +53,7 @@ hsk_two:
 future_review:
   character: 车
   pinyin: chē
+  pinyin_sort_key: che
   meaning: car; vehicle
   story: A vehicle carries reviews into the future.
   category: transport
@@ -61,6 +66,7 @@ future_review:
 overdue_review:
   character: 学
   pinyin: xué
+  pinyin_sort_key: xue
   meaning: study; learn
   story: Learning waits for no one.
   category: education
