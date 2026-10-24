@@ -584,3 +584,35 @@ caught a first draft that wired the controller without them - exactly
 the failure the old x-data assertion could not have seen.
 
 Commits: `a3adf0b` (migration), this one (docs).
+
+## 28. herb-lint triage and the first two fix waves
+
+bunx @herb-tools/linter (libherb 0.11.1) over the repo reported 33
+errors and 11 warnings in 64 files. The triage split three ways.
+Twenty-one component templates and views end without a trailing
+newline - latent since they were written, surfaced by the linter
+rather than by any recent change. Ten html-no-space-in-tag "errors"
+are false positives on the minified one-line SVG of Rails' stock
+public/ error pages (adjacent self-closing elements need no
+separating whitespace; the files are untouched since app init), so
+the lint scope belongs on app/, not the repo root. The eleven
+warnings are the remaining Alpine surface itself - ten
+invalid-in-HTML attribute names (@click, :class, :aria-expanded,
+:aria-selected) across the four unmigrated clusters, plus one
+aria-label casing nit on the navbar - so herb doubles as a progress
+dial for the Alpine removal: the collapsible cluster's warnings are
+already gone from this run.
+
+Two findings need real work beyond hygiene. The review tabs'
+role="tab" anchor has no href, so keyboard users cannot focus it
+(html-anchor-require-href) - deferred to the answer-tabs cluster,
+which also owns the redundant double @click on the tab li and its
+anchor. And a3adf0b's own template put <%= " hidden" %> in attribute
+position, exactly what erb-no-output-in-attribute-position exists to
+catch; the control-flow form emits byte-identical HTML with a
+statically readable attribute list. herb is not yet in CI (ci.yml
+runs brakeman, bundler-audit, rubocop and the suite) and wiring it
+before this cleanup would have gone red on all 33 errors.
+
+Commits: `68e0481` (attribute position), `6cdcc14` (newlines), this
+one (docs).
