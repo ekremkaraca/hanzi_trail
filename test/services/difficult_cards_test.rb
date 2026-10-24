@@ -57,4 +57,22 @@ class DifficultCardsTest < ActiveSupport::TestCase
       assert_equal 1, cards.first.difficult_review_count.to_i
     end
   end
+
+  test "equal difficult counts fall back to a stable character order" do
+    freeze_time do
+      ReviewAttempt.delete_all
+
+      # Three cards tied at one difficult review each; the result must be
+      # deterministic (by character) across repeated queries.
+      [ flashcards(:hsk_two), flashcards(:hsk_one), flashcards(:algorithm) ].each do |card|
+        ReviewAttempt.create!(flashcard: card, rating: "again", reviewed_at: Time.current)
+      end
+
+      # Codepoint order of 你(4F60) 我(6211) 算(7B97).
+      assert_equal [ "你", "我", "算" ], DifficultCards.call(limit: 10).map(&:character)
+      assert_equal DifficultCards.call(limit: 10).map(&:character),
+        DifficultCards.call(limit: 10).map(&:character),
+        "repeated calls must return the same order"
+    end
+  end
 end

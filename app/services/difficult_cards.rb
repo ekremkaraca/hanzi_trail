@@ -13,7 +13,10 @@ class DifficultCards
       .where(review_attempts: { rating: DIFFICULT_RATINGS })
       .where("review_attempts.reviewed_at > ?", DIFFICULT_WINDOW.ago)
       .group("flashcards.id")
-      .order(Arel.sql("COUNT(review_attempts.id) DESC"))
+      # COUNT ties are the norm for small counts; without a deterministic
+      # tiebreaker Postgres may reorder equal-count rows between queries,
+      # making the "Top 10" list shuffle on every stats load.
+      .order(Arel.sql("COUNT(review_attempts.id) DESC"), :character)
       .limit(limit)
   end
 end
