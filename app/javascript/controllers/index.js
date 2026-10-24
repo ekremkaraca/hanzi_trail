@@ -7,5 +7,7 @@ eagerLoadControllersFrom("controllers", application)
 // directory, so they register explicitly.
 import AutoSubmit from "stimulus-components/auto-submit"
 import CharacterCounter from "stimulus-components/character-counter"
+import TextareaAutogrow from "stimulus-components/textarea-autogrow"
 application.register("auto-submit", AutoSubmit)
 application.register("character-counter", CharacterCounter)
+application.register("textarea-autogrow", TextareaAutogrow)

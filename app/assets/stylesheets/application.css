@@ -933,6 +933,12 @@ button.collapsible-header:hover,
   letter-spacing: 0.02em;
 }
 
+/* Autogrown textareas manage their own height; a drag handle would
+   fight the controller on the next keystroke. */
+textarea[data-controller="textarea-autogrow"] {
+  resize: none;
+}
+
 /* Stacked pure-form controls fill the card instead of the ~200px
    browser default width. */
 .pure-form-stacked input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),

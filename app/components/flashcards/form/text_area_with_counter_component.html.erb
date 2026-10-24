@@ -13,7 +13,7 @@
         placeholder: placeholder,
         id: field_id,
         maxlength: char_limit,
-        data: { "character-counter-target": "input" } %>
+        data: { "character-counter-target": "input", controller: "textarea-autogrow" } %>
   <p class="char-counter text-right">
     <span data-character-counter-target="counter">0</span> / <%= char_limit %>
   </p>
