@@ -7,13 +7,10 @@ import { chineseVoice, voicesReady } from "speech/voices";
 // Web Speech playback and keyboard shortcuts (Space, 1–4) that delegate
 // to the rating buttons.
 export default class extends Controller {
-  static targets = ["character", "speakButton", "voiceHint", "answerSection", "toggleButton"];
+  static targets = ["character", "speakButton", "voiceHint", "answerSection", "actions", "toggleButton"];
 
   connect() {
     this.answerVisible = false;
-    if (this.hasAnswerSectionTarget) {
-      this.answerSectionTarget.hidden = true;
-    }
     this.updateToggleButton();
     // null = not known yet, true = a Chinese voice is available, false =
     // the browser has none. The button stays enabled until we know, so a
@@ -24,8 +21,13 @@ export default class extends Controller {
 
   toggleAnswer() {
     this.answerVisible = !this.answerVisible;
+    // Answer content and rating actions reveal together; both start hidden
+    // in the server-rendered markup so there is no pre-JS flash.
     if (this.hasAnswerSectionTarget) {
       this.answerSectionTarget.hidden = !this.answerVisible;
+    }
+    if (this.hasActionsTarget) {
+      this.actionsTarget.hidden = !this.answerVisible;
     }
     this.updateToggleButton();
   }

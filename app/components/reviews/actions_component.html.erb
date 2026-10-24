@@ -1,5 +1,6 @@
 <%# DRY: negative side margins let the actions escape the .review-card padding and span the full page width %>
-<div class="mt-auto pt-5" x-show="answerVisible" x-cloak>
+<%# Hidden in markup (no flash of rating buttons before reveal); review_controller flips it with the answer section. %>
+<div class="mt-auto pt-5" data-review-target="actions" hidden>
   <div class="review-buttons grid mb-2 review-buttons--bleed">
     <%= rating_buttons %>
   </div>

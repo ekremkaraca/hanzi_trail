@@ -2,6 +2,11 @@ require "test_helper"
 
 module Reviews
   class AnswerSectionComponentTest < ViewComponent::TestCase
+    # The section ships hidden (revealed by review_controller together
+    # with the rating actions), so every assertion must opt out of
+    # Capybara's visibility filtering.
+    VISIBLE_ALL = { visible: :all }.freeze
+
     test "renders story tab only when card has no optional answer sections" do
       flashcard = flashcards(:network)
       flashcard.update!(
@@ -14,9 +19,12 @@ module Reviews
 
       render_inline(AnswerSectionComponent.new(flashcard: flashcard))
 
-      assert_selector "[role='tab']", text: "Story"
-      assert_no_selector "[role='tab']", text: "Breakdown"
-      assert_no_selector "[role='tab']", text: "Context"
+      # Ships hidden; revealed together with the rating actions.
+      assert_selector "div[data-review-target='answerSection'][hidden]", **VISIBLE_ALL
+
+      assert_selector "[role='tab']", text: "Story", **VISIBLE_ALL
+      assert_no_selector "[role='tab']", text: "Breakdown", **VISIBLE_ALL
+      assert_no_selector "[role='tab']", text: "Context", **VISIBLE_ALL
     end
 
     test "renders optional answer tabs from component metadata" do
@@ -25,9 +33,9 @@ module Reviews
 
       render_inline(AnswerSectionComponent.new(flashcard: flashcard))
 
-      assert_selector "[role='tab']", text: "Story"
-      assert_selector "[role='tab']", text: "Breakdown"
-      assert_selector "[role='tab']", text: "Context"
+      assert_selector "[role='tab']", text: "Story", **VISIBLE_ALL
+      assert_selector "[role='tab']", text: "Breakdown", **VISIBLE_ALL
+      assert_selector "[role='tab']", text: "Context", **VISIBLE_ALL
       assert_text "网 = net"
       assert_text "Used in internet terms."
     end

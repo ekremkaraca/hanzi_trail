@@ -18,7 +18,11 @@ module Reviews
       assert_text "Hard · 2"
       assert_text "Good · 3"
       assert_text "Easy · 4"
-      assert_selector "form[action='#{review_flashcard_path(flashcard)}'][method='post']"
+      # The whole action block ships hidden; review_controller reveals it
+      # together with the answer section (regression: dead Alpine x-show
+      # left it visible before the answer was revealed).
+      assert_selector "div[data-review-target='actions'][hidden]", visible: :all
+      assert_selector "form[action='#{review_flashcard_path(flashcard)}'][method='post']", visible: :all
       assert_selector "input[name='review[rating]'][value='good']", visible: false
       assert_selector "input[name='source'][value='hsk']", visible: false
       assert_selector "input[name='story_status'][value='missing']", visible: false

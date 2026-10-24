@@ -1,4 +1,5 @@
-<div data-review-target="answerSection" class="review-answer-section">
+<%# Hidden in markup; revealed by review_controller#toggleAnswer together with the rating actions. %>
+<div data-review-target="answerSection" class="review-answer-section" hidden>
   <%# DRY: pinyin + meaning header pulled out of inline styles into a class %>
   <header class="review-meaning-header">
     <p class="pinyin"><%= flashcard.pinyin %></p>
