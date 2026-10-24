@@ -716,3 +716,53 @@ plus hidden guard), the answer toggle reveals its tabs, and tab
 switching works.
 
 Commits: `c77055a` (removal), `730dbc8` (CSP), this one (docs).
+
+## 35. stimulus-components adoption: auto-submit, character-counter, textarea-autogrow
+
+Three controllers move from hand-rolled to the maintained
+stimulus-components collection, chosen for fit rather than novelty.
+Vendoring is the adoption mechanism, not CDN pinning: the §5 CSP
+pins script-src to 'self', so each controller lands under
+vendor/javascript/stimulus-components/ with its MIT header, gets an
+explicit importmap pin, and registers in controllers/index.js - the
+vendored dir sits outside the eager-load path by design.
+
+auto-submit makes the browse filter bar's three selects (source,
+hsk_level, story_status) submit on change with a 150 ms debounce;
+text fields deliberately stay manual so typing a query never fires a
+request per keystroke. One Rails gotcha cost a full debug cycle:
+data: passed inside form.select's options hash is silently dropped -
+it must be the fourth (html_options) argument.
+
+character-counter replaces the custom controller §32 built during
+the Alpine removal, and fixes a latent correctness bug: the custom
+one measured JS .length (UTF-16 code units) while Rails' length
+validations count code points, so an astral character like 𠮷 read
+5 against the server's 4. The vendored controller supports
+countUnit "code-points" - set on every counter field - and maxlength
+now mirrors the server cap, which makes the old over-limit warning
+state unreachable; the custom controller and its CSS modifier are
+deleted with it. Countdown mode is unused: the cap is a maximum, not
+a budget.
+
+textarea-autogrow grows the five story-layer textareas and the entry
+notes field to fit content; rows stays the minimum height. It
+coexists with character-counter on the same element (Stimulus allows
+multiple controllers; one reads value, the other sets height), and
+CSS resize:none keeps the drag handle from fighting the controller.
+
+Two candidates were evaluated and rejected on evidence: notification
+pulls in stimulus-use for its transitions, and the flash controller
+already carries two documented fallback fixes; hotkey's guard tests
+pointer-events, which does not respect the hidden-attribute gating
+that commit `2284958` added before the answer is revealed - adopting it
+as written would have resurrected that bug.
+
+Verified in a real browser: selecting HSK navigates without the
+Filter button; typing "𠮷网测试" shows 4; eight typed lines grow the
+story box 144px to 188px with the counter updating in the same input
+event; console clean throughout.
+
+Commits: `2312b66` (auto-submit), `437277f` (README credits),
+`a24c99b` (character-counter), `12a55f8` (textarea-autogrow),
+this one (docs).
