@@ -123,9 +123,34 @@ class Flashcard < ApplicationRecord
     review_attempts.maximum(:reviewed_at)
   end
 
-  # DRY: shared ordered association used by flashcard show and review answer views
+  # DRY: shared ordered association used by flashcard show and review answer views.
+  # When the association is already loaded (preloaded or hydrated via
+  # preload_character_links!) sorting happens in memory instead of re-querying.
   def ordered_characters
+    return flashcard_characters.sort_by(&:position) if flashcard_characters.loaded?
+
     flashcard_characters.includes(:character_entry).order(:position)
+  end
+
+  # True when the card has at least one character link. Uses the loaded
+  # association when available so repeated view checks (tab visibility +
+  # tab content) cost zero extra queries after preload_character_links!.
+  def has_character_links?
+    if flashcard_characters.loaded?
+      flashcard_characters.any?
+    else
+      flashcard_characters.exists?
+    end
+  end
+
+  # Hydrates flashcard_characters (with entries) for exactly this card so
+  # the review answer tabs render from memory. Idempotent.
+  def preload_character_links!
+    return if flashcard_characters.loaded?
+
+    association(:flashcard_characters).target =
+      flashcard_characters.includes(:character_entry).order(:position).to_a
+    association(:flashcard_characters).loaded!
   end
 
   private

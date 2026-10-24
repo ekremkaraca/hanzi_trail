@@ -90,7 +90,11 @@ class FlashcardsController < ApplicationController
   def set_flashcard
     # QueryParam.scalar keeps an Array/Hash id (?id[]=1) from reaching find,
     # which would otherwise return a collection and 500 downstream.
-    @flashcard = Flashcard.find(QueryParam.scalar(params[:id]))
+    # The character links are preloaded because the show page renders both
+    # the any?-guard and the ordered list from the same association.
+    @flashcard = Flashcard
+      .includes(flashcard_characters: :character_entry)
+      .find(QueryParam.scalar(params[:id]))
   end
 
   def flashcard_params

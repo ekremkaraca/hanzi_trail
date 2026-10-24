@@ -23,7 +23,7 @@ module Reviews
         label: "Context",
         visible: ->(flashcard) {
           flashcard.usage_note.present? ||
-            flashcard.character_entries.any?
+            flashcard.has_character_links?
         },
         component: Reviews::TabPanels::ContextTabComponent
       }

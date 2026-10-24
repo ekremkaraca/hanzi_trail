@@ -44,6 +44,10 @@ class ReviewsController < ApplicationController
     )
 
     @flashcard = @review_queue.next_card
+    # One join+entry read for the current card; the answer tabs' visibility
+    # check and component list then render from memory instead of issuing
+    # two EXISTS queries plus a two-query association load per page view.
+    @flashcard&.preload_character_links!
     @remaining_due_count = @review_queue.remaining_count
     @empty_state_title = empty_state_title
     @reviewed_count = reviewed_count

@@ -465,4 +465,44 @@ class FlashcardTest < ActiveSupport::TestCase
     assert CharacterEntry.exists?(entry.id)
     assert_includes other.reload.character_entries, entry
   end
+
+  test "preload_character_links! hydrates once and serves checks in memory" do
+    card = Flashcard.create!(character: "网络", pinyin: "wǎngluò", meaning: "network").reload
+
+    card.preload_character_links!
+    assert card.association(:flashcard_characters).loaded?
+
+    # Guard + ordered list must not hit the database after hydration.
+    assert_no_sql do
+      assert card.has_character_links?
+      assert card.has_character_links?
+      assert_equal %w[网 络], card.ordered_characters.map { |l| l.character_entry.character }
+    end
+
+    # Idempotent: a second call neither reloads nor re-queries.
+    assert_no_sql { card.preload_character_links! }
+  end
+
+  test "has_character_links? is false for an unlinked card" do
+    card = flashcards(:network)
+    card.flashcard_characters.delete_all
+
+    assert_not card.reload.has_character_links?
+  end
+
+  private
+
+  # Fails when the block issues any non-cached SQL.
+  def assert_no_sql(&)
+    queries = []
+    subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
+      queries << payload[:sql] unless payload[:cached] || payload[:name] == "SCHEMA"
+    end
+
+    yield
+
+    assert_empty queries, "expected no database queries, got:\n#{queries.join("\n")}"
+  ensure
+    ActiveSupport::Notifications.unsubscribe(subscriber)
+  end
 end
