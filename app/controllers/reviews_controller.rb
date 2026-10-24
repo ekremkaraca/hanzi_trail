@@ -154,16 +154,30 @@ class ReviewsController < ApplicationController
       .presence || "all"
   end
 
+  # Counters are day-scoped: each entry stores {"c" => count, "d" =>
+  # "YYYY-MM-DD"}. A counter written on an earlier local day reads as 0,
+  # so "N reviewed" always describes today's session with the current
+  # filters instead of accumulating across weeks. Legacy integer values
+  # (pre-schema sessions) are treated as expired rather than crashing.
+  # Pure class method so the shape rules are unit-testable without a request.
+  def self.counter_value(raw, today)
+    return 0 unless raw.is_a?(Hash) && raw["d"] == today
+
+    raw["c"].to_i
+  end
+
   def reviewed_count
-    session[:review_sessions] ||= {}
-    session[:review_sessions][review_session_key].to_i
+    self.class.counter_value(
+      (session[:review_sessions] || {})[review_session_key],
+      Date.current.to_s
+    )
   end
 
   def increment_reviewed_count
     sessions = session[:review_sessions] ||= {}
     # Re-insert so the active filter counts as most recently used.
     sessions.delete(review_session_key)
-    sessions[review_session_key] = reviewed_count + 1
+    sessions[review_session_key] = { "c" => reviewed_count + 1, "d" => Date.current.to_s }
     # Bound the hash (see REVIEW_SESSION_LIMIT) so the session
     # cookie cannot overflow.
     session[:review_sessions] = sessions.last(REVIEW_SESSION_LIMIT).to_h if sessions.size > REVIEW_SESSION_LIMIT
@@ -171,6 +185,6 @@ class ReviewsController < ApplicationController
 
   def reset_reviewed_count
     session[:review_sessions] ||= {}
-    session[:review_sessions][review_session_key] = 0
+    session[:review_sessions][review_session_key] = { "c" => 0, "d" => Date.current.to_s }
   end
 end

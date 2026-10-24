@@ -258,6 +258,43 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "1 reviewed"
   end
 
+  test "counters written on an earlier day read as zero today" do
+    flashcards(:network).update!(next_review_at: 1.minute.ago)
+    flashcards(:algorithm).update!(next_review_at: 1.minute.ago)
+
+    # Review yesterday: the counter is stamped with that day.
+    travel_to 1.day.ago do
+      patch review_flashcard_path(flashcards(:network)),
+        params: { review: { rating: "again" } }
+    end
+
+    # Today the queue still has a card (algorithm), and yesterday's
+    # progress must not carry over.
+    get review_path
+    assert_includes response.body, "0 reviewed"
+  end
+
+  test "counters written today persist across requests" do
+    flashcards(:network).update!(next_review_at: 1.minute.ago)
+    flashcards(:algorithm).update!(next_review_at: 1.minute.ago)
+
+    patch review_flashcard_path(flashcards(:network)),
+      params: { review: { rating: "again" } }
+
+    get review_path
+    assert_includes response.body, "1 reviewed"
+  end
+
+  test "legacy integer counters are treated as expired, not crashed on" do
+    today = Date.current.to_s
+
+    assert_equal 0, ReviewsController.counter_value(9, today),
+      "pre-schema Integer payload must read as 0"
+    assert_equal 0, ReviewsController.counter_value(nil, today)
+    assert_equal 0, ReviewsController.counter_value({ "c" => 5, "d" => Date.yesterday.to_s }, today)
+    assert_equal 5, ReviewsController.counter_value({ "c" => 5, "d" => today }, today)
+  end
+
   test "reviewed count is separated by review filters" do
     hsk_card = flashcards(:hsk_one)
     curated_card = flashcards(:network)
