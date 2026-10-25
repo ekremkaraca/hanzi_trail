@@ -32,7 +32,7 @@ class DueFlashcards
   attr_reader :scope, :new_cap
 
   def admitted_new_ids(due)
-    remaining = [new_cap - introduced_today, 0].max
+    remaining = [ new_cap - introduced_today, 0 ].max
     return [] if remaining.zero?
 
     due.where(review_count: 0).limit(remaining).pluck(:id)

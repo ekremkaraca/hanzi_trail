@@ -38,11 +38,11 @@ module Flashcards
       # values only, so empty levels never appear.
       def hsk_level_options
         @hsk_level_options ||= [
-          ["All", ""],
+          [ "All", "" ],
           *Flashcard.where.not(hsk_level: nil)
                    .distinct.order(:hsk_level)
                    .pluck(:hsk_level)
-                   .map { |level| [hsk_level_label(level), level] }
+                   .map { |level| [ hsk_level_label(level), level ] }
         ]
       end
 
