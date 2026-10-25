@@ -1,29 +1,25 @@
 namespace :hsk do
-  desc "Re-derive pinyin and meaning for cards imported from an HSK file, " \
-       "skipping any card a curator has edited " \
-       "(bin/rails hsk:reimport[path/to/complete.json]; " \
-       "without a path the maintained file is fetched, DRY_RUN=1 previews)"
-  task :reimport, [ :path ] => :environment do |_task, args|
-    file = args[:path] || SourceFetcher::HSK_URL
+  desc "Replace HSK 2.0 (old-*) flashcards with HSK 3.0 (new-1..new-5). " \
+       "Review attempts attached to deleted cards are cascade-removed. " \
+       "Idempotent: safe to re-run."
+  task migrate_to_v3: :environment do
+    # Deletion must precede import: HskImporter skips persisted characters,
+    # so any old card left behind (e.g. 爱) would block its new-N replacement
+    # and keep the stale old-1 tag.
+    old = Flashcard.where(source: "hsk").where("hsk_level LIKE ?", "old-%")
+    puts "Deleting #{old.count} HSK 2.0 cards (their review attempts go with them)..."
+    old.destroy_all
 
-    SourceFetcher.open(file) do |hsk|
-      report = HskReimporter.call(path: hsk, dry_run: ENV["DRY_RUN"] == "1")
-
-      puts "HSK file: #{file}" + (args[:path].blank? ? " (fetched)" : "")
-
-      puts "Repaired #{report.updated.size} card(s):"
-      report.updated.each do |change|
-        puts "  #{change.character}: #{change.pinyin_from} -> #{change.pinyin_to}"
-        puts "      #{change.meaning_from} -> #{change.meaning_to}"
-      end
-
-      puts "Already correct: #{report.unchanged.size}"
-      puts "Left alone (edited by a curator): #{report.edited.size}" \
-           "#{report.edited.empty? ? "" : " - #{report.edited.join(", ")}"}"
-      puts "Left alone (not in this file): #{report.missing.size}" \
-           "#{report.missing.empty? ? "" : " - #{report.missing.join(", ")}"}"
-
-      puts "(dry run - nothing written)" if ENV["DRY_RUN"] == "1"
+    (1..5).each do |level|
+      print "Importing new-#{level}... "
+      HskImporter.import!(
+        path: Rails.root.join("vendor/datasets/hsk/new/#{level}.json"),
+        hsk_level: "new-#{level}"
+      )
+      puts "done"
     end
+
+    puts format("HSK 3.0 migration complete: %d hsk cards, %d characters linked.",
+                Flashcard.where(source: "hsk").count, CharacterEntry.count)
   end
 end
