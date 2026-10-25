@@ -766,3 +766,48 @@ event; console clean throughout.
 Commits: `2312b66` (auto-submit), `437277f` (README credits),
 `a24c99b` (character-counter), `12a55f8` (textarea-autogrow),
 this one (docs).
+
+## 36. HSK 2.0 out, HSK 3.0 in: the new-1..new-5 migration
+
+The single old-1 band (150 words) is replaced by the HSK 3.0
+exclusive lists for levels 1-5: 506+750+953+972+1059 = 4,240 words
+across 1,499 distinct characters. Two dataset facts made the swap
+clean: every distinct character of old-1 also appears in new 1-5, so
+character_entries (and any curator-typed metadata on them) survive
+the card deletion; and the schema is identical across schemes, so
+HskImporter parses the new files unchanged. exclusive/ over
+inclusive/ so each word carries exactly one hsk_level tag; unminified
+JSON over .min to avoid a key-decoder in the importer for ~2 MB.
+
+Deletion precedes import, deliberately: the importer skips persisted
+characters, so a surviving old card (爱) would block its new-N
+replacement and keep a stale band. Review attempts on old cards
+cascade away - accepted explicitly, HSK 3.0 supersedes the band.
+
+Two governors keep a 4,240-word import from becoming a 4,240-card
+wall: the importer staggers next_review_at across STAGGER_CYCLE_DAYS
+(30) days per level with a one-cycle-per-level offset (new-1 starts
+today, new-5 at day 120), and DueFlashcards admits at most
+NEW_CARDS_PER_DAY (20) never-reviewed cards per day on top of the
+spread - repetitions are never capped. Known leak, commented: a card
+rated "again" twice today stops counting as introduced, so the cap
+drifts toward MORE practice, the safe direction.
+
+Single-character entries backfill CharacterEntry#radical (the entry
+page renders it; HSK characters had none); multi-character entries
+are skipped since their radical belongs to the headword only.
+Curator values are never overwritten. The HSK filter select now
+derives its options from DISTINCT hsk_level with learner labels
+("new-3" -> "HSK 3"), so future bands need no template change.
+
+Verified on the dev database: migrate_to_v3 deleted 148 old cards,
+imported 4,227 (13 characters already existed as curated cards and
+kept their source - the skip policy, unchanged), linked 1,512
+characters, backfilled 865 radicals; a re-run deleted 0 and changed
+nothing (idempotent); due-today stayed small with the first imported
+card due tomorrow. Prod: run bin/rails hsk:migrate_to_v3 once after
+deploy, then character_entries:fill_pinyin for the new bare entries.
+
+Commits: `44a9578` (datasets), `8efa704` (stagger+radicals),
+`c1603a4` (migration task), `b239a47` (daily cap), `a0326e4`
+(derived filter), this one (docs).

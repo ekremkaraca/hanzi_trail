@@ -3,6 +3,14 @@ class HskImporter
 
   SOURCE = "hsk".freeze
 
+  # Imported cards must not all be due at once: a fresh 4,240-word import
+  # would otherwise dump an unworkable queue on the reviewer. Cards cycle
+  # through STAGGER_CYCLE_DAYS days inside their level, and each level is
+  # offset by one more cycle - level 1 fills the first month, level 2 the
+  # next, and so on. The daily new-card cap in DueFlashcards is the second
+  # line of defence on top of this spread.
+  STAGGER_CYCLE_DAYS = 30
+
   # complete-hsk-vocabulary marks proper nouns with a capitalized pinyin and
   # lists the headword sense first: 书 arrives as "Shū" / "abbr. for 书经",
   # with the common sense "shū" / "book" in a later form. Importing the
@@ -58,7 +66,7 @@ class HskImporter
     raise ImportError, "HSK data must be an array" unless data.is_a?(Array)
 
     Flashcard.transaction do
-      data.each { |entry| import_entry(entry) }
+      data.each_with_index { |entry, index| import_entry(entry, index: index) }
     end
   rescue KeyError => error
     raise ImportError, "Invalid HSK entry: missing #{error.key}"
@@ -68,7 +76,7 @@ class HskImporter
 
   attr_reader :path, :hsk_level
 
-  def import_entry(entry)
+  def import_entry(entry, index:)
     character = entry.fetch("simplified")
 
     flashcard = Flashcard.find_or_initialize_by(character: character)
@@ -84,7 +92,7 @@ class HskImporter
       story_status: "missing",
       source: SOURCE,
       hsk_level: hsk_level,
-      next_review_at: Time.current
+      next_review_at: staggered_due_date(index)
     )
 
     # Concurrent imports of the same character both miss the
@@ -93,8 +101,36 @@ class HskImporter
     # import transaction, so save under a savepoint and
     # treat a lost race as "already imported".
     Flashcard.transaction(requires_new: true) { flashcard.save! }
+    backfill_radical(entry)
   rescue ActiveRecord::RecordNotUnique
     nil
+  end
+
+  def staggered_due_date(index)
+    Time.current +
+      (index % STAGGER_CYCLE_DAYS).days +
+      # Level 1 starts today (offset 0), level 2 one cycle later, etc.;
+      # nil/malformed levels behave like level 1.
+      ([ level_number - 1, 0 ].max * STAGGER_CYCLE_DAYS).days
+  end
+
+  # "new-3" -> 3, "old-1" -> 1, nil or malformed -> 0 (no level offset).
+  def level_number
+    hsk_level.to_s[/\A(?:new|old)-(\d+)\z/, 1].to_i
+  end
+
+  # The dataset's radical is the headword's Kangxi radical, so it can only
+  # be attributed to a character when the entry IS that character; for
+  # multi-character words it would mislabel nothing (skipped) rather than
+  # guess. Runs after save so the relink callback has created the entry.
+  # Curator-typed values are never overwritten.
+  def backfill_radical(entry)
+    character = entry.fetch("simplified")
+    radical = entry["radical"]
+    return unless character.length == 1 && radical.present?
+
+    record = CharacterEntry.find_by(character: character)
+    record.update!(radical: radical) if record&.radical.blank?
   end
 
   def parse_json

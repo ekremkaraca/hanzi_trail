@@ -10,14 +10,19 @@ FLASHCARD_SEEDS.each do |attrs|
 end
 
 puts "Seeded #{FLASHCARD_SEEDS.size} flashcards."
-puts "Importing HSK old-1 flashcards..."
+puts "Importing HSK 3.0 (new-1..new-5) flashcards..."
 
-HskImporter.new(
-  path: Rails.root.join("vendor/datasets/hsk/old/1.json"),
-  hsk_level: "old-1"
-).call
+# Idempotent: HskImporter skips persisted characters, and due dates are
+# staggered across months at import time (see STAGGER_CYCLE_DAYS), so
+# re-running seeds never dumps a wall of new cards into today's queue.
+(1..5).each do |level|
+  HskImporter.new(
+    path: Rails.root.join("vendor/datasets/hsk/new/#{level}.json"),
+    hsk_level: "new-#{level}"
+  ).call
+end
 
-puts "HSK old-1 import completed."
+puts "HSK 3.0 import completed."
 puts "Linking character entries..."
 
 # HskImporter already linked the cards it imported; only curated seed rows

@@ -20,6 +20,16 @@ module Flashcards
         # Manual submit still available.
         assert_selector "input[type=submit][value='Filter']"
       end
+
+      test "hsk options are derived from the data with learner-facing labels" do
+        # Fixtures carry old-1 only -> exactly one level option besides All.
+        render_inline(FilterBarComponent.new(params: {}))
+
+        assert_selector "select[name='hsk_level'] option[value='']"
+        assert_selector "select[name='hsk_level'] option[value='old-1']",
+          text: "HSK 2.0 (1)"
+        assert_selector "select[name='hsk_level'] option", count: 2
+      end
     end
   end
 end

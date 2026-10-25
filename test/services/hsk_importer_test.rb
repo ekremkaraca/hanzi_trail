@@ -219,4 +219,53 @@ class HskImporterTest < ActiveSupport::TestCase
   ensure
     File.delete(path) if File.exist?(path)
   end
+
+  test "due dates are staggered within the level cycle" do
+    HskImporter.import!(
+      path: Rails.root.join("test/fixtures/files/hsk_v3_sample.json"),
+      hsk_level: "new-1"
+    )
+
+    # new-1 offset is 0; indices 0,1,2 -> due in 0,1,2 days.
+    freeze_time do
+      assert_in_delta Time.current, Flashcard.find_by!(character: "爱").next_review_at, 1.minute
+      assert_in_delta 1.day.from_now, Flashcard.find_by!(character: "爱好").next_review_at, 1.minute
+      assert_in_delta 2.days.from_now, Flashcard.find_by!(character: "八").next_review_at, 1.minute
+    end
+  end
+
+  test "higher levels start one cycle later per level" do
+    HskImporter.import!(
+      path: Rails.root.join("test/fixtures/files/hsk_v3_sample.json"),
+      hsk_level: "new-2"
+    )
+
+    freeze_time do
+      assert_in_delta 30.days.from_now, Flashcard.find_by!(character: "爱").next_review_at, 1.minute
+    end
+  end
+
+  test "single-character entries backfill the radical, multi-character ones do not" do
+    HskImporter.import!(
+      path: Rails.root.join("test/fixtures/files/hsk_v3_sample.json"),
+      hsk_level: "new-1"
+    )
+
+    assert_equal "爫", CharacterEntry.find_by!(character: "爱").radical
+    assert_equal "八", CharacterEntry.find_by!(character: "八").radical
+    # 好 only ever appears inside the multi-character 爱好 entry, whose
+    # radical belongs to the headword 爱 - it must not be attributed to 好.
+    assert_nil CharacterEntry.find_by!(character: "好").radical
+  end
+
+  test "radical backfill never overwrites curator values" do
+    existing = CharacterEntry.create!(character: "爱", radical: "手")
+
+    HskImporter.import!(
+      path: Rails.root.join("test/fixtures/files/hsk_v3_sample.json"),
+      hsk_level: "new-1"
+    )
+
+    assert_equal "手", existing.reload.radical
+  end
 end
