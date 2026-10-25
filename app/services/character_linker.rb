@@ -13,9 +13,13 @@ class CharacterLinker
       # entry that ends up with no remaining links can be pruned (entries are
       # derived data, not curator-owned records). Mirrors Flashcard's destroy
       # pruning so editing a card's character no longer orphans stale rows.
-      previously_linked = flashcard.flashcard_characters.includes(:character_entry).map(&:character_entry)
+      previous_links = flashcard.flashcard_characters.includes(:character_entry).to_a
 
-      flashcard.flashcard_characters.destroy_all
+      # A just-created card (or a first-ever link) has nothing to wipe; the
+      # emptiness check also keeps a repeated call after create! correct,
+      # which a previous_changes heuristic would not.
+      flashcard.flashcard_characters.destroy_all if previous_links.any?
+      previously_linked = previous_links.map(&:character_entry)
       linked_characters = {}
 
       flashcard.character.each_char.with_index do |char, index|
@@ -36,6 +40,8 @@ class CharacterLinker
       # string is never removed. The link counts come from one grouped
       # query instead of a reload per entry (the entries' in-memory link
       # lists are stale after destroy_all).
+      next if previously_linked.empty?
+
       link_counts = FlashcardCharacter
         .where(character_entry_id: previously_linked.map(&:id))
         .group(:character_entry_id)

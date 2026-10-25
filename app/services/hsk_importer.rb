@@ -11,6 +11,12 @@ class HskImporter
   # line of defence on top of this spread.
   STAGGER_CYCLE_DAYS = 30
 
+  # Entries per committed chunk. One transaction per level meant a killed
+  # ssh session on Fly (scale-to-zero mid-import) rolled back everything
+  # done so far; committed chunks make the import resumable - a re-run
+  # skips persisted characters and continues where it stopped.
+  CHUNK_SIZE = 100
+
   # complete-hsk-vocabulary marks proper nouns with a capitalized pinyin and
   # lists the headword sense first: 书 arrives as "Shū" / "abbr. for 书经",
   # with the common sense "shū" / "book" in a later form. Importing the
@@ -65,8 +71,16 @@ class HskImporter
     data = parse_json
     raise ImportError, "HSK data must be an array" unless data.is_a?(Array)
 
-    Flashcard.transaction do
-      data.each_with_index { |entry, index| import_entry(entry, index: index) }
+    indexed = data.each_with_index.to_a
+    imported = 0
+    processed = 0
+
+    indexed.each_slice(CHUNK_SIZE) do |slice|
+      Flashcard.transaction do
+        slice.each { |entry, index| imported += 1 if import_entry(entry, index: index) }
+      end
+      processed += slice.size
+      say_progress(processed, imported, data.size)
     end
   rescue KeyError => error
     raise ImportError, "Invalid HSK entry: missing #{error.key}"
@@ -81,7 +95,7 @@ class HskImporter
 
     flashcard = Flashcard.find_or_initialize_by(character: character)
 
-    return if flashcard.persisted?
+    return false if flashcard.persisted?
 
     form = self.class.form_for(entry)
 
@@ -102,8 +116,9 @@ class HskImporter
     # treat a lost race as "already imported".
     Flashcard.transaction(requires_new: true) { flashcard.save! }
     backfill_radical(entry)
+    true
   rescue ActiveRecord::RecordNotUnique
-    nil
+    false # lost a race with a concurrent import; already counted by the winner
   end
 
   def staggered_due_date(index)
@@ -137,5 +152,10 @@ class HskImporter
     JSON.parse(File.read(path))
   rescue JSON::ParserError => error
     raise ImportError, "Invalid JSON: #{error.message}"
+  end
+
+  # Progress to stdout so a detached prod run can be polled from the log.
+  def say_progress(processed, imported, total)
+    puts format("  %s: %d/%d entries processed, %d imported", File.basename(path), processed, total, imported)
   end
 end

@@ -245,6 +245,34 @@ class HskImporterTest < ActiveSupport::TestCase
     end
   end
 
+  test "a mid-import failure keeps already-committed chunks" do
+    # 105 entries with CHUNK_SIZE 100: the last chunk fails, the first
+    # must survive so a re-run resumes instead of rolling back everything
+    # (the Fly scale-to-zero failure mode this chunking was added for).
+    entries = Array.new(105) do |i|
+      { "simplified" => "字#{i}", "forms" => [ { "transcriptions" => { "pinyin" => "zì #{i}" }, "meanings" => [ "sense #{i}" ] } ] }
+    end
+    path = Rails.root.join("tmp/hsk_chunk_failure.json")
+    File.write(path, entries.to_json)
+
+    original = Flashcard.instance_method(:save!)
+    Flashcard.define_method(:save!) do
+      raise ActiveRecord::RecordInvalid, self if character == "字104"
+
+      original.bind_call(self)
+    end
+
+    assert_raises(ActiveRecord::RecordInvalid) do
+      HskImporter.import!(path: path, hsk_level: "new-1")
+    end
+
+    assert_equal 100, Flashcard.where("character LIKE '字%'").count,
+      "chunk 1 must stay committed while the failing chunk rolls back"
+  ensure
+    Flashcard.define_method(:save!, original)
+    File.delete(path) if File.exist?(path)
+  end
+
   test "single-character entries backfill the radical, multi-character ones do not" do
     HskImporter.import!(
       path: Rails.root.join("test/fixtures/files/hsk_v3_sample.json"),
