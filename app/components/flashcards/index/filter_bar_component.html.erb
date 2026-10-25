@@ -36,7 +36,7 @@
       <label>
         <%= form.label :hsk_level, "HSK" %>
         <%= form.select :hsk_level,
-              [["All", ""], ["Old 1", "old-1"]],
+              hsk_level_options,
               { selected: hsk_level },
               data: { action: "auto-submit#submit" } %>
       </label>
