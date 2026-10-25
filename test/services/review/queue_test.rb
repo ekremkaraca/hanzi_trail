@@ -131,8 +131,9 @@ class Review::QueueTest < ActiveSupport::TestCase
     assert_equal 3, queue.remaining_count
     assert queue.next_card
     # next_card and remaining_count share one materialized page, so the
-    # second call must not ask the database again.
-    assert_equal 1, reads
+    # second call must not ask the database again. Two reads now: the
+    # new-card budget pluck (DueFlashcards governor) + the page itself.
+    assert_equal 2, reads
   ensure
     ActiveSupport::Notifications.unsubscribe(counter)
   end
@@ -152,13 +153,15 @@ class Review::QueueTest < ActiveSupport::TestCase
     assert_equal flashcards(:algorithm), queue.next_card
   ensure
     ActiveSupport::Notifications.unsubscribe(counter)
-    assert_equal 1, sqls.size
+    # Budget pluck + bounded page read (see DueFlashcards new-card governor).
+    assert_equal 2, sqls.size
     # The adapter parameterizes the LIMIT (LIMIT $2), so the cap is read
-    # back from the binds rather than the SQL text.
-    sql, binds = sqls.first
+    # back from the binds rather than the SQL text. The page read is the
+    # one whose binds carry DUE_READ_CAP (the pluck carries the smaller
+    # new-card budget).
+    sql, binds = sqls.find { |_s, b| b&.include?(Review::Queue::DUE_READ_CAP) }
+    assert sql, "no flashcards read carried LIMIT #{Review::Queue::DUE_READ_CAP}: #{sqls.inspect}"
     assert_includes sql, "LIMIT $"
-    assert_includes binds, Review::Queue::DUE_READ_CAP,
-      "expected the bounded read to carry LIMIT #{Review::Queue::DUE_READ_CAP}, binds: #{binds.inspect}"
     assert_not_includes sql, "COUNT(*)"
   end
 end
