@@ -44,8 +44,13 @@ namespace :audio do
           card = Flashcard.find_by(character: word)
           reading = SAMPLE[:polyphones][word]
 
+          # Polyphone entries render with the forced reading even if the
+          # card exists — this pass is about the VOICE, so both readings
+          # of interest get heard. A Struct stands in for the card:
+          # Ruby 4 no longer autoloads ostruct (the first prod run died
+          # here), and Struct is core anyway.
           source = if reading
-                     OpenStruct.new(character: word, pinyin: reading)
+                     Struct.new(:character, :pinyin).new(word, reading)
                    elsif card
                      card
                    else
