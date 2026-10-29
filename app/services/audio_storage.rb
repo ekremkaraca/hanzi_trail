@@ -1,22 +1,45 @@
-# Storage for pre-rendered card audio, backed by the production Postgres.
+# Object storage for pre-rendered card audio (Cloudflare R2, S3-compatible).
 #
-# Postgres won over object storage (R2/S3) for the MVP: ~10MB for the
-# 952 HSK3 words (~47MB for the full deck), no new provider, no extra
-# secrets, and the render task needs nothing but DATABASE_URL + the
-# Azure keys. The R2 sketch lives in git history if traffic ever
-# justifies a CDN — the swap point is this module plus the audio_url
-# helper; flashcards.audio_key stays the stable identifier either way.
-module AudioStorage
-  def self.upload!(flashcard, key, mp3_bytes)
-    CardAudio.upsert_with_key!(flashcard, key, mp3_bytes)
-  end
+# Postgres was tried first and reverted: Neon's free tier can't spare the
+# ~10-47MB of blobs. Keys are stored in flashcards.audio_key and public
+# URLs are composed at read time from R2_CDN_BASE — env-dependent values
+# never get baked into 4k DB rows, so re-pointing at a new CDN is an env
+# change, not a migration. The gem is require: false in the Gemfile, so
+# the explicit require below is load-bearing (its absence was the
+# "uninitialized constant Aws" prod crash).
+require "aws-sdk-s3"
 
-  def self.find_bytes(key)
-    CardAudio.find_by!(key: key).bytes
+module AudioStorage
+  def self.upload!(key, mp3_bytes)
+    client.put_object(
+      bucket: ENV.fetch("R2_BUCKET"),
+      key: key,
+      body: mp3_bytes,
+      content_type: "audio/mpeg",
+      # Objects are immutable per key (the key encodes card + voice), so
+      # caches can hold them effectively forever.
+      cache_control: "public, max-age=31536000, immutable"
+    )
+    key
   end
 
   def self.public_url(key)
-    # Keys contain slashes ("words/12-xiaoxiao.mp3") — keep them whole.
-    "/audios/#{key}"
+    "#{ENV.fetch('R2_CDN_BASE')}/#{key}"
+  end
+
+  # Injectable for tests (a real client would need live credentials).
+  def self.client=(replacement)
+    @client = replacement
+  end
+
+  def self.client
+    @client ||= Aws::S3::Client.new(
+      endpoint: ENV.fetch("R2_ENDPOINT"),
+      region: "auto",
+      credentials: Aws::Credentials.new(
+        ENV.fetch("R2_ACCESS_KEY_ID"),
+        ENV.fetch("R2_SECRET_ACCESS_KEY")
+      )
+    )
   end
 end

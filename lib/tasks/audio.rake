@@ -101,7 +101,7 @@ namespace :audio do
         # Key encodes card + voice: objects are immutable per key, and a
         # future voice switch gets fresh keys instead of overwriting.
         key = "words/#{card.id}-#{voice_slug}.mp3"
-        AudioStorage.upload!(card, key, bytes)
+        AudioStorage.upload!(key, bytes)
         card.update_columns(audio_key: key)
         print "."
       rescue StandardError => e
