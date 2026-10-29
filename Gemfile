@@ -17,6 +17,7 @@ gem "turbo-rails", "~> 2.0", ">= 2.0.23"
 gem "tzinfo-data", "~> 1.2026", ">= 1.2026.2", platforms: %i[ windows jruby ]
 gem "view_component", "~> 4"
 gem "action_policy"
+gem "aws-sdk-s3", require: false # R2 is S3-compatible; audio object storage
 gem "bcrypt", "~> 3.1"
 gem "faraday", ">= 2.15", require: false
 gem "lograge", ">= 0.15.1"

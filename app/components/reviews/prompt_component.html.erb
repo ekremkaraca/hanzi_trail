@@ -25,6 +25,10 @@
       class="btn btn--dark btn--icon"
       data-review-target="speakButton"
       data-action="click->review#speak"
+      <%# Pre-rendered audio (nil until the render task covers the card);
+          the controller plays this instead of speechSynthesis when set,
+          and keeps the button enabled even without a browser voice. %>
+      data-audio-url="<%= flashcard.audio_url %>"
       aria-describedby="review-voice-hint"
     >
       <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">

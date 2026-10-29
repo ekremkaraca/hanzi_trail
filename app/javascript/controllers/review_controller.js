@@ -48,7 +48,9 @@ export default class extends Controller {
   }
 
   renderVoiceState() {
-    const missing = this.voiceAvailable === false;
+    // Pre-rendered audio makes the missing-voice warning moot: the button
+    // plays authoritative audio without any local Mandarin voice.
+    const missing = this.voiceAvailable === false && !this.audioUrl();
 
     if (this.hasSpeakButtonTarget) {
       this.speakButtonTarget.disabled = missing;
@@ -111,7 +113,29 @@ export default class extends Controller {
     );
   }
 
+  // Pre-rendered audio (when the render task covered this card) wins over
+  // speechSynthesis: it is pinned to the card's own pinyin, while a browser
+  // voice guessing a polyphone reading from raw hanzi is the one error
+  // this app cannot afford. Null until audio:render covers the card.
+  audioUrl() {
+    return this.speakButtonTarget.dataset.audioUrl || null;
+  }
+
+  playPreRendered(url) {
+    // Fresh element each play: repeated taps restart cleanly and no
+    // player state needs lifecycle management across Turbo navigations.
+    const player = new Audio(url);
+    player.play();
+  }
+
   async speak() {
+    const audioUrl = this.audioUrl();
+    if (audioUrl) {
+      window.speechSynthesis?.cancel();
+      this.playPreRendered(audioUrl);
+      return;
+    }
+
     if (!("speechSynthesis" in window)) {
       this.voiceAvailable = false;
       this.renderVoiceState();

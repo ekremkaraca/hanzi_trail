@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_29_063937) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_29_124958) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -66,6 +66,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_063937) do
     t.integer "position"
     t.float "ease", default: 2.5, null: false
     t.integer "success_streak", default: 0, null: false
+    t.string "audio_key"
     t.index ["category"], name: "idx_flashcards_trgm_category", opclass: :gin_trgm_ops, using: :gin
     t.index ["category"], name: "index_flashcards_on_category"
     t.index ["character"], name: "idx_flashcards_trgm_character", opclass: :gin_trgm_ops, using: :gin
