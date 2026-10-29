@@ -127,10 +127,9 @@ class Flashcard < ApplicationRecord
     end
   end
 
-  # Public CDN URL for the card's pre-rendered audio, composed at read
-  # time from the stored key (env-dependent values stay out of the DB).
-  # Nil until the audio:render task covers the card, so the review UI
-  # falls back to browser speechSynthesis.
+  # Public audio URL, composed at read time from the stored key, so the
+  # URL never depends on env config. Nil until the audio:render task
+  # covers the card, so the review UI falls back to browser speechSynthesis.
   def audio_url
     AudioStorage.public_url(audio_key) if audio_key
   end

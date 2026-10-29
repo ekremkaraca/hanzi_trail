@@ -1,33 +1,22 @@
-# Object storage for pre-rendered card audio (Cloudflare R2, S3-compatible).
+# Storage for pre-rendered card audio, backed by the production Postgres.
 #
-# Keys are stored in flashcards.audio_key and public URLs are composed at
-# read time from CDN_BASE — env-dependent values never get baked into
-# 4k DB rows, so re-pointing at a new CDN is an env change, not a migration.
+# Postgres won over object storage (R2/S3) for the MVP: ~10MB for the
+# 952 HSK3 words (~47MB for the full deck), no new provider, no extra
+# secrets, and the render task needs nothing but DATABASE_URL + the
+# Azure keys. The R2 sketch lives in git history if traffic ever
+# justifies a CDN — the swap point is this module plus the audio_url
+# helper; flashcards.audio_key stays the stable identifier either way.
 module AudioStorage
-  def self.upload!(key, mp3_bytes)
-    client.put_object(
-      bucket: ENV.fetch("R2_BUCKET"),
-      key: key,
-      body: mp3_bytes,
-      content_type: "audio/mpeg",
-      # Objects are immutable per key (the key encodes card + voice), so
-      # caches can hold them effectively forever.
-      cache_control: "public, max-age=31536000, immutable"
-    )
+  def self.upload!(flashcard, key, mp3_bytes)
+    CardAudio.upsert_with_key!(flashcard, key, mp3_bytes)
+  end
+
+  def self.find_bytes(key)
+    CardAudio.find_by!(key: key).bytes
   end
 
   def self.public_url(key)
-    "#{ENV.fetch('CDN_BASE')}/#{key}"
-  end
-
-  def self.client
-    @client ||= Aws::S3::Client.new(
-      endpoint: ENV.fetch("R2_ENDPOINT"),
-      region: "auto",
-      credentials: Aws::Credentials.new(
-        ENV.fetch("R2_ACCESS_KEY_ID"),
-        ENV.fetch("R2_SECRET_ACCESS_KEY")
-      )
-    )
+    # Keys contain slashes ("words/12-xiaoxiao.mp3") — keep them whole.
+    "/audios/#{key}"
   end
 end

@@ -9,6 +9,11 @@ Rails.application.routes.draw do
 
   resources :character_entries, only: %i[show edit update destroy]
 
+  # Audio keys contain slashes and a .mp3 extension — without format:
+  # false, Rails eats the extension as a format segment and truncates
+  # the key ("words/12-xiaoxiao.mp3" arrives as "words/12-xiaoxiao").
+  get "audios/*key", to: "audios#show", as: :audio, format: false
+
   patch "review/preferences", to: "reviews#preferences"
   patch "review/reset", to: "reviews#reset", as: :review_reset
   patch "review/:flashcard_id", to: "reviews#update", as: :review_flashcard

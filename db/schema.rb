@@ -10,10 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_29_124958) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_29_154613) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
+
+  create_table "card_audios", force: :cascade do |t|
+    t.bigint "flashcard_id", null: false
+    t.string "key", null: false
+    t.binary "bytes", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["flashcard_id"], name: "index_card_audios_on_flashcard_id"
+    t.index ["key"], name: "index_card_audios_on_key", unique: true
+  end
 
   create_table "character_entries", force: :cascade do |t|
     t.string "character", null: false
@@ -333,6 +343,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_124958) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "card_audios", "flashcards"
   add_foreign_key "flashcard_characters", "character_entries"
   add_foreign_key "flashcard_characters", "flashcards"
   add_foreign_key "review_attempts", "flashcards"
