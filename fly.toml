@@ -12,12 +12,20 @@ console_command = '/rails/bin/rails console'
 [deploy]
   release_command = './bin/rails db:prepare db:prepare_solid'
 
+# SOLID_QUEUE_IN_PUMA removed from [env]: Solid Queue now runs on its own
+# "queue" machine (see processes below), so background jobs and the
+# recurring schedules keep running while the web machine is auto-stopped
+# when idle. The in-puma plugin only activates when that env var is set,
+# so config/puma.rb needs no change.
 [env]
   PORT = '8080'
-  SOLID_QUEUE_IN_PUMA = 'true'
 
 [processes]
   app = './bin/rails server'
+  # Standalone Solid Queue supervisor (dispatcher + workers + scheduler).
+  # http_service is scoped to the app group, so the queue machine gets
+  # no health checks and never auto-stops — jobs need it always on.
+  queue = 'bin/jobs'
 
 [http_service]
   internal_port = 8080
@@ -38,7 +46,11 @@ console_command = '/rails/bin/rails console'
     [http_service.checks.headers]
       X-Forwarded-Proto = 'https'
 
+# 256MB each: puma and Solid Queue each sit around 150MB RSS, so both
+# fit comfortably on their own machine. The web machine auto-stops when
+# idle (billed only while awake); the queue machine is the only
+# always-on box, which is what keeps the schedules alive.
 [[vm]]
-  memory = '512mb'
+  memory = '256mb'
   cpus = 1
-  memory_mb = 512
+  memory_mb = 256
