@@ -1,4 +1,5 @@
 require "test_helper"
+require "rexml/document"
 
 module Audio
   class SsmlBuilderTest < ActiveSupport::TestCase
@@ -6,50 +7,18 @@ module Audio
       @builder = SsmlBuilder.new
     end
 
-    test "builds well-formed SSML with a phoneme hint per syllable" do
+    test "wraps the hanzi in well-formed SSML with the default voice" do
       card = Flashcard.new(character: "网络", pinyin: "wǎngluò")
 
       ssml = @builder.call(card)
 
       assert_includes ssml, 'voice name="zh-CN-XiaoxiaoNeural"'
       assert_includes ssml, 'rate="-10%"'
-      assert_includes ssml, '<phoneme alphabet="sapi" ph="wang3">wang3</phoneme>'
-      assert_includes ssml, '<phoneme alphabet="sapi" ph="luo4">luo4</phoneme>'
-    end
-
-    test "lexicon mode feeds the hanzi and no phoneme hints" do
-      builder = SsmlBuilder.new(hint: SsmlBuilder::HINT_NONE)
-      card = Flashcard.new(character: "网络", pinyin: "wǎngluò")
-
-      ssml = builder.call(card)
-
       assert_includes ssml, "网络"
+      # Phoneme hinting is empirically rejected by the endpoint (400,
+      # empty body) — the builder must never emit it.
       assert_not_includes ssml, "<phoneme"
-    end
-
-    test "neutral-tone syllables keep their place and digit" do
-      # 名字: the draft dropped "zi" entirely.
-      card = Flashcard.new(character: "名字", pinyin: "míngzi")
-
-      ssml = @builder.call(card)
-
-      assert_includes ssml, 'ph="ming2"'
-      assert_includes ssml, 'ph="zi5"'
-    end
-
-    test "erhua cards render one merged rhotacized syllable" do
-      card = Flashcard.new(character: "哪儿", pinyin: "nǎr")
-
-      ssml = @builder.call(card)
-
-      assert_includes ssml, 'ph="nar3"'
-    end
-
-    test "syllable count that contradicts the hanzi is a hard error" do
-      card = Flashcard.new(character: "网络", pinyin: "wǎng")
-
-      error = assert_raises(SsmlBuilder::MismatchError) { @builder.call(card) }
-      assert_match(/网络/, error.message)
+      REXML::Document.new(ssml) # well-formed
     end
 
     test "voice slug picks the candidate voice" do
@@ -57,6 +26,19 @@ module Audio
       card = Flashcard.new(character: "网", pinyin: "wǎng")
 
       assert_includes builder.call(card), 'voice name="zh-CN-YunxiNeural"'
+    end
+
+    test "erhua cards pass the pinyin guard with one merged syllable" do
+      card = Flashcard.new(character: "哪儿", pinyin: "nǎr")
+
+      assert_includes @builder.call(card), "哪儿"
+    end
+
+    test "syllable count that contradicts the hanzi is a hard error" do
+      card = Flashcard.new(character: "网络", pinyin: "wǎng")
+
+      error = assert_raises(SsmlBuilder::MismatchError) { @builder.call(card) }
+      assert_match(/网络/, error.message)
     end
   end
 end
