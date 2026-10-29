@@ -4,6 +4,7 @@ module Reviews
     REVIEW_MODES = [
       { mode: :all,             label: "All",             params: {} },
       { mode: :hsk,             label: "HSK",             params: { source: "hsk" } },
+      { mode: :hsk3,            label: "HSK 3",           params: { source: "hsk", hsk_level: "new-3" } },
       { mode: :curated,         label: "Curated",         params: { source: "curated" } },
       { mode: :missing_stories, label: "Missing stories", params: { story_status: "missing" } }
     ].freeze
@@ -42,7 +43,8 @@ module Reviews
     def mode_active?(mode)
       case mode
       when :all then filter_params.values.all?(&:blank?)
-      when :hsk then filter_params[:source] == "hsk"
+      when :hsk then filter_params[:source] == "hsk" && filter_params[:hsk_level].blank?
+      when :hsk3 then filter_params[:source] == "hsk" && filter_params[:hsk_level] == "new-3"
       when :curated then filter_params[:source] == "curated"
       when :missing_stories then filter_params[:story_status] == "missing"
       else false

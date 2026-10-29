@@ -124,9 +124,9 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     rendered = css_select(".flashcard-character-link").map { |a| a.text.strip }
 
-    # chē ní suàn wǎng wǒ xué — raw codepoint order would put 网(7F51)
+    # chē ní ruǎn suàn wǎng wǒ xué — raw codepoint order would put 网(7F51)
     # and 我(6211)/你(4F60) in a different, learner-hostile sequence.
-    assert_equal [ "车", "你", "算", "网", "我", "学" ], rendered
+    assert_equal [ "车", "你", "软", "算", "网", "我", "学" ], rendered
   end
 
   test "index filters by source" do

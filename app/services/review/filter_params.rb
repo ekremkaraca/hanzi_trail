@@ -1,6 +1,6 @@
 module Review
   class FilterParams
-    FILTER_KEYS = %i[source category story_status].freeze
+    FILTER_KEYS = %i[source category story_status hsk_level].freeze
 
     def self.from(params)
       raw_params = params.respond_to?(:to_unsafe_h) ? params.to_unsafe_h : params

@@ -3,13 +3,12 @@ class HskImporter
 
   SOURCE = "hsk".freeze
 
-  # Imported cards must not all be due at once: a fresh 4,240-word import
-  # would otherwise dump an unworkable queue on the reviewer. Cards cycle
-  # through STAGGER_CYCLE_DAYS days inside their level, and each level is
-  # offset by one more cycle - level 1 fills the first month, level 2 the
-  # next, and so on. The daily new-card cap in DueFlashcards is the second
-  # line of defence on top of this spread.
-  STAGGER_CYCLE_DAYS = 30
+  # Imported cards are due immediately: the due-date pacing that the old
+  # import-time stagger provided is now entirely the daily new-card cap in
+  # DueFlashcards (20/day, uncapped inside an explicit hsk_level filter).
+  # The stagger kept cards locked out of review for months — fatal for a
+  # companion app whose whole point is drilling HSK3 words on demand —
+  # while duplicating what the cap already does.
 
   # Entries per committed chunk. One transaction per level meant a killed
   # ssh session on Fly (scale-to-zero mid-import) rolled back everything
@@ -105,8 +104,9 @@ class HskImporter
       story: nil,
       story_status: "missing",
       source: SOURCE,
-      hsk_level: hsk_level,
-      next_review_at: staggered_due_date(index)
+      hsk_level: hsk_level
+      # next_review_at is left unset: the model's create callback makes
+      # imported cards due immediately; the daily cap paces arrivals.
     )
 
     # Concurrent imports of the same character both miss the
@@ -119,19 +119,6 @@ class HskImporter
     true
   rescue ActiveRecord::RecordNotUnique
     false # lost a race with a concurrent import; already counted by the winner
-  end
-
-  def staggered_due_date(index)
-    Time.current +
-      (index % STAGGER_CYCLE_DAYS).days +
-      # Level 1 starts today (offset 0), level 2 one cycle later, etc.;
-      # nil/malformed levels behave like level 1.
-      ([ level_number - 1, 0 ].max * STAGGER_CYCLE_DAYS).days
-  end
-
-  # "new-3" -> 3, "old-1" -> 1, nil or malformed -> 0 (no level offset).
-  def level_number
-    hsk_level.to_s[/\A(?:new|old)-(\d+)\z/, 1].to_i
   end
 
   # The dataset's radical is the headword's Kangxi radical, so it can only

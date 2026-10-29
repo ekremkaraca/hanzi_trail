@@ -138,6 +138,31 @@ class Review::QueueTest < ActiveSupport::TestCase
     ActiveSupport::Notifications.unsubscribe(counter)
   end
 
+  test "hsk_level filter scopes the queue to that level" do
+    new3 = Flashcard.create!(character: "软3", pinyin: "ruǎn", meaning: "soft", hsk_level: "new-3", source: "hsk", next_review_at: 1.hour.ago)
+    other = flashcards(:hsk_one) # old-1
+
+    queue = Review::Queue.new(filters: { hsk_level: "new-3" }, session: {})
+
+    assert_equal new3.character, queue.next_card.character
+    assert_not_includes queue.scope.to_a, other
+  end
+
+  test "an explicit hsk_level drill bypasses the daily new-card cap" do
+    cards = 25.times.map do |i|
+      Flashcard.create!(character: "层#{i}", pinyin: "céng", meaning: "layer",
+                        source: "hsk", hsk_level: "new-3", next_review_at: 1.minute.ago)
+    end
+
+    filtered = Review::Queue.new(filters: { hsk_level: "new-3" }, session: {})
+    unfiltered = Review::Queue.new(filters: {}, session: {})
+
+    # Deliberate drilling wants every due word on demand...
+    assert_equal cards.size, filtered.remaining_count
+    # ...while unfiltered review still paces new cards at 20/day.
+    assert_equal DueFlashcards::NEW_CARDS_PER_DAY, unfiltered.remaining_count
+  end
+
   test "the due-card read is bounded by a LIMIT" do
     # The cap bounds the rows a page view can load; the LIMIT is asserted
     # in the issued SQL rather than simulated with a tiny cap, since the

@@ -22,13 +22,13 @@ module Flashcards
       end
 
       test "hsk options are derived from the data with learner-facing labels" do
-        # Fixtures carry old-1 only -> exactly one level option besides All.
+        # Fixtures carry old-1 and new-3 -> two level options besides All.
         render_inline(FilterBarComponent.new(params: {}))
 
         assert_selector "select[name='hsk_level'] option[value='']"
         assert_selector "select[name='hsk_level'] option[value='old-1']",
           text: "HSK 2.0 (1)"
-        assert_selector "select[name='hsk_level'] option", count: 2
+        assert_selector "select[name='hsk_level'] option", count: 3
       end
     end
   end

@@ -220,28 +220,18 @@ class HskImporterTest < ActiveSupport::TestCase
     File.delete(path) if File.exist?(path)
   end
 
-  test "due dates are staggered within the level cycle" do
+  test "imported cards are due immediately (pacing is the cap's job)" do
     HskImporter.import!(
       path: Rails.root.join("test/fixtures/files/hsk_v3_sample.json"),
       hsk_level: "new-1"
     )
 
-    # new-1 offset is 0; indices 0,1,2 -> due in 0,1,2 days.
+    # The old import-time stagger parked cards for weeks; pacing now
+    # lives entirely in DueFlashcards' daily cap.
     freeze_time do
       assert_in_delta Time.current, Flashcard.find_by!(character: "爱").next_review_at, 1.minute
-      assert_in_delta 1.day.from_now, Flashcard.find_by!(character: "爱好").next_review_at, 1.minute
-      assert_in_delta 2.days.from_now, Flashcard.find_by!(character: "八").next_review_at, 1.minute
-    end
-  end
-
-  test "higher levels start one cycle later per level" do
-    HskImporter.import!(
-      path: Rails.root.join("test/fixtures/files/hsk_v3_sample.json"),
-      hsk_level: "new-2"
-    )
-
-    freeze_time do
-      assert_in_delta 30.days.from_now, Flashcard.find_by!(character: "爱").next_review_at, 1.minute
+      assert_in_delta Time.current, Flashcard.find_by!(character: "爱好").next_review_at, 1.minute
+      assert_in_delta Time.current, Flashcard.find_by!(character: "八").next_review_at, 1.minute
     end
   end
 

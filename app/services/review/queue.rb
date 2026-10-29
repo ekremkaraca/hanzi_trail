@@ -26,6 +26,7 @@ module Review
       # Reuse the model scopes so queue filtering stays identical to the old controller.
       Flashcard
         .by_source(filters[:source])
+        .by_hsk_level(filters[:hsk_level])
         .by_category(filters[:category])
         .with_story_filter(filters[:story_status])
     end
@@ -37,7 +38,15 @@ module Review
     # view - a LIMIT 1 for the card and a separate full COUNT for the
     # number - and the COUNT had no bound at all.
     def due_page
-      @due_page ||= DueFlashcards.call(scope:).limit(DUE_READ_CAP).to_a
+      @due_page ||= DueFlashcards.call(scope:, new_cap:).limit(DUE_READ_CAP).to_a
+    end
+
+    # The 20/day cap paces casual review so new cards trickle in. An
+    # explicit hsk_level filter is deliberate drilling — "I want HSK3
+    # words now" — so the cap must not throttle it; unfiltered review
+    # keeps the pacing.
+    def new_cap
+      filters[:hsk_level].present? ? nil : DueFlashcards::NEW_CARDS_PER_DAY
     end
   end
 end

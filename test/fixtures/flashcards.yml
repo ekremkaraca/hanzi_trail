@@ -50,6 +50,19 @@ hsk_two:
   review_count: 0
   next_review_at: <%= Time.current %>
 
+hsk_three:
+  character: 软
+  pinyin: ruǎn
+  pinyin_sort_key: ruan
+  meaning: soft
+  story:
+  category:
+  source: hsk
+  hsk_level: new-3
+  difficulty: new
+  review_count: 0
+  next_review_at: <%= 1.hour.from_now %>
+
 future_review:
   character: 车
   pinyin: chē
