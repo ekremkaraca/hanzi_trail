@@ -20,6 +20,11 @@
 !/log/.keep
 !/tmp/.keep
 
+# Ignore coverage reports: SimpleCov rewrites them on every test run,
+# so shipping them would both bloat the build context and invalidate
+# the COPY cache layer on every deploy.
+/coverage
+
 # Ignore pidfiles, but keep the directory.
 /tmp/pids/*
 !/tmp/pids/.keep
