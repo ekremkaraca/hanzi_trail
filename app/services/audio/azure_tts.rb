@@ -39,14 +39,26 @@ module Audio
           .post("/cognitiveservices/v1", ssml, "Content-Type" => "application/ssml+xml")
           .body # binary MP3 string, as SilenceGuard/File.binwrite expect
       rescue Faraday::TooManyRequestsError, Faraday::ServerError => e
-        raise SynthesisError, "Azure TTS failed after #{attempts} attempt(s): #{e.message}" if attempts >= MAX_ATTEMPTS
+        raise synthesis_failure(attempts, e) if attempts >= MAX_ATTEMPTS
 
         sleep(BACKOFF_SECONDS**(attempts - 1))
         retry
+      rescue Faraday::ClientError => e
+        # No retry, but never lose Azure's reason: 400 bodies name the
+        # exact SSML/header problem, which is the only way to debug a
+        # rejected render.
+        raise synthesis_failure(attempts, e)
       end
     end
 
     private
+
+    def synthesis_failure(attempts, error)
+      body = error.response_body.to_s.slice(0, 500)
+      SynthesisError.new(
+        "Azure TTS failed after #{attempts} attempt(s): #{error.message} #{body}"
+      )
+    end
 
     def connection
       @connection ||= Faraday.new(url: base_url) do |f|

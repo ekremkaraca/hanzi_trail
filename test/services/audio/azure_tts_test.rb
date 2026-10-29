@@ -112,10 +112,24 @@ module Audio
     test "a client error like 401 fails fast with zero retries" do
       @tts = make_tts([:client_error])
 
-      # Bad keys / bad SSML fail identically forever; retrying them only
-      # delays the failure report.
-      assert_raises(Faraday::ClientError) { @tts.synthesize(ssml: "<speak/>") }
+      # Bad keys / bad SSML fail identically forever; they re-raise as
+      # SynthesisError (with Azure's body) without any backoff.
+      assert_raises(AzureTts::SynthesisError) { @tts.synthesize(ssml: "<speak/>") }
       assert_empty @slept
+    end
+
+    test "a rejected render surfaces Azure's error body, not just the status" do
+      # 400 bodies name the exact SSML/header problem; a bare status line
+      # would make every rejection undiagnosable.
+      @tts = make_tts([proc do
+        error = Faraday::BadRequestError.new("the server responded with status 400")
+        error.define_singleton_method(:response_body) { "<ssml>Invalid ph value</ssml>" }
+        raise error
+      end])
+
+      error = assert_raises(AzureTts::SynthesisError) { @tts.synthesize(ssml: "<speak/>") }
+
+      assert_match(/Invalid ph value/, error.message)
     end
   end
 end

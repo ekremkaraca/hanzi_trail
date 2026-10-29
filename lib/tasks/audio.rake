@@ -44,27 +44,32 @@ namespace :audio do
           card = Flashcard.find_by(character: word)
           reading = SAMPLE[:polyphones][word]
 
+          source = if reading
+                     OpenStruct.new(character: word, pinyin: reading)
+                   elsif card
+                     card
+                   else
+                     puts "  ! no card for #{word}, skipping"
+                     next
+                   end
           begin
-            # Polyphone entries render with the forced reading even if the
-            # card exists — this pass is about the VOICE, so both readings
-            # of interest get heard. The stand-in quacks like a card.
-            source = if reading
-                       OpenStruct.new(character: word, pinyin: reading)
-                     elsif card
-                       card
-                     else
-                       puts "  ! no card for #{word}, skipping"
-                       next
-                     end
-            bytes = Audio::AzureTts.synthesize(ssml: builder.call(source))
-            unless Audio::SilenceGuard.valid?(bytes)
-              puts "  ! silence guard rejected #{word} (#{mode})"
-              next
+              # Build once: the SSML is both the request body and the
+              # diagnostic artifact if it's rejected (mismatch or Azure).
+              ssml = builder.call(source)
+              bytes = Audio::AzureTts.synthesize(ssml: ssml)
+              unless Audio::SilenceGuard.valid?(bytes)
+                puts "  ! silence guard rejected #{word} (#{mode})"
+                next
+              end
+              File.binwrite(mode_dir.join("#{word}.mp3"), bytes)
+            rescue StandardError => e
+              # One bad word must not kill a ~150-word listening pass:
+              # report and keep going. The rejected SSML is saved next to
+              # the sample so the failure can be replayed/inspected
+              # without guessing what was sent.
+              puts "  ! #{word} (#{mode}): #{e.class}: #{e.message.to_s.slice(0, 400)}"
+              File.binwrite(mode_dir.join("#{word}.rejected-ssml"), ssml.to_s) if ssml
             end
-            File.binwrite(mode_dir.join("#{word}.mp3"), bytes)
-          rescue Audio::SsmlBuilder::MismatchError => e
-            puts "  ! mismatch for #{word} (#{mode}): #{e.message}"
-          end
         end
       end
       puts "Wrote #{slug} samples to #{dir}"
