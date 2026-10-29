@@ -76,7 +76,9 @@ module Audio
     end
 
     def base_url
-      "https://#{ENV.fetch('AZURE_SPEECH_REGION')}.tts.speech.microsoft.com"
+      # Test seam: a local replay server can stand in for Azure so request
+      # shape and error surfacing are verifiable without a real key.
+      ENV["AZURE_TTS_BASE_URL"] || "https://#{ENV.fetch('AZURE_SPEECH_REGION')}.tts.speech.microsoft.com"
     end
   end
 end
