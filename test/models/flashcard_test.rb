@@ -504,6 +504,22 @@ class FlashcardTest < ActiveSupport::TestCase
     assert_equal "ceshi", card.reload.pinyin_sort_key
   end
 
+  test "ease and success_streak mirror their check constraints" do
+    card = Flashcard.new(character: "测", pinyin: "cè", meaning: "test")
+
+    card.ease = 1.2
+    assert_not card.valid?
+    card.ease = 2.6
+    assert_not card.valid?
+    card.ease = 2.0
+    assert card.valid?
+
+    card.success_streak = -1
+    assert_not card.valid?
+    card.success_streak = 3
+    assert card.valid?
+  end
+
   private
 
   # Fails when the block issues any non-cached SQL.

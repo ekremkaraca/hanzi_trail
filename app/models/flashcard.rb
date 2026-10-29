@@ -18,6 +18,11 @@ class Flashcard < ApplicationRecord
   validates :next_review_at, presence: true
   validates :source, presence: true, inclusion: { in: SOURCES }
   validates :difficulty, presence: true, inclusion: { in: DIFFICULTY_LEVELS }
+  # Mirrors the flashcards_ease_range / success_streak check constraints;
+  # clamping itself lives in Review::Scheduler so an invalid value is a
+  # bug, not a user input path.
+  validates :ease, presence: true, numericality: { greater_than_or_equal_to: 1.3, less_than_or_equal_to: 2.5 }
+  validates :success_streak, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :story_status, presence: true, inclusion: { in: STORY_STATUSES }
   validates :review_count, numericality: { greater_than_or_equal_to: 0 }
   validates :meaning, length: { maximum: 500 }
@@ -120,6 +125,14 @@ class Flashcard < ApplicationRecord
     else
       all
     end
+  end
+
+  # Public CDN URL for the card's pre-rendered audio, composed at read
+  # time from the stored key (env-dependent values stay out of the DB).
+  # Nil until the audio:render task covers the card, so the review UI
+  # falls back to browser speechSynthesis.
+  def audio_url
+    AudioStorage.public_url(audio_key) if audio_key
   end
 
   # Aggregate per call: one SELECT MAX over this card's attempts. Safe on

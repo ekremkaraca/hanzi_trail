@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_23_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_29_063937) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -26,7 +26,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_200000) do
     t.string "pinyin_source"
     t.index ["character"], name: "index_character_entries_on_character", unique: true
     t.index ["pinyin_source"], name: "index_character_entries_on_pinyin_source"
-    t.check_constraint "pinyin_source IS NULL OR (pinyin_source::text = ANY (ARRAY['manual'::character varying::text, 'dictionary'::character varying::text]))", name: "character_entries_pinyin_source_check"
+    t.check_constraint "pinyin_source IS NULL OR (pinyin_source::text = ANY (ARRAY['manual'::character varying, 'dictionary'::character varying]::text[]))", name: "character_entries_pinyin_source_check"
   end
 
   create_table "flashcard_characters", force: :cascade do |t|
@@ -60,6 +60,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_200000) do
     t.datetime "updated_at", null: false
     t.text "usage_note"
     t.string "pinyin_sort_key", default: "", null: false
+    t.jsonb "tokens", default: [], null: false
+    t.text "audio_url"
+    t.integer "audio_duration_ms"
+    t.integer "position"
+    t.float "ease", default: 2.5, null: false
+    t.integer "success_streak", default: 0, null: false
     t.index ["category"], name: "idx_flashcards_trgm_category", opclass: :gin_trgm_ops, using: :gin
     t.index ["category"], name: "index_flashcards_on_category"
     t.index ["character"], name: "idx_flashcards_trgm_character", opclass: :gin_trgm_ops, using: :gin
@@ -69,13 +75,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_200000) do
     t.index ["next_review_at"], name: "index_flashcards_on_next_review_at"
     t.index ["pinyin"], name: "idx_flashcards_trgm_pinyin", opclass: :gin_trgm_ops, using: :gin
     t.index ["pinyin_sort_key"], name: "index_flashcards_on_pinyin_sort_key"
+    t.index ["position"], name: "index_flashcards_on_position"
     t.index ["source", "hsk_level"], name: "index_flashcards_on_source_and_hsk_level"
     t.index ["source"], name: "index_flashcards_on_source"
     t.index ["story_status"], name: "index_flashcards_on_story_status"
+    t.index ["tokens"], name: "index_flashcards_on_tokens", using: :gin
     t.check_constraint "difficulty::text = ANY (ARRAY['new'::character varying::text, 'again'::character varying::text, 'easy'::character varying::text, 'good'::character varying::text, 'hard'::character varying::text])", name: "flashcards_difficulty_check"
+    t.check_constraint "ease >= 1.3::double precision AND ease <= 2.5::double precision", name: "flashcards_ease_range"
     t.check_constraint "review_count >= 0", name: "flashcards_review_count_check"
     t.check_constraint "source::text = ANY (ARRAY['curated'::character varying::text, 'hsk'::character varying::text])", name: "flashcards_source_check"
     t.check_constraint "story_status::text = ANY (ARRAY['missing'::character varying::text, 'draft'::character varying::text, 'curated'::character varying::text])", name: "flashcards_story_status_check"
+    t.check_constraint "success_streak >= 0", name: "flashcards_success_streak_non_negative"
   end
 
   create_table "review_attempts", force: :cascade do |t|
@@ -89,6 +99,58 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_200000) do
     t.index ["rating"], name: "index_review_attempts_on_rating"
     t.index ["reviewed_at"], name: "index_review_attempts_on_reviewed_at"
     t.check_constraint "rating::text = ANY (ARRAY['again'::character varying::text, 'easy'::character varying::text, 'good'::character varying::text, 'hard'::character varying::text])", name: "review_attempts_rating_check"
+  end
+
+  create_table "sentence_tokens", force: :cascade do |t|
+    t.bigint "sentence_id", null: false
+    t.integer "position", null: false
+    t.string "token", null: false
+    t.boolean "is_punctuation", default: false, null: false
+    t.integer "letters_count"
+    t.boolean "visible_default", default: true, null: false
+    t.string "lemma"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sentence_id", "position"], name: "index_sentence_tokens_on_sentence_id_and_position", unique: true
+    t.index ["sentence_id"], name: "index_sentence_tokens_on_sentence_id"
+    t.index ["token"], name: "index_sentence_tokens_on_token"
+  end
+
+  create_table "sentence_word_translations", force: :cascade do |t|
+    t.bigint "sentence_id", null: false
+    t.bigint "sentence_token_id"
+    t.string "word_form", null: false
+    t.string "gloss", null: false
+    t.integer "rank", default: 0
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sentence_id", "word_form"], name: "index_sentence_word_translations_on_sentence_id_and_word_form"
+    t.index ["sentence_id"], name: "index_sentence_word_translations_on_sentence_id"
+    t.index ["sentence_token_id"], name: "index_sentence_word_translations_on_sentence_token_id"
+    t.index ["word_form"], name: "index_sentence_word_translations_on_word_form"
+  end
+
+  create_table "sentences", force: :cascade do |t|
+    t.string "external_id"
+    t.string "source", default: "curated", null: false
+    t.string "language", default: "de", null: false
+    t.text "phrase", null: false
+    t.text "translation_sentence"
+    t.text "translation_gloss"
+    t.text "audio_url"
+    t.integer "audio_duration_ms"
+    t.integer "position"
+    t.string "difficulty_level"
+    t.boolean "is_favorite", default: false, null: false
+    t.jsonb "grammar_tips", default: {}
+    t.text "grammar_table_html"
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["external_id"], name: "index_sentences_on_external_id"
+    t.index ["position"], name: "index_sentences_on_position"
+    t.index ["source", "language"], name: "index_sentences_on_source_and_language"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -244,6 +306,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_200000) do
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
+  create_table "user_sentence_states", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "sentence_id", null: false
+    t.jsonb "revealed_mask", default: []
+    t.integer "review_count", default: 0, null: false
+    t.integer "lapse_count", default: 0, null: false
+    t.float "ease_factor", default: 2.5
+    t.integer "interval_days", default: 0
+    t.datetime "next_review_at"
+    t.datetime "last_reviewed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["next_review_at"], name: "index_user_sentence_states_on_next_review_at"
+    t.index ["sentence_id"], name: "index_user_sentence_states_on_sentence_id"
+    t.index ["user_id", "sentence_id"], name: "index_user_sentence_states_on_user_id_and_sentence_id", unique: true
+    t.index ["user_id"], name: "index_user_sentence_states_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email_address", null: false
     t.string "password_digest", null: false
@@ -255,6 +335,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_200000) do
   add_foreign_key "flashcard_characters", "character_entries"
   add_foreign_key "flashcard_characters", "flashcards"
   add_foreign_key "review_attempts", "flashcards"
+  add_foreign_key "sentence_tokens", "sentences", on_delete: :cascade
+  add_foreign_key "sentence_word_translations", "sentence_tokens", on_delete: :cascade
+  add_foreign_key "sentence_word_translations", "sentences", on_delete: :cascade
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
@@ -262,4 +345,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_200000) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "user_sentence_states", "sentences", on_delete: :cascade
+  add_foreign_key "user_sentence_states", "users", on_delete: :cascade
 end
