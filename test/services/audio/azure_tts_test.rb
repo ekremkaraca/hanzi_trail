@@ -36,6 +36,40 @@ module Audio
       @slept = []
     end
 
+    # Regression: `f.request :raise_error` only fails when the production
+    # connection builder runs — injected fakes in the retry tests never
+    # execute it, and the failure shipped to the first prod validation run.
+    # The connection builder reads credentials from ENV; the test env
+    # intentionally has none, so stub them for its duration and restore.
+    def with_azure_env
+      keys = { "AZURE_SPEECH_KEY" => "test-key", "AZURE_SPEECH_REGION" => "testregion" }
+      saved = keys.transform_values { |key| ENV[key] }
+      keys.each { |key, value| ENV[key] = value }
+      yield
+    ensure
+      keys.each do |key, value|
+        saved[key] ? ENV[key] = saved[key] : ENV.delete(key)
+      end
+    end
+
+    test "builds a real Faraday connection without middleware registry errors" do
+      with_azure_env do
+        tts = AzureTts.new
+
+        # connection is private (internal detail) — the send is the point:
+        # building it executes the middleware registry lookups.
+        assert_instance_of Faraday::Connection, tts.send(:connection)
+      end
+    end
+
+    test "connection honors the configured timeout" do
+      with_azure_env do
+        tts = AzureTts.new
+
+        assert_equal AzureTts::TIMEOUT_SECONDS, tts.send(:connection).options.timeout
+      end
+    end
+
     # Builds the service with a scripted connection and an instant,
     # recording backoff. Bare `sleep` resolves on the instance, so the
     # singleton stub intercepts the retry scheduler without patching

@@ -52,7 +52,10 @@ module Audio
       @connection ||= Faraday.new(url: base_url) do |f|
         f.headers["Ocp-Apim-Subscription-Key"] = ENV.fetch("AZURE_SPEECH_KEY")
         f.headers["X-Microsoft-OutputFormat"] = OUTPUT_FORMAT
-        f.request :raise_error
+        # raise_error is a RESPONSE middleware — requesting it on the
+        # request side fails to resolve at connection build time, which
+        # is exactly what the first prod validation run hit.
+        f.response :raise_error
         # Net::HTTP had an explicit read timeout; Faraday's default is none,
         # and a hung connection would stall an overnight render forever.
         f.options.timeout = TIMEOUT_SECONDS
