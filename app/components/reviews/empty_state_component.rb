@@ -10,7 +10,7 @@ module Reviews
 
     attr_reader :reviewed_count, :filter_params, :title
 
-    def has_reviewed_cards?
+    def reviewed_cards?
       reviewed_count.to_i.positive?
     end
 

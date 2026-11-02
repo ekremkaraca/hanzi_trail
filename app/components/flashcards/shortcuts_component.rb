@@ -2,9 +2,9 @@ module Flashcards
   class ShortcutsComponent < ViewComponent::Base
     STORY_STATUS_LINKS = {
       "missing" => { label: "Missing stories", tone: "btn--soft-warning" },
-      "draft"   => { label: "Draft stories",   tone: "btn--soft-info" },
+      "draft" => { label: "Draft stories", tone: "btn--soft-info" },
       "curated" => { label: "Curated stories", tone: "btn--soft-success" },
-      "short"   => { label: "Short stories",   tone: "btn--ghost" }
+      "short" => { label: "Short stories", tone: "btn--ghost" }
     }.freeze
 
     def initialize(status: nil)

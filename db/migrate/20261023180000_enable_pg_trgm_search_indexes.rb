@@ -26,8 +26,8 @@ class EnablePgTrgmSearchIndexes < ActiveRecord::Migration[8.1]
 
     %w[character pinyin meaning category].each do |column|
       add_index :flashcards, column, using: :gin,
-        opclass: :gin_trgm_ops,
-        name: "idx_flashcards_trgm_#{column}"
+                                     opclass: :gin_trgm_ops,
+                                     name: "idx_flashcards_trgm_#{column}"
     end
   end
 

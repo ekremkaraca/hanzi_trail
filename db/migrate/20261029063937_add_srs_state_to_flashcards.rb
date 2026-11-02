@@ -7,11 +7,11 @@ class AddSrsStateToFlashcards < ActiveRecord::Migration[8.1]
     add_column :flashcards, :ease, :float, default: 2.5, null: false
     add_column :flashcards, :success_streak, :integer, default: 0, null: false
     add_check_constraint :flashcards,
-      "ease >= 1.3 AND ease <= 2.5",
-      name: "flashcards_ease_range"
+                         "ease >= 1.3 AND ease <= 2.5",
+                         name: "flashcards_ease_range"
     add_check_constraint :flashcards,
-      "success_streak >= 0",
-      name: "flashcards_success_streak_non_negative"
+                         "success_streak >= 0",
+                         name: "flashcards_success_streak_non_negative"
 
     backfill_from_review_attempts
   end
@@ -39,10 +39,12 @@ class AddSrsStateToFlashcards < ActiveRecord::Migration[8.1]
 
       card.review_attempts.order(:reviewed_at).pluck(:rating).each do |rating|
         case rating
-        when "again" then ease = [ ease - 0.2, 1.3 ].max; streak = 0
-        when "hard"  then ease = [ ease - 0.1, 1.3 ].max
-        when "good"  then streak += 1
-        when "easy"  then ease = [ ease + 0.1, 2.5 ].min; streak += 1
+        when "again" then ease = [ ease - 0.2, 1.3 ].max
+                          streak = 0
+        when "hard" then ease = [ ease - 0.1, 1.3 ].max
+        when "good" then streak += 1
+        when "easy" then ease = [ ease + 0.1, 2.5 ].min
+                         streak += 1
         end
       end
 

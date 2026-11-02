@@ -81,15 +81,15 @@ class HskImporter
       processed += slice.size
       say_progress(processed, imported, data.size)
     end
-  rescue KeyError => error
-    raise ImportError, "Invalid HSK entry: missing #{error.key}"
+  rescue KeyError => e
+    raise ImportError, "Invalid HSK entry: missing #{e.key}"
   end
 
   private
 
   attr_reader :path, :hsk_level
 
-  def import_entry(entry, index:)
+  def import_entry(entry)
     character = entry.fetch("simplified")
 
     flashcard = Flashcard.find_or_initialize_by(character: character)
@@ -137,12 +137,16 @@ class HskImporter
 
   def parse_json
     JSON.parse(File.read(path))
-  rescue JSON::ParserError => error
-    raise ImportError, "Invalid JSON: #{error.message}"
+  rescue JSON::ParserError => e
+    raise ImportError, "Invalid JSON: #{e.message}"
   end
 
   # Progress to stdout so a detached prod run can be polled from the log.
   def say_progress(processed, imported, total)
-    puts format("  %s: %d/%d entries processed, %d imported", File.basename(path), processed, total, imported)
+    Rails.logger.debug format("  %<basename>s: %<processed>d/%<imported>d entries processed, %<total>d imported",
+                              basename: File.basename(path),
+                              processed: processed,
+                              total: total,
+                              imported: imported)
   end
 end

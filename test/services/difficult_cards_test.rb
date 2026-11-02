@@ -69,10 +69,10 @@ class DifficultCardsTest < ActiveSupport::TestCase
       end
 
       # Codepoint order of 你(4F60) 我(6211) 算(7B97).
-      assert_equal [ "你", "我", "算" ], DifficultCards.call(limit: 10).map(&:character)
+      assert_equal %w[你 我 算], DifficultCards.call(limit: 10).map(&:character)
       assert_equal DifficultCards.call(limit: 10).map(&:character),
-        DifficultCards.call(limit: 10).map(&:character),
-        "repeated calls must return the same order"
+                   DifficultCards.call(limit: 10).map(&:character),
+                   "repeated calls must return the same order"
     end
   end
 end

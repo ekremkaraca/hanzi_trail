@@ -78,7 +78,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
     assert_equal "Sign in to edit content.", flash[:alert]
     assert_equal review_flashcard_path(@flashcard),
-      session[:return_to_after_authenticating]
+                 session[:return_to_after_authenticating]
   ensure
     ENV.delete("REQUIRE_AUTH_FOR_REVIEWS")
   end
@@ -114,11 +114,9 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to review_url
     assert_equal "Too many reviews, please slow down.", flash[:alert]
     assert_equal review_count, @flashcard.reload.review_count,
-      "a limited request must not mutate card state"
+                 "a limited request must not mutate card state"
   ensure
-    if store&.singleton_class&.instance_methods(false)&.include?(:increment)
-      store.singleton_class.send(:remove_method, :increment)
-    end
+    store.singleton_class.send(:remove_method, :increment) if store&.singleton_class&.method_defined?(:increment, false)
   end
 
   test "the rate limit counts review writes only, and passes them while under the limit" do
@@ -138,9 +136,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, calls, "one write under the limit goes through and is counted"
     assert_equal "Review saved.", flash[:notice]
   ensure
-    if store&.singleton_class&.instance_methods(false)&.include?(:increment)
-      store.singleton_class.send(:remove_method, :increment)
-    end
+    store.singleton_class.send(:remove_method, :increment) if store&.singleton_class&.method_defined?(:increment, false)
   end
 
   test "should redirect on invalid rating" do
@@ -250,7 +246,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     flashcards(:algorithm).update!(next_review_at: 1.minute.ago)
 
     patch review_flashcard_path(flashcard),
-      params: { review: { rating: "good" } }
+          params: { review: { rating: "good" } }
 
     follow_redirect!
 
@@ -265,7 +261,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     # Review yesterday: the counter is stamped with that day.
     travel_to 1.day.ago do
       patch review_flashcard_path(flashcards(:network)),
-        params: { review: { rating: "again" } }
+            params: { review: { rating: "again" } }
     end
 
     # Today the queue still has a card (algorithm), and yesterday's
@@ -279,7 +275,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     flashcards(:algorithm).update!(next_review_at: 1.minute.ago)
 
     patch review_flashcard_path(flashcards(:network)),
-      params: { review: { rating: "again" } }
+          params: { review: { rating: "again" } }
 
     get review_path
     assert_includes response.body, "1 reviewed"
@@ -289,7 +285,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     today = Date.current.to_s
 
     assert_equal 0, ReviewsController.counter_value(9, today),
-      "pre-schema Integer payload must read as 0"
+                 "pre-schema Integer payload must read as 0"
     assert_equal 0, ReviewsController.counter_value(nil, today)
     assert_equal 0, ReviewsController.counter_value({ "c" => 5, "d" => Date.yesterday.to_s }, today)
     assert_equal 5, ReviewsController.counter_value({ "c" => 5, "d" => today }, today)
@@ -304,7 +300,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     curated_card.update!(source: "curated", next_review_at: 1.minute.ago)
 
     patch review_flashcard_path(hsk_card, source: "hsk"),
-      params: { review: { rating: "good" } }
+          params: { review: { rating: "good" } }
 
     get review_path(source: "hsk")
     assert_includes response.body, "1 reviewed"
@@ -318,7 +314,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     flashcard.update!(next_review_at: 1.minute.ago)
 
     patch review_flashcard_path(flashcard),
-      params: { review: { rating: "good" } }
+          params: { review: { rating: "good" } }
 
     follow_redirect!
 
@@ -334,7 +330,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     flashcards(:overdue_review).update!(category: "hsk", next_review_at: 1.minute.ago)
 
     patch review_flashcard_path(hsk_card, source: "hsk"),
-      params: { review: { rating: "good" } }
+          params: { review: { rating: "good" } }
 
     get review_path(source: "hsk")
     assert_includes response.body, "1 reviewed"
@@ -349,7 +345,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     flashcards(:hsk_two).update!(next_review_at: 1.minute.ago, source: "curated", story_status: "curated")
 
     patch review_flashcard_path(card, source: "curated"),
-      params: { review: { rating: "good" } }
+          params: { review: { rating: "good" } }
 
     get review_path(source: "curated")
     assert_includes response.body, "1 reviewed"
@@ -364,7 +360,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     flashcards(:algorithm).update!(next_review_at: 1.minute.ago, category: "missing")
 
     patch review_flashcard_path(card, category: "missing"),
-      params: { review: { rating: "good" } }
+          params: { review: { rating: "good" } }
 
     get review_path(category: "missing")
     assert_includes response.body, "1 reviewed"
@@ -387,7 +383,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     )
 
     patch review_flashcard_path(combined_card, source: "curated", category: "hsk"),
-      params: { review: { rating: "good" } }
+          params: { review: { rating: "good" } }
 
     get review_path(source: "curated", category: "hsk")
     assert_includes response.body, "1 reviewed"
@@ -402,7 +398,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     flashcards(:algorithm).update!(next_review_at: 1.minute.ago)
 
     patch review_flashcard_path(card),
-      params: { review: { rating: "good" } }
+          params: { review: { rating: "good" } }
 
     get review_path
     assert_includes response.body, "1 reviewed"
@@ -437,7 +433,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     )
 
     patch review_flashcard_path(card, source: "curated"),
-      params: { review: { rating: "good" } }
+          params: { review: { rating: "good" } }
 
     get review_path(source: "curated")
     assert_includes response.body, "1 reviewed"
@@ -479,7 +475,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     curated_card.update!(next_review_at: 1.minute.ago)
 
     patch review_flashcard_url(curated_card, source: "hsk"),
-      params: { review: { rating: "good" } }
+          params: { review: { rating: "good" } }
 
     assert_redirected_to review_path(source: "hsk")
     assert_equal "That card is not in the current review filter.", flash[:alert]
@@ -494,12 +490,12 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     # Object#stub, so swap call and restore afterwards).
     call = Review::Scheduler.instance_method(:call)
     Review::Scheduler.define_method(:call) do
-      raise ActiveRecord::RecordInvalid.new(Flashcard.new)
+      raise ActiveRecord::RecordInvalid, Flashcard.new
     end
 
     begin
       patch review_flashcard_path(flashcard),
-        params: { review: { rating: "good" } }
+            params: { review: { rating: "good" } }
 
       assert_redirected_to review_path
       assert_equal "Could not save the review. Try again.", flash[:alert]
@@ -514,7 +510,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     flashcards(:algorithm).update!(next_review_at: 1.minute.ago)
 
     patch review_flashcard_path(flashcard),
-      params: { review: { rating: "good" } }
+          params: { review: { rating: "good" } }
 
     follow_redirect!
     assert_includes response.body, "1 reviewed"
@@ -571,7 +567,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     flashcard.update!(next_review_at: 1.minute.ago)
 
     patch review_flashcard_path(flashcard),
-      params: { review: { rating: "good" } }
+          params: { review: { rating: "good" } }
 
     follow_redirect!
 
@@ -606,13 +602,13 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     plain.update!(next_review_at: 1.minute.ago, source: "hsk", category: "a")
 
     patch review_flashcard_path(crafted, category: "a&source=hsk"),
-      params: { review: { rating: "good" } }
+          params: { review: { rating: "good" } }
     assert_equal 1, session[:review_sessions].size
 
     patch review_flashcard_path(plain, source: "hsk", category: "a"),
-      params: { review: { rating: "good" } }
+          params: { review: { rating: "good" } }
 
     assert_equal 2, session[:review_sessions].size,
-      "the crafted category collided with the {source: hsk, category: a} key"
+                 "the crafted category collided with the {source: hsk, category: a} key"
   end
 end

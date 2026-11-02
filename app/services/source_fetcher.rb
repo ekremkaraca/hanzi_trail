@@ -46,8 +46,8 @@ class SourceFetcher
     response =
       begin
         connection.get(url)
-      rescue Faraday::Error => error
-        raise FetchError, "download failed: #{url} (#{error.message})"
+      rescue Faraday::Error => e
+        raise FetchError, "download failed: #{url} (#{e.message})"
       end
 
     return response if response.status.between?(200, 299)

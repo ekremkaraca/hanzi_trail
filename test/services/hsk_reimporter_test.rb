@@ -85,7 +85,7 @@ class HskReimporterTest < ActiveSupport::TestCase
     # so only the lists that mean "something was written" must be empty.
     assert_empty report.updated
     assert_empty report.edited
-    refute_includes report.missing, "书"
+    assert_not_includes report.missing, "书"
   end
 
   test "raises when file does not exist" do

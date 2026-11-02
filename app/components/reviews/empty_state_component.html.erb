@@ -1,7 +1,7 @@
 <article class="review-empty-state panel-card text-center py-6">
   <div class="review-empty-icon" aria-hidden="true">✓</div>
 
-  <% if has_reviewed_cards? %>
+  <% if reviewed_cards? %>
     <h2>Review session complete.</h2>
     <p class="text-soft mt-2">You reviewed <%= pluralize(reviewed_count, "card") %>.</p>
     <p class="text-soft">Good work. Your current review queue is clear.</p>

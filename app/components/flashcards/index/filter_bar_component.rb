@@ -40,9 +40,9 @@ module Flashcards
         @hsk_level_options ||= [
           [ "All", "" ],
           *Flashcard.where.not(hsk_level: nil)
-                   .distinct.order(:hsk_level)
-                   .pluck(:hsk_level)
-                   .map { |level| [ hsk_level_label(level), level ] }
+                    .distinct.order(:hsk_level)
+                    .pluck(:hsk_level)
+                    .map { |level| [ hsk_level_label(level), level ] }
         ]
       end
 

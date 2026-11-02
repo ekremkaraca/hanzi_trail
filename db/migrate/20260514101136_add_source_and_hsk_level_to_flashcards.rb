@@ -5,6 +5,6 @@ class AddSourceAndHskLevelToFlashcards < ActiveRecord::Migration[8.1]
 
     add_index :flashcards, :source
     add_index :flashcards, :hsk_level
-    add_index :flashcards, [ :source, :hsk_level ]
+    add_index :flashcards, %i[source hsk_level]
   end
 end

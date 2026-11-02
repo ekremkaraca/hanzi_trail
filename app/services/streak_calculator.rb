@@ -21,9 +21,9 @@ class StreakCalculator
 
   def call
     active = ReviewAttempt
-      .where(reviewed_at: window_start..)
-      .pluck(Arel.sql("DISTINCT (reviewed_at AT TIME ZONE 'UTC' AT TIME ZONE #{app_zone_sql})::date"))
-      .to_set
+             .where(reviewed_at: window_start..)
+             .pluck(Arel.sql("DISTINCT (reviewed_at AT TIME ZONE 'UTC' AT TIME ZONE #{app_zone_sql})::date"))
+             .to_set
 
     streak = 0
     day = Date.current

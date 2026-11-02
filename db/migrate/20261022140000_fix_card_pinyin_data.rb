@@ -19,9 +19,7 @@ class FixCardPinyinData < ActiveRecord::Migration[8.1]
 
   def down
     phone_card = Flashcard.find_by(character: "电话")
-    if phone_card && phone_card.pinyin == "diànhuà" && phone_card.meaning == "telephone"
-      phone_card.update!(character: "电")
-    end
+    phone_card.update!(character: "电") if phone_card && phone_card.pinyin == "diànhuà" && phone_card.meaning == "telephone"
 
     Flashcard.where(character: "鑫", pinyin: "xīn").update_all(pinyin: "xīnmiǎo")
   end

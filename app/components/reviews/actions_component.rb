@@ -5,9 +5,9 @@ module Reviews
     # easy green — the row should read at a glance like the SRS meaning.
     REVIEW_BUTTONS = {
       "again" => { label: "Again", key: "1", tone: "btn--danger" },
-      "hard"  => { label: "Hard",  key: "2", tone: "btn--warning" },
-      "good"  => { label: "Good",  key: "3", tone: "btn--primary" },
-      "easy"  => { label: "Easy",  key: "4", tone: "btn--success" }
+      "hard" => { label: "Hard", key: "2", tone: "btn--warning" },
+      "good" => { label: "Good", key: "3", tone: "btn--primary" },
+      "easy" => { label: "Easy", key: "4", tone: "btn--success" }
     }.freeze
 
     def initialize(flashcard:, filter_params:)

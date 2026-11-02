@@ -8,7 +8,7 @@ module Flashcards
 
     attr_reader :flashcard
 
-    def has_errors?
+    def errors?
       flashcard.errors.any?
     end
 

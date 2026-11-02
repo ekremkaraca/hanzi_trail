@@ -1,7 +1,7 @@
 require "test_helper"
 
 class SourceFetcherTest < ActiveSupport::TestCase
-  URL = "https://example.com/sources/pinyin.txt"
+  URL = "https://example.com/sources/pinyin.txt".freeze
 
   # Duck-typed to what Faraday returns, since an injected connection is
   # how these tests stay offline.
@@ -42,7 +42,7 @@ class SourceFetcherTest < ActiveSupport::TestCase
     end
 
     assert ran
-    refute File.exist?(fetched_path)
+    assert_not File.exist?(fetched_path)
   end
 
   test "a plain file path is handed through and no fetch is made" do

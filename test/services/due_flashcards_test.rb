@@ -56,7 +56,7 @@ class DueFlashcardsTest < ActiveSupport::TestCase
       next_review_at: 1.minute.ago
     )
     ReviewAttempt.create!(flashcard: introduced, rating: "again",
-      reviewed_at: Time.current)
+                          reviewed_at: Time.current)
 
     20.times do |i|
       Flashcard.create!(
@@ -71,7 +71,7 @@ class DueFlashcardsTest < ActiveSupport::TestCase
 
     assert_includes admitted, introduced
     assert_equal 19, admitted.count { |card| card.review_count.zero? },
-      "one budget slot was spent on the card introduced today"
+                 "one budget slot was spent on the card introduced today"
   end
 
   test "nil cap disables the governor" do

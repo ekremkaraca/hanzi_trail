@@ -14,8 +14,8 @@ namespace :srs do
     parked = Flashcard.where(review_count: 0).where("next_review_at > ?", Time.current)
     parked = parked.where(hsk_level: args[:scope]) if args[:scope].present?
 
-    puts "Pulling #{parked.count} parked cards forward to now (scope: #{args[:scope] || "all"})"
+    puts "Pulling #{parked.count} parked cards forward to now (scope: #{args[:scope] || 'all'})"
     parked.find_each(batch_size: 500) { |card| card.update_columns(next_review_at: Time.current) }
-    puts "Done. #{Flashcard.where(review_count: 0).where("next_review_at > ?", Time.current).count} parked cards remain."
+    puts "Done. #{Flashcard.where(review_count: 0).where('next_review_at > ?', Time.current).count} parked cards remain."
   end
 end

@@ -65,7 +65,7 @@ class CharacterEntryTest < ActiveSupport::TestCase
   test "splits readings into a primary reading and alternates" do
     entry = CharacterEntry.new(character: "重", pinyin: "chóng,zhǎng")
 
-    assert_equal [ "chóng", "zhǎng" ], entry.pinyin_readings
+    assert_equal %w[chóng zhǎng], entry.pinyin_readings
     assert_equal "chóng", entry.primary_pinyin
     assert_equal [ "zhǎng" ], entry.alternate_pinyin
   end

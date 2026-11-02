@@ -43,9 +43,9 @@ class CharacterLinker
       next if previously_linked.empty?
 
       link_counts = FlashcardCharacter
-        .where(character_entry_id: previously_linked.map(&:id))
-        .group(:character_entry_id)
-        .count
+                    .where(character_entry_id: previously_linked.map(&:id))
+                    .group(:character_entry_id)
+                    .count
 
       previously_linked.each do |entry|
         next if link_counts.fetch(entry.id, 0).positive?

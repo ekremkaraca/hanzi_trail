@@ -78,6 +78,7 @@ module Review
 
     # good divides by nothing (factor 1), hard shrinks, easy rewards.
     RATING_FACTOR = { "hard" => 1 / HARD_DIV, "good" => 1.0, "easy" => EASY_MULT }.freeze
+    private_constant :RATING_FACTOR
 
     def clamp_ease(value)
       [ [ value, EASE_MIN ].max, EASE_MAX ].min

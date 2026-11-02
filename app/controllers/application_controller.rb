@@ -16,7 +16,7 @@ class ApplicationController < ActionController::Base
       redirect_to new_session_path, alert: "Sign in to edit content."
     else
       redirect_to same_host_referer || root_path,
-        alert: "You are not allowed to do that."
+                  alert: "You are not allowed to do that."
     end
   end
 

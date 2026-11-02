@@ -126,7 +126,7 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
 
     # chē ní ruǎn suàn wǎng wǒ xué — raw codepoint order would put 网(7F51)
     # and 我(6211)/你(4F60) in a different, learner-hostile sequence.
-    assert_equal [ "车", "你", "软", "算", "网", "我", "学" ], rendered
+    assert_equal %w[车 你 软 算 网 我 学], rendered
   end
 
   test "index filters by source" do
@@ -297,7 +297,7 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
   test "index paginates cards in deterministic order" do
     120.times do |i|
       Flashcard.create!(
-        character: "溢#{format("%03d", i)}",
+        character: "溢#{format('%03d', i)}",
         pinyin: "yì",
         meaning: "paginationmarker",
         category: "pagination_test",
@@ -305,8 +305,8 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
       )
     end
 
-    card_links = -> {
-      response.body.scan(/flashcard-character-link" href="\/flashcards\/\d+">([^<]+)</).flatten
+    card_links = lambda {
+      response.body.scan(%r{flashcard-character-link" href="/flashcards/\d+">([^<]+)<}).flatten
     }
     page_link = ->(page) { flashcards_path(category: "pagination_test", page: page) }
 
@@ -372,7 +372,7 @@ class FlashcardsControllerTest < ActionDispatch::IntegrationTest
     # And the form field must not echo the Array's to_s back as its value:
     # the raw-param render bug the QueryParam.scalar guard in the index
     # components closes (HTML-escaped, so the quotes arrive as &quot;).
-    refute_includes response.body, "[&quot;a&quot;]"
+    assert_not_includes response.body, "[&quot;a&quot;]"
     assert_select "input[name=query]:not([value])", count: 1
   end
 

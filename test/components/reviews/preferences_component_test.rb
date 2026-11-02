@@ -20,9 +20,9 @@ module Reviews
 
     test "reflects the saved preference and carries the active filters" do
       render_inline(PreferencesComponent.new(
-        show_pinyin: true,
-        filter_params: { source: "hsk", category: nil, story_status: "missing" }
-      ))
+                      show_pinyin: true,
+                      filter_params: { source: "hsk", category: nil, story_status: "missing" }
+                    ))
 
       # Hidden inputs are invisible to Capybara's default filter, so the
       # assertions below opt out of it explicitly.

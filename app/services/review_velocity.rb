@@ -27,7 +27,7 @@ class ReviewVelocity
   # the window keeps the result set from growing with the table.
   def dates
     @dates ||= window
-      .pluck(Arel.sql("DISTINCT (reviewed_at AT TIME ZONE 'UTC' AT TIME ZONE #{app_zone_sql})::date"))
+               .pluck(Arel.sql("DISTINCT (reviewed_at AT TIME ZONE 'UTC' AT TIME ZONE #{app_zone_sql})::date"))
   end
 
   def total_reviews

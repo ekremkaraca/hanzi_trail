@@ -43,11 +43,11 @@ module Audio
     # intentionally has none, so stub them for its duration and restore.
     def with_azure_env
       keys = { "AZURE_SPEECH_KEY" => "test-key", "AZURE_SPEECH_REGION" => "testregion" }
-      saved = keys.transform_values { |key| ENV[key] }
+      saved = keys.transform_values { |key| ENV.fetch(key, nil) }
       keys.each { |key, value| ENV[key] = value }
       yield
     ensure
-      keys.each do |key, value|
+      keys.each_key do |key|
         saved[key] ? ENV[key] = saved[key] : ENV.delete(key)
       end
     end

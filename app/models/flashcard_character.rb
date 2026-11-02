@@ -3,8 +3,8 @@ class FlashcardCharacter < ApplicationRecord
   belongs_to :character_entry
 
   validates :position,
-    presence: true,
-    numericality: {
-      greater_than_or_equal_to: 0
-    }
+            presence: true,
+            numericality: {
+              greater_than_or_equal_to: 0
+            }
 end

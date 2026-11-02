@@ -20,12 +20,12 @@ namespace :audio do
     # whatever each voice's lexicon chooses, which is exactly what the
     # ear must judge since <phoneme> hinting is unavailable (rejected
     # with 400 by the endpoint).
-    SAMPLE = {
-      sandhi: %w[一样 不过 不好意思 一般 一会儿 不错 不客气],
-      polyphones: %w[行 得了 长大 都是 还有 觉得 音乐 地铁 银行],
-      plain: %w[安静 安排 报纸 比较 表演 冰箱 菜单 参加 操作
-                试 是 四 十 没事儿 哪儿 女儿]
-    }.freeze
+    const_set(:SAMPLE, {
+                sandhi: %w[一样 不过 不好意思 一般 一会儿 不错 不客气],
+                polyphones: %w[行 得了 长大 都是 还有 觉得 音乐 地铁 银行],
+                plain: %w[安静 安排 报纸 比较 表演 冰箱 菜单 参加 操作
+                          试 是 四 十 没事儿 哪儿 女儿]
+              })
 
     out = Rails.root.join("tmp/audio_validation")
     FileUtils.rm_rf(out)
@@ -89,25 +89,23 @@ namespace :audio do
     # card, and re-runs resume from the NULL-scope.
     failed = 0
     cards.find_each do |card|
-      begin
-        ssml = builder.call(card)
-        bytes = Audio::AzureTts.synthesize(ssml: ssml)
-        unless Audio::SilenceGuard.valid?(bytes)
-          puts "\n! silence guard rejected #{card.character}"
-          failed += 1
-          next
-        end
-
-        # Key encodes card + voice: objects are immutable per key, and a
-        # future voice switch gets fresh keys instead of overwriting.
-        key = "words/#{card.id}-#{voice_slug}.mp3"
-        AudioStorage.upload!(key, bytes)
-        card.update_columns(audio_key: key)
-        print "."
-      rescue StandardError => e
+      ssml = builder.call(card)
+      bytes = Audio::AzureTts.synthesize(ssml: ssml)
+      unless Audio::SilenceGuard.valid?(bytes)
+        puts "\n! silence guard rejected #{card.character}"
         failed += 1
-        puts "\n! FAIL #{card.character}: #{e.class}: #{e.message.to_s.slice(0, 300)}"
+        next
       end
+
+      # Key encodes card + voice: objects are immutable per key, and a
+      # future voice switch gets fresh keys instead of overwriting.
+      key = "words/#{card.id}-#{voice_slug}.mp3"
+      AudioStorage.upload!(key, bytes)
+      card.update_columns(audio_key: key)
+      print "."
+    rescue StandardError => e
+      failed += 1
+      puts "\n! FAIL #{card.character}: #{e.class}: #{e.message.to_s.slice(0, 300)}"
     end
 
     puts "\nDone. Failed: #{failed}. Remaining without audio: #{Flashcard.where(audio_key: nil).count}"

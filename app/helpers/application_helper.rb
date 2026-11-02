@@ -1,6 +1,6 @@
 module ApplicationHelper
   def link_to_active_review_if_present
-    return unless session[:review_return_to].present?
+    return if session[:review_return_to].blank?
 
     link_to session[:review_return_to], class: "btn btn--info btn--block mb-4" do
       concat content_tag(:span, "←", class: "icon mr-1")

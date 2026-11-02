@@ -663,4 +663,4 @@ FLASHCARD_SEEDS = [
     hsk_level: nil,
     story_status: "curated"
   }
-]
+].freeze

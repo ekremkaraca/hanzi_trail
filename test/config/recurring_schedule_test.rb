@@ -15,7 +15,7 @@ require "fugit"
 
 class RecurringScheduleTest < ActiveSupport::TestCase
   TASKS = begin
-    all = ERB.new(File.read(Rails.root.join("config/recurring.yml"))).result
+    all = ERB.new(Rails.root.join("config/recurring.yml").read).result
     (YAML.load(all) || {}).transform_keys(&:to_s)
   end
 
@@ -39,10 +39,10 @@ class RecurringScheduleTest < ActiveSupport::TestCase
       parsed = Fugit.parse(schedule.to_s, multi: :fail)
 
       assert_kind_of Fugit::Cron, parsed,
-        "#{env}/#{key}: schedule #{schedule.inspect} is not a supported " \
-        "recurring schedule (solid_queue rejects it and the booting " \
-        "process exits). Use an explicit cron or \"every day at 3am\" " \
-        "phrasing; bare \"daily\" parses to nil."
+                     "#{env}/#{key}: schedule #{schedule.inspect} is not a supported " \
+                     "recurring schedule (solid_queue rejects it and the booting " \
+                     "process exits). Use an explicit cron or \"every day at 3am\" " \
+                     "phrasing; bare \"daily\" parses to nil."
     end
 
     # Guards the guard: a silently empty config would pass vacuously.
@@ -56,7 +56,7 @@ class RecurringScheduleTest < ActiveSupport::TestCase
       klass = task["class"] || task[:class]
 
       assert command.present? || klass.present?,
-        "#{env}/#{key} has neither command nor class"
+             "#{env}/#{key} has neither command nor class"
     end
   end
 

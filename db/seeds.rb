@@ -9,8 +9,8 @@ FLASHCARD_SEEDS.each do |attrs|
   end
 end
 
-puts "Seeded #{FLASHCARD_SEEDS.size} flashcards."
-puts "Importing HSK 3.0 (new-1..new-5) flashcards..."
+Rails.logger.debug { "Seeded #{FLASHCARD_SEEDS.size} flashcards." }
+Rails.logger.debug "Importing HSK 3.0 (new-1..new-5) flashcards..."
 
 # Idempotent: HskImporter skips persisted characters, and due dates are
 # staggered across months at import time (see STAGGER_CYCLE_DAYS), so
@@ -22,8 +22,8 @@ puts "Importing HSK 3.0 (new-1..new-5) flashcards..."
   ).call
 end
 
-puts "HSK 3.0 import completed."
-puts "Linking character entries..."
+Rails.logger.debug "HSK 3.0 import completed."
+Rails.logger.debug "Linking character entries..."
 
 # HskImporter already linked the cards it imported; only curated seed rows
 # (and any strays) still need links. Re-linking everything would destroy and
@@ -32,4 +32,4 @@ Flashcard.where.missing(:flashcard_characters).find_each do |flashcard|
   CharacterLinker.call(flashcard)
 end
 
-puts "Done."
+Rails.logger.debug "Done."

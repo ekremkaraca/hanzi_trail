@@ -19,7 +19,7 @@ module CharacterEntries
       alternates = character_entry.alternate_pinyin
       return if alternates.empty?
 
-      "also #{alternates.join(", ")}"
+      "also #{alternates.join(', ')}"
     end
 
     def meaning_text

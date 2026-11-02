@@ -36,7 +36,7 @@ module Audio
     # when several chart-valid splits exist ("xian" = xian | xi+an), the
     # split matching the hanzi count wins.
     def self.syllables(word, target_count: nil)
-      words = word.to_s.downcase.split(/[\s'\u2019]+/).reject(&:blank?)
+      words = word.to_s.downcase.split(/[\s'\u2019]+/).compact_blank
       return [] if words.empty?
 
       if words.size == 1
@@ -98,7 +98,7 @@ module Audio
     # syllable chart; word length is ≤ ~10 letters, so this stays cheap.
     def self.valid_splits(base, tones)
       results = []
-      walk = ->(pos, acc) do
+      walk = lambda do |pos, acc|
         if pos == base.length
           results << acc
           return

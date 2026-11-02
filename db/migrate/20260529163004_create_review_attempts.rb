@@ -6,7 +6,7 @@ class CreateReviewAttempts < ActiveRecord::Migration[8.1]
       t.datetime :reviewed_at, null: false
 
       t.index :reviewed_at
-      t.index [ :flashcard_id, :reviewed_at ]
+      t.index %i[flashcard_id reviewed_at]
       t.index :rating
 
       t.timestamps

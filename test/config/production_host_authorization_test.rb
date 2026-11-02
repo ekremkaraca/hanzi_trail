@@ -5,7 +5,7 @@
 require "test_helper"
 
 class ProductionHostAuthorizationTest < ActiveSupport::TestCase
-  SCRIPT = <<~RUBY
+  SCRIPT = <<~RUBY.freeze
     hosts = Rails.application.config.hosts
     perm  = ActionDispatch::HostAuthorization::Permissions.new(hosts)
     configured = ENV.fetch("APP_HOST", "hanzitrail.fly.dev")
@@ -26,12 +26,16 @@ class ProductionHostAuthorizationTest < ActiveSupport::TestCase
       { "RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1" },
       [ Rails.root.join("bin/rails").to_s, "runner", "-" ],
       "r+", err: File::NULL
-    ) { |io| io.write(SCRIPT); io.close_write; io.read }
+    ) do |io|
+      io.write(SCRIPT)
+      io.close_write
+      io.read
+    end
 
     assert_includes out, "configured=true",
-      "the app's own host must be allowed"
+                    "the app's own host must be allowed"
     assert_includes out, "hostile=false",
-      "a hostile Host header must be rejected (config.hosts empty allows all)"
+                    "a hostile Host header must be rejected (config.hosts empty allows all)"
     assert_includes out, "real_host_status=200"
     assert_includes out, "hostile_status=403"
   end

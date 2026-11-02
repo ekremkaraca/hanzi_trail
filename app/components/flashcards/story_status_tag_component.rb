@@ -2,10 +2,10 @@ module Flashcards
   class StoryStatusTagComponent < ViewComponent::Base
     STATUSES = {
       "missing" => [ "Missing Story", "badge--warning" ],
-      "draft"   => [ "Draft Story",   "badge--info" ],
+      "draft" => [ "Draft Story", "badge--info" ],
       "curated" => [ "Curated Story", "badge--success" ]
     }.freeze
-    DEFAULT  = [ "Unknown Story", "badge--neutral" ].freeze
+    DEFAULT = [ "Unknown Story", "badge--neutral" ].freeze
 
     def initialize(flashcard:)
       @flashcard = flashcard

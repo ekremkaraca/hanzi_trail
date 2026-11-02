@@ -83,7 +83,7 @@ class StatsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :success
-    assert_match(/Last 7 days.{0,200}?<strong[^>]*>1<\/strong>/m, response.body)
+    assert_match(%r{Last 7 days.{0,200}?<strong[^>]*>1</strong>}m, response.body)
   end
 
   test "the aggregate bundle is computed once per TTL, the feed is not" do
@@ -118,7 +118,7 @@ class StatsControllerTest < ActionDispatch::IntegrationTest
   def count_attempt_queries
     count = 0
     counter = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
-      count += 1 if payload[:sql].include?(%q(FROM "review_attempts"))
+      count += 1 if payload[:sql].include?('FROM "review_attempts"')
     end
     yield
     count

@@ -15,14 +15,14 @@ class FlashcardPolicyTest < ActiveSupport::TestCase
   test "guests cannot write" do
     %i[create? update? destroy?].each do |rule|
       assert_not permitted?(rule, @flashcard, user: nil),
-        "expected #{rule} to be denied for guests"
+                 "expected #{rule} to be denied for guests"
     end
   end
 
   test "curators can do everything" do
     %i[index? show? create? update? destroy?].each do |rule|
       assert permitted?(rule, @flashcard, user: @user),
-        "expected #{rule} to be allowed for curators"
+             "expected #{rule} to be allowed for curators"
     end
   end
 

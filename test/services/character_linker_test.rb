@@ -11,7 +11,7 @@ class CharacterLinkerTest < ActiveSupport::TestCase
 
     assert_equal 2, card.flashcard_characters.count
 
-    assert_equal [ "网", "络" ], card.character_entries.order("flashcard_characters.position").pluck(:character)
+    assert_equal %w[网 络], card.character_entries.order("flashcard_characters.position").pluck(:character)
   end
 
   test "does not duplicate links" do
@@ -36,11 +36,11 @@ class CharacterLinkerTest < ActiveSupport::TestCase
     card.update!(character: "中国")
     CharacterLinker.call(card)
 
-    assert_equal [ "中", "国" ],
-      card.flashcard_characters
-          .includes(:character_entry)
-          .order(:position)
-          .map { |link| link.character_entry.character }
+    assert_equal(%w[中 国],
+                 card.flashcard_characters
+                     .includes(:character_entry)
+                     .order(:position)
+                     .map { |link| link.character_entry.character })
   end
 
   test "does not duplicate links when run repeatedly" do
@@ -82,7 +82,7 @@ class CharacterLinkerTest < ActiveSupport::TestCase
     # explicitly and restore it afterwards.)
     finder = CharacterEntry.method(:find_or_create_by!)
     CharacterEntry.define_singleton_method(:find_or_create_by!) do |_attrs|
-      raise ActiveRecord::RecordNotUnique.new("stub insert race")
+      raise ActiveRecord::RecordNotUnique, "stub insert race"
     end
 
     begin

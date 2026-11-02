@@ -128,7 +128,7 @@ class CharacterEntriesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to character_entry_path(entry)
     # Exact count pins the message path: it must still carry the number.
     assert_equal "网 is still part of 1 card(s); delete or edit those cards first.",
-      flash[:alert]
+                 flash[:alert]
     # Gate and message read the same rows now: one LIKE scan for both, not
     # deletable?'s none? plus required_by_cards.count (two scans).
     assert_equal 1, like_scans

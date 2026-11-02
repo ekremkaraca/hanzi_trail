@@ -39,7 +39,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     get new_session_path, params: { email_address: [ "a" ] }
 
     assert_response :success
-    refute_includes response.body, "[&quot;a&quot;]"
+    assert_not_includes response.body, "[&quot;a&quot;]"
     assert_select "input[name=\"email_address\"]:not([value])", count: 1
   end
 

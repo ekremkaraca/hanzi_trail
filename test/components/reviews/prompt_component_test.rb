@@ -16,9 +16,9 @@ module Reviews
       # Capybara's default visibility filter.
       assert_selector "[data-review-target='voiceHint'][hidden]", visible: false
       assert_selector "[data-review-target='voiceHint']",
-        text: "This browser has no Mandarin voice", visible: false
+                      text: "This browser has no Mandarin voice", visible: false
       assert_selector "[data-review-target='voiceHint']",
-        text: "How to add one", visible: :all
+                      text: "How to add one", visible: :all
     end
 
     test "names the hint as the description of the Speak button" do

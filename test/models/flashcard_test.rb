@@ -8,10 +8,10 @@ class FlashcardTest < ActiveSupport::TestCase
   end
   test "valid with required fields" do
     card = Flashcard.new(
-    character: "新",
-    pinyin: "xīn",
-    meaning: "new"
-  )
+      character: "新",
+      pinyin: "xīn",
+      meaning: "new"
+    )
 
     assert card.valid?, card.errors.full_messages.to_sentence
     assert_equal "new", card.difficulty
@@ -35,7 +35,7 @@ class FlashcardTest < ActiveSupport::TestCase
     future_review = flashcards(:future_review)
 
     assert_includes Flashcard.due_for_review, overdue_review
-    refute_includes Flashcard.due_for_review, future_review
+    assert_not_includes Flashcard.due_for_review, future_review
   end
 
   test "defaults story status to missing when story is blank" do
@@ -174,7 +174,7 @@ class FlashcardTest < ActiveSupport::TestCase
     hsk = flashcards(:hsk_one)
 
     assert_includes Flashcard.by_source("curated"), curated
-    refute_includes Flashcard.by_source("curated"), hsk
+    assert_not_includes Flashcard.by_source("curated"), hsk
   end
 
   test "by_source scope returns all when blank" do
@@ -194,7 +194,7 @@ class FlashcardTest < ActiveSupport::TestCase
     curated = flashcards(:network)
 
     assert_includes Flashcard.by_hsk_level("old-1"), hsk_one
-    refute_includes Flashcard.by_hsk_level("old-1"), curated
+    assert_not_includes Flashcard.by_hsk_level("old-1"), curated
   end
 
   test "by_hsk_level scope returns all when blank" do
@@ -206,7 +206,7 @@ class FlashcardTest < ActiveSupport::TestCase
     education = flashcards(:overdue_review)
 
     assert_includes Flashcard.by_category("technical"), technical
-    refute_includes Flashcard.by_category("technical"), education
+    assert_not_includes Flashcard.by_category("technical"), education
   end
 
   test "by_category scope returns all when blank" do
@@ -219,7 +219,7 @@ class FlashcardTest < ActiveSupport::TestCase
     hsk.update!(story_status: "missing")
 
     assert_includes Flashcard.by_story_status("curated"), @default_card
-    refute_includes Flashcard.by_story_status("curated"), hsk
+    assert_not_includes Flashcard.by_story_status("curated"), hsk
   end
 
   test "by_story_status scope returns all when blank" do
@@ -232,7 +232,7 @@ class FlashcardTest < ActiveSupport::TestCase
     hsk.update!(story_status: "missing")
 
     assert_includes Flashcard.missing_story, hsk
-    refute_includes Flashcard.missing_story, @default_card
+    assert_not_includes Flashcard.missing_story, @default_card
   end
 
   test "draft_story scope returns cards with draft story" do
@@ -241,7 +241,7 @@ class FlashcardTest < ActiveSupport::TestCase
     hsk.update!(story_status: "missing")
 
     assert_includes Flashcard.draft_story, @default_card
-    refute_includes Flashcard.draft_story, hsk
+    assert_not_includes Flashcard.draft_story, hsk
   end
 
   test "curated_story scope returns cards with curated story" do
@@ -250,7 +250,7 @@ class FlashcardTest < ActiveSupport::TestCase
     hsk.update!(story_status: "missing")
 
     assert_includes Flashcard.curated_story, @default_card
-    refute_includes Flashcard.curated_story, hsk
+    assert_not_includes Flashcard.curated_story, hsk
   end
 
   test "short_story scope returns cards with short non-blank stories" do
@@ -259,7 +259,7 @@ class FlashcardTest < ActiveSupport::TestCase
     long.update!(story: "x" * Flashcard::SHORT_STORY_LENGTH)
 
     assert_includes Flashcard.short_story, @default_card
-    refute_includes Flashcard.short_story, long
+    assert_not_includes Flashcard.short_story, long
   end
 
   test "short_story scope excludes blank and nil stories" do
@@ -412,7 +412,7 @@ class FlashcardTest < ActiveSupport::TestCase
   test "with_story_filter curated returns curated cards" do
     results = Flashcard.with_story_filter("curated")
 
-    assert results.all? { |card| card.story_status == "curated" }
+    assert(results.all? { |card| card.story_status == "curated" })
   end
 
   test "create links each character to an entry automatically" do
@@ -474,20 +474,20 @@ class FlashcardTest < ActiveSupport::TestCase
 
     # Guard + ordered list must not hit the database after hydration.
     assert_no_sql do
-      assert card.has_character_links?
-      assert card.has_character_links?
-      assert_equal %w[网 络], card.ordered_characters.map { |l| l.character_entry.character }
+      assert card.character_links?
+      assert card.character_links?
+      assert_equal(%w[网 络], card.ordered_characters.map { |l| l.character_entry.character })
     end
 
     # Idempotent: a second call neither reloads nor re-queries.
     assert_no_sql { card.preload_character_links! }
   end
 
-  test "has_character_links? is false for an unlinked card" do
+  test "character_links? is false for an unlinked card" do
     card = flashcards(:network)
     card.flashcard_characters.delete_all
 
-    assert_not card.reload.has_character_links?
+    assert_not card.reload.character_links?
   end
 
   test "normalize_pinyin strips tones and case" do

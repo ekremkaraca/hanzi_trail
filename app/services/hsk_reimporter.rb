@@ -38,8 +38,8 @@ class HskReimporter
     end
 
     report
-  rescue KeyError => error
-    raise ReimportError, "Invalid HSK entry: missing #{error.key}"
+  rescue KeyError => e
+    raise ReimportError, "Invalid HSK entry: missing #{e.key}"
   end
 
   private
@@ -80,7 +80,7 @@ class HskReimporter
 
   def pristine?(card, entry)
     form = entry.fetch("forms").first
-    raise ReimportError, "Entry '#{entry.fetch("simplified")}' has an empty forms array" if form.nil?
+    raise ReimportError, "Entry '#{entry.fetch('simplified')}' has an empty forms array" if form.nil?
 
     card.pinyin == form.fetch("transcriptions").fetch("pinyin") &&
       card.meaning == form.fetch("meanings").join("; ")
@@ -97,7 +97,7 @@ class HskReimporter
 
   def parse_json
     JSON.parse(File.read(path))
-  rescue JSON::ParserError => error
-    raise ReimportError, "Invalid JSON: #{error.message}"
+  rescue JSON::ParserError => e
+    raise ReimportError, "Invalid JSON: #{e.message}"
   end
 end

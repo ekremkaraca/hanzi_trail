@@ -21,7 +21,7 @@ module Flashcards
       render_inline(EmptyStateComponent.new)
 
       assert_text "No flashcards matched your filter."
-      assert_selector "a[href='#{flashcards_path(story_status: "missing")}']", text: "Missing stories"
+      assert_selector "a[href='#{flashcards_path(story_status: 'missing')}']", text: "Missing stories"
       assert_selector "a[href='#{flashcards_path}']", text: "Browse all flashcards"
     end
   end

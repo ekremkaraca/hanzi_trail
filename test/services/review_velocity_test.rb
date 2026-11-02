@@ -29,7 +29,7 @@ class ReviewVelocityTest < ActiveSupport::TestCase
       card = flashcards(:network)
 
       ReviewAttempt.create!(flashcard: card, rating: "good", reviewed_at: Time.current)
-      ReviewAttempt.create!(flashcard: card, rating: "good", reviewed_at: Time.current + 3.hours)
+      ReviewAttempt.create!(flashcard: card, rating: "good", reviewed_at: 3.hours.from_now)
 
       assert_equal 2.0, ReviewVelocity.call
     end

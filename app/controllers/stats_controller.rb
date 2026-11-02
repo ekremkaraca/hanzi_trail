@@ -14,7 +14,7 @@ class StatsController < ApplicationController
   # money, no quota), and a reviewer landing here right after a review
   # still sees their own attempt in @recent_attempts, which stays live.
   # Bump the TTL only with that staleness trade written down.
-  AGGREGATES_CACHE_KEY = "stats/aggregates/v1"
+  AGGREGATES_CACHE_KEY = "stats/aggregates/v1".freeze
   AGGREGATES_TTL = 1.minute
 
   def show
@@ -26,8 +26,8 @@ class StatsController < ApplicationController
         # same local midnight as "Reviewed today" and the
         # streak instead of on a rolling 7x24h window.
         week_count: ReviewAttempt
-          .where(reviewed_at: 6.days.ago.beginning_of_day..Time.current.end_of_day)
-          .count,
+                    .where(reviewed_at: 6.days.ago.beginning_of_day..Time.current.end_of_day)
+                    .count,
         total_count: ReviewAttempt.count,
         # Keep the streak as a small aggregate so the view can render it directly.
         streak: StreakCalculator.call,

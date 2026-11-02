@@ -154,7 +154,9 @@ class HskImporterTest < ActiveSupport::TestCase
     )
 
     assert_no_difference "Flashcard.count" do
-      importer.call rescue nil
+      importer.call
+    rescue StandardError
+      nil
     end
   end
 
@@ -165,7 +167,9 @@ class HskImporterTest < ActiveSupport::TestCase
     )
 
     assert_no_difference "Flashcard.count" do
-      importer.call rescue nil
+      importer.call
+    rescue StandardError
+      nil
     end
   end
 
@@ -185,7 +189,7 @@ class HskImporterTest < ActiveSupport::TestCase
       HskImporter.import!(path: path, level: "old-1")
     end
   ensure
-    File.delete(path) if File.exist?(path)
+    FileUtils.rm_f(path)
   end
 
   test "treats a character a concurrent import just inserted as already imported" do
@@ -206,7 +210,7 @@ class HskImporterTest < ActiveSupport::TestCase
     # explicitly and restore it afterwards.)
     save = Flashcard.instance_method(:save!)
     Flashcard.define_method(:save!) do |*|
-      raise ActiveRecord::RecordNotUnique.new("stub insert race")
+      raise ActiveRecord::RecordNotUnique, "stub insert race"
     end
 
     begin
@@ -217,7 +221,7 @@ class HskImporterTest < ActiveSupport::TestCase
       Flashcard.define_method(:save!, save)
     end
   ensure
-    File.delete(path) if File.exist?(path)
+    FileUtils.rm_f(path)
   end
 
   test "imported cards are due immediately (pacing is the cap's job)" do
@@ -257,10 +261,10 @@ class HskImporterTest < ActiveSupport::TestCase
     end
 
     assert_equal 100, Flashcard.where("character LIKE '字%'").count,
-      "chunk 1 must stay committed while the failing chunk rolls back"
+                 "chunk 1 must stay committed while the failing chunk rolls back"
   ensure
     Flashcard.define_method(:save!, original)
-    File.delete(path) if File.exist?(path)
+    FileUtils.rm_f(path)
   end
 
   test "single-character entries backfill the radical, multi-character ones do not" do

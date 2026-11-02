@@ -46,9 +46,7 @@ class CardPinyinAudit
     report.checked += 1
     syllables = dictionary.segment(card.pinyin, count: card.character.length)
 
-    if syllables.nil?
-      return explain_split_failure(card)
-    end
+    return explain_split_failure(card) if syllables.nil?
 
     separate(card, syllables)
     compare_readings(card, syllables)
@@ -74,9 +72,7 @@ class CardPinyinAudit
     return unless card.character.length > 1
     return if card.pinyin.match?(/[ '’]/)
 
-    unless fix_spacing
-      return finding(card, :spacing, "no separator between the syllables")
-    end
+    return finding(card, :spacing, "no separator between the syllables") unless fix_spacing
 
     respaced = syllables.join(" ")
     report.respaced << Change.new(character: card.character, from: card.pinyin, to: respaced)
@@ -105,12 +101,12 @@ class CardPinyinAudit
       elsif PinyinDictionary.tone_marked?(key)
         finding(
           card, :tone,
-          "'#{syllable}' differs in tone from #{same_base.map { |reading| "'#{reading}'" }.join(", ")}"
+          "'#{syllable}' differs in tone from #{same_base.map { |reading| "'#{reading}'" }.join(', ')}"
         )
       else
         finding(
           card, :neutral,
-          "'#{syllable}' has no tone mark; the dictionary lists #{same_base.join(", ")}"
+          "'#{syllable}' has no tone mark; the dictionary lists #{same_base.join(', ')}"
         )
       end
     end

@@ -19,7 +19,8 @@ namespace :hsk do
       puts "done"
     end
 
-    puts format("HSK 3.0 migration complete: %d hsk cards, %d characters linked.",
-                Flashcard.where(source: "hsk").count, CharacterEntry.count)
+    puts format("HSK 3.0 migration complete: %<card_count>d hsk cards, %<entry_count>d characters linked.",
+                card_count: Flashcard.where(source: "hsk").count,
+                entry_count: CharacterEntry.count)
   end
 end

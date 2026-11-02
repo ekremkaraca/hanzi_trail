@@ -33,23 +33,22 @@ class Flashcard < ApplicationRecord
   validates :usage_note, length: { maximum: 1_000 }, allow_blank: true
 
   before_validation :set_initial_review_time, on: :create
-  before_validation :sync_story_status, on: %i[ create update ]
+  before_validation :sync_story_status, on: %i[create update]
   before_save :set_pinyin_sort_key
-
-  # Curators can now edit cards, so the character-entry links must follow
-  # the character. Runs on create too (saved_change_to_character? is true
-  # for new records), replacing the explicit CharacterLinker calls that
-  # the importer used to make.
-  after_save :relink_characters, if: :saved_change_to_character?
 
   # Deleting a card removes its join rows but leaves the CharacterEntry rows it
   # created stranded when no other card uses that hanzi (probed: destroying a
   # two-hanzi card grew the orphan set). Entries are derived data, so prune the
   # ones this card was the last user of.
   after_destroy :prune_orphaned_character_entries
+  # Curators can now edit cards, so the character-entry links must follow
+  # the character. Runs on create too (saved_change_to_character? is true
+  # for new records), replacing the explicit CharacterLinker calls that
+  # the importer used to make.
+  after_save :relink_characters, if: :saved_change_to_character?
 
-  scope(:due_for_review, -> {
-    where("next_review_at <= ?", Time.current).order(:next_review_at, :id)
+  scope(:due_for_review, lambda {
+    where(next_review_at: ..Time.current).order(:next_review_at, :id)
   })
 
   # Enum-backed filters ignore an unknown value rather than filtering to an
@@ -63,7 +62,7 @@ class Flashcard < ApplicationRecord
   scope :by_category, ->(category) { category.present? ? where(category: category) : all }
   scope :by_story_status, ->(story_status) { story_status.present? ? where(story_status: story_status) : all }
 
-  scope :search, ->(query) {
+  scope :search, lambda { |query|
     if query.present?
       where(
         "character ILIKE :query
@@ -77,19 +76,19 @@ class Flashcard < ApplicationRecord
     end
   }
 
-  scope :missing_story, -> {
+  scope :missing_story, lambda {
     where(story_status: "missing")
   }
 
-  scope :draft_story, -> {
+  scope :draft_story, lambda {
     where(story_status: "draft")
   }
 
-  scope :curated_story, -> {
+  scope :curated_story, lambda {
     where(story_status: "curated")
   }
 
-  scope :short_story, -> {
+  scope :short_story, lambda {
     where.not(story: [ nil, "" ]).where("LENGTH(story) < ?", SHORT_STORY_LENGTH)
   }
 
@@ -156,7 +155,7 @@ class Flashcard < ApplicationRecord
   # True when the card has at least one character link. Uses the loaded
   # association when available so repeated view checks (tab visibility +
   # tab content) cost zero extra queries after preload_character_links!.
-  def has_character_links?
+  def character_links?
     if flashcard_characters.loaded?
       flashcard_characters.any?
     else
@@ -196,8 +195,7 @@ class Flashcard < ApplicationRecord
 
     CharacterEntry
       .where(character: linked)
-      .left_joins(:flashcard_characters)
-      .where(flashcard_characters: { id: nil })
+      .where.missing(:flashcard_characters)
       .delete_all
   end
 

@@ -19,7 +19,7 @@ module Audio
     # Storage env config is absent in tests; stub it for the duration.
     def with_storage_env
       saved = %w[R2_BUCKET R2_CDN_BASE R2_ENDPOINT R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY]
-                .to_h { |k| [k, ENV[k]] }
+              .index_with { |k| ENV.fetch(k, nil) }
       ENV["R2_BUCKET"] = "test-bucket"
       ENV["R2_CDN_BASE"] = "https://cdn.test"
       yield
@@ -48,7 +48,7 @@ module Audio
     test "public_url composes the CDN base with the key" do
       with_storage_env do
         assert_equal "https://cdn.test/words/12-xiaoxiao.mp3",
-          AudioStorage.public_url("words/12-xiaoxiao.mp3")
+                     AudioStorage.public_url("words/12-xiaoxiao.mp3")
       end
     end
 

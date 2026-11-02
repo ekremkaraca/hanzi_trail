@@ -16,7 +16,7 @@ module Flashcards
         assert_selector "div[data-controller='character-counter'][data-character-counter-count-unit-value='code-points']", count: 5
 
         story = "textarea[name='flashcard[story]'][data-character-counter-target='input']"
-        assert_selector story + "[maxlength='2000']"
+        assert_selector "#{story}[maxlength='2000']"
         assert_selector "span[data-character-counter-target='counter']", count: 5
         assert_text "/ 2000"
       end

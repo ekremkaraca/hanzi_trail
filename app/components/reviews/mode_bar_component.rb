@@ -25,18 +25,18 @@ module Reviews
 
     def mode_link(config)
       helpers.link_to config.fetch(:label),
-        helpers.review_path(config.fetch(:params)),
-        role: "button",
-        class: mode_button_class(config.fetch(:mode)),
-        "aria-current": (mode_active?(config.fetch(:mode)) ? "page" : nil)
+                      helpers.review_path(config.fetch(:params)),
+                      role: "button",
+                      class: mode_button_class(config.fetch(:mode)),
+                      'aria-current': (mode_active?(config.fetch(:mode)) ? "page" : nil)
     end
 
     def mode_button_class(mode)
       helpers.class_names(
         "btn",
         "btn--sm",
-        "btn--ghost": !mode_active?(mode),
-        "btn--primary": mode_active?(mode)
+        'btn--ghost': !mode_active?(mode),
+        'btn--primary': mode_active?(mode)
       )
     end
 

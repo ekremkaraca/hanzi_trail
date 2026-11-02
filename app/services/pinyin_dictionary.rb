@@ -8,7 +8,7 @@
 # syllable per character: the card stores the word ("Zhōngguó"), the
 # dictionary knows the parts.
 class PinyinDictionary
-  TONE_MARKED = /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜǹńň]/.freeze
+  TONE_MARKED = /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜǹńň]/
 
   def self.load(path)
     new(path: path)
@@ -101,10 +101,10 @@ class PinyinDictionary
     return memo[key] if memo.key?(key)
 
     memo[key] = if count.zero?
-      index == clean.length ? [] : nil
-    else
-      split_longest_first(clean, index, count, memo)
-    end
+                  index == clean.length ? [] : nil
+                else
+                  split_longest_first(clean, index, count, memo)
+                end
   end
 
   def split_longest_first(clean, index, count, memo)

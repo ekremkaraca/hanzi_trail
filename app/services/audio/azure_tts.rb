@@ -12,7 +12,7 @@ module Audio
   # which is deliberately NOT rescued (a bad key or bad SSML fails
   # identically forever).
   class AzureTts
-    OUTPUT_FORMAT = "audio-24khz-48kbitrate-mono-mp3"
+    OUTPUT_FORMAT = "audio-24khz-48kbitrate-mono-mp3".freeze
     # Small enough to retry within a task run, large enough to real backoff.
     MAX_ATTEMPTS = 4
     BACKOFF_SECONDS = 2

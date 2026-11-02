@@ -21,19 +21,19 @@ class FlashcardsController < ApplicationController
     # "Next" link without a second count query, then hand
     # the page exactly PER_PAGE cards.
     cards = Flashcard
-      .all
-      .by_source(QueryParam.scalar(params[:source]))
-      .by_hsk_level(QueryParam.scalar(params[:hsk_level]))
-      .by_category(QueryParam.scalar(params[:category]))
-      .with_story_filter(QueryParam.scalar(params[:story_status]))
-      .search(QueryParam.scalar(params[:query]))
-      # Codepoint order of the characters is meaningless to learners;
-      # toneless pinyin (see pinyin_sort_key) approximates dictionary
-      # order, with character as the deterministic tiebreaker.
-      .order(:pinyin_sort_key, :character)
-      .limit(PER_PAGE + 1)
-      .offset((page - 1) * PER_PAGE)
-      .to_a
+            .all
+            .by_source(QueryParam.scalar(params[:source]))
+            .by_hsk_level(QueryParam.scalar(params[:hsk_level]))
+            .by_category(QueryParam.scalar(params[:category]))
+            .with_story_filter(QueryParam.scalar(params[:story_status]))
+            .search(QueryParam.scalar(params[:query]))
+            # Codepoint order of the characters is meaningless to learners;
+            # toneless pinyin (see pinyin_sort_key) approximates dictionary
+            # order, with character as the deterministic tiebreaker.
+            .order(:pinyin_sort_key, :character)
+            .limit(PER_PAGE + 1)
+            .offset((page - 1) * PER_PAGE)
+            .to_a
 
     @has_more_flashcards = cards.size > PER_PAGE
     @flashcards = cards.first(PER_PAGE)
@@ -59,7 +59,7 @@ class FlashcardsController < ApplicationController
     if @flashcard.save
       redirect_to @flashcard, notice: "Flashcard was successfully created."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -69,7 +69,7 @@ class FlashcardsController < ApplicationController
     if @flashcard.update(flashcard_params)
       redirect_to @flashcard, notice: "Flashcard was successfully updated."
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
@@ -96,23 +96,22 @@ class FlashcardsController < ApplicationController
     # The character links are preloaded because the show page renders both
     # the any?-guard and the ordered list from the same association.
     @flashcard = Flashcard
-      .includes(flashcard_characters: :character_entry)
-      .find(QueryParam.scalar(params[:id]))
+                 .includes(flashcard_characters: :character_entry)
+                 .find(QueryParam.scalar(params.expect(:id)))
   end
 
   def flashcard_params
     params
-      .require(:flashcard)
-      .permit(
-        :character,
-        :pinyin,
-        :meaning,
-        :story,
-        :category,
-        :components,
-        :literal_meaning,
-        :mnemonic,
-        :usage_note
+      .expect(
+        flashcard: %i[character
+                      pinyin
+                      meaning
+                      story
+                      category
+                      components
+                      literal_meaning
+                      mnemonic
+                      usage_note]
       )
   end
 end

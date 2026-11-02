@@ -9,7 +9,7 @@ class CardPinyinAuditTest < ActiveSupport::TestCase
     report = CardPinyinAudit.call(path: DICTIONARY)
 
     assert_finding(report, character: card.character, kind: :reading,
-                            detail: "'zhōng' is not a reading of '电'")
+                           detail: "'zhōng' is not a reading of '电'")
     assert_empty report.respaced
   end
 
@@ -19,7 +19,7 @@ class CardPinyinAuditTest < ActiveSupport::TestCase
     report = CardPinyinAudit.call(path: DICTIONARY)
 
     assert_finding(report, character: card.character, kind: :count,
-                            detail: "2 syllables for 1 character(s)")
+                           detail: "2 syllables for 1 character(s)")
   end
 
   test "reports a transcript the dictionary cannot parse at all" do
@@ -28,7 +28,7 @@ class CardPinyinAuditTest < ActiveSupport::TestCase
     report = CardPinyinAudit.call(path: DICTIONARY)
 
     assert_finding(report, character: card.character, kind: :unsegmentable,
-                            detail: "cannot be split into known syllables")
+                           detail: "cannot be split into known syllables")
   end
 
   test "sorts a written tone from a tone-less spelling" do
@@ -38,9 +38,9 @@ class CardPinyinAuditTest < ActiveSupport::TestCase
     report = CardPinyinAudit.call(path: DICTIONARY)
 
     assert_finding(report, character: "机", kind: :neutral,
-                            detail: "'qi' has no tone mark; the dictionary lists qī")
+                           detail: "'qi' has no tone mark; the dictionary lists qī")
     assert_finding(report, character: feed.character, kind: :tone,
-                            detail: "'wéi' differs in tone from 'wèi'")
+                           detail: "'wéi' differs in tone from 'wèi'")
   end
 
   test "flags an unspaced multi-character reading until asked to fix it" do
@@ -109,6 +109,6 @@ class CardPinyinAuditTest < ActiveSupport::TestCase
   end
 
   def assert_finding_absent(report, character:)
-    assert_empty report.findings.select { |f| f.character == character }
+    assert_empty(report.findings.select { |f| f.character == character })
   end
 end

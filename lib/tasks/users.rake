@@ -7,7 +7,7 @@ namespace :users do
     password = ENV["USERS_PASSWORD"] || begin
       require "io/console"
       print "Password (min 10 chars): "
-      STDIN.noecho(&:gets).to_s.strip.tap { puts }
+      $stdin.noecho(&:gets).to_s.strip.tap { puts }
     end
 
     user = User.new(email_address: email, password: password)

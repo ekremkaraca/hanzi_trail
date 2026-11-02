@@ -2,7 +2,7 @@
   <div class="panel-card form-card">
     <h1 class="fs-3 mb-5"><%= flashcard.persisted? ? "Edit flashcard" : "New flashcard" %></h1>
 
-    <% if has_errors? %>
+    <% if errors? %>
       <div class="notice notice--danger mb-4">
         <p><strong>Please fix the following errors:</strong></p>
         <ul>

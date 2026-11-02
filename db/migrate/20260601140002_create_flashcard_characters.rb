@@ -5,8 +5,8 @@ class CreateFlashcardCharacters < ActiveRecord::Migration[8.1]
       t.references :character_entry, null: false, foreign_key: true
       t.integer :position, null: false
 
-      t.index [ :flashcard_id, :character_entry_id ], unique: true
-      t.index [ :flashcard_id, :position ], unique: true
+      t.index %i[flashcard_id character_entry_id], unique: true
+      t.index %i[flashcard_id position], unique: true
 
       t.timestamps
     end

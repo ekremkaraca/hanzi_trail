@@ -12,7 +12,7 @@ class User < ApplicationRecord
   # instead of a validation message — probed: the task died with a full
   # backtrace and `if user.save` never reached its errors branch.
   validates :email_address, presence: true, uniqueness: true,
-            format: { with: URI::MailTo::EMAIL_REGEXP }
+                            format: { with: URI::MailTo::EMAIL_REGEXP }
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 end

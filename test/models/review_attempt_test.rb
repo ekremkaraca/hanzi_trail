@@ -30,7 +30,7 @@ class ReviewAttemptTest < ActiveSupport::TestCase
     )
 
     assert_includes ReviewAttempt.today, today_attempt
-    refute_includes ReviewAttempt.today, old_attempt
+    assert_not_includes ReviewAttempt.today, old_attempt
   end
 
   test "recent scope orders by reviewed_at descending" do
@@ -45,7 +45,7 @@ class ReviewAttemptTest < ActiveSupport::TestCase
     hard = ReviewAttempt.create!(flashcard: flashcards(:network), rating: "hard")
 
     assert_includes ReviewAttempt.by_rating("good"), good
-    refute_includes ReviewAttempt.by_rating("good"), hard
+    assert_not_includes ReviewAttempt.by_rating("good"), hard
   end
 
   test "requires a flashcard association" do

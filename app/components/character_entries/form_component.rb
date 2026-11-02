@@ -8,7 +8,7 @@ module CharacterEntries
 
     attr_reader :character_entry
 
-    def has_errors?
+    def errors?
       character_entry.errors.any?
     end
 

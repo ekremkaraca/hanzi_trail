@@ -20,7 +20,7 @@ class CharacterEntry < ApplicationRecord
   # The dictionary stores readings comma-separated, primary first
   # ("cháng,zhǎng"). These helpers split that for display.
   def pinyin_readings
-    pinyin.to_s.split(",").map(&:strip).reject(&:blank?)
+    pinyin.to_s.split(",").map(&:strip).compact_blank
   end
 
   def primary_pinyin

@@ -12,14 +12,14 @@ class ReviewsController < ApplicationController
   # reloading the controller, and the flag takes effect on the next
   # request after a fly secret change (no rebuild).
   def self.writes_require_authentication?
-    ActiveModel::Type::Boolean.new.cast(ENV["REQUIRE_AUTH_FOR_REVIEWS"])
+    ActiveModel::Type::Boolean.new.cast(ENV.fetch("REQUIRE_AUTH_FOR_REVIEWS", nil))
   end
 
   # Runs before rate_limit: with the flag on, an anonymous flood is
   # bounced to sign-in (zero writes, zero limiter state) instead of
   # burning 60/min of budget on actions that will never execute.
   before_action :require_authentication,
-    if: -> { self.class.writes_require_authentication? }, only: :update
+                if: -> { self.class.writes_require_authentication? }, only: :update
 
   # preferences and reset only touch the caller's own session and need
   # no limit; update appends a ReviewAttempt row and moves the shared
@@ -27,7 +27,7 @@ class ReviewsController < ApplicationController
   # the auth flag off. 60 per minute is far above human review pace and
   # still bounds how fast rows can be written.
   rate_limit to: 60, within: 1.minute, only: :update,
-    with: -> { redirect_to review_path(filter_params), alert: "Too many reviews, please slow down." }
+             with: -> { redirect_to review_path(filter_params), alert: "Too many reviews, please slow down." }
 
   # One session[:review_sessions] key is created per filter
   # combination ever reviewed. Left unbounded that hash grows
@@ -66,14 +66,12 @@ class ReviewsController < ApplicationController
     rating = review_params[:rating]
 
     # Keep invalid input as a redirect instead of surfacing a 500 from the service.
-    unless Flashcard::REVIEW_RATINGS.include?(rating)
-      return redirect_to review_path, alert: "Invalid review rating."
-    end
+    return redirect_to review_path, alert: "Invalid review rating." unless Flashcard::REVIEW_RATINGS.include?(rating)
 
     # Find through the queue scope so filtered review URLs cannot rate outside cards.
     flashcard = Review::Queue.new(filters: filter_params, session: session)
-      .scope
-      .find(QueryParam.scalar(params[:flashcard_id]))
+                             .scope
+                             .find(QueryParam.scalar(params.expect(:flashcard_id)))
 
     # Scheduler owns the locked mutation and review-attempt side effect.
     Review::Scheduler.new(
@@ -87,17 +85,17 @@ class ReviewsController < ApplicationController
     redirect_to review_path(filter_params), notice: "Review saved."
   rescue Flashcard::CardNotDueError
     redirect_to review_path(filter_params),
-      alert: "This card is not due for review."
+                alert: "This card is not due for review."
   rescue ActiveRecord::RecordNotFound
     redirect_to review_path(filter_params),
-      alert: "That card is not in the current review filter."
+                alert: "That card is not in the current review filter."
   rescue ActiveRecord::RecordInvalid
     # The scheduler's update!/create! only writes
     # server-controlled fields, so this should be
     # unreachable — but a failed save inside the lock
     # must not surface as a 500 mid-review.
     redirect_to review_path(filter_params),
-      alert: "Could not save the review. Try again."
+                alert: "Could not save the review. Try again."
   end
 
   def preferences
@@ -115,6 +113,20 @@ class ReviewsController < ApplicationController
   end
 
   private
+
+  class << self
+    # Counters are day-scoped: each entry stores {"c" => count, "d" =>
+    # "YYYY-MM-DD"}. A counter written on an earlier local day reads as 0,
+    # so "N reviewed" always describes today's session with the current
+    # filters instead of accumulating across weeks. Legacy integer values
+    # (pre-schema sessions) are treated as expired rather than crashing.
+    # Pure class method so the shape rules are unit-testable without a request.
+    def counter_value(raw, today)
+      return 0 unless raw.is_a?(Hash) && raw["d"] == today
+
+      raw["c"].to_i
+    end
+  end
 
   def review_params
     { rating: params.dig(:review, :rating) }
@@ -152,18 +164,6 @@ class ReviewsController < ApplicationController
       .map { |k, v| "#{k}=#{Rack::Utils.escape(v)}" }
       .join("&")
       .presence || "all"
-  end
-
-  # Counters are day-scoped: each entry stores {"c" => count, "d" =>
-  # "YYYY-MM-DD"}. A counter written on an earlier local day reads as 0,
-  # so "N reviewed" always describes today's session with the current
-  # filters instead of accumulating across weeks. Legacy integer values
-  # (pre-schema sessions) are treated as expired rather than crashing.
-  # Pure class method so the shape rules are unit-testable without a request.
-  def self.counter_value(raw, today)
-    return 0 unless raw.is_a?(Hash) && raw["d"] == today
-
-    raw["c"].to_i
   end
 
   def reviewed_count

@@ -21,10 +21,10 @@ module Audio
       "yunxi" => "zh-CN-YunxiNeural",
       "xiaoyi" => "zh-CN-XiaoyiNeural"
     }.freeze
-    DEFAULT_VOICE = "zh-CN-XiaoxiaoNeural"
+    DEFAULT_VOICE = "zh-CN-XiaoxiaoNeural".freeze
 
     # Drill audio wants clear and slightly slow, not conversational.
-    DEFAULT_RATE = "-10%"
+    DEFAULT_RATE = "-10%".freeze
 
     def initialize(voice: DEFAULT_VOICE, rate: DEFAULT_RATE)
       @voice = voice
@@ -39,9 +39,7 @@ module Audio
       # pronounced as the -r rhotacization of the previous syllable, so a
       # card ending in 儿 comes back one syllable short. Anything else
       # means the pinyin does not describe this word.
-      if syllables.size != hanzi_count && !(flashcard.character.end_with?("儿") && syllables.size == hanzi_count - 1)
-        raise MismatchError, "#{flashcard.character}: #{syllables.size} syllables (#{syllables.join(' ')}) vs #{hanzi_count} hanzi from pinyin '#{flashcard.pinyin}'"
-      end
+      raise MismatchError, "#{flashcard.character}: #{syllables.size} syllables (#{syllables.join(' ')}) vs #{hanzi_count} hanzi from pinyin '#{flashcard.pinyin}'" if syllables.size != hanzi_count && !(flashcard.character.end_with?("儿") && syllables.size == hanzi_count - 1)
 
       <<~SSML
         <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="zh-CN"><voice name="#{@voice}"><prosody rate="#{@rate}">#{flashcard.character}</prosody></voice></speak>

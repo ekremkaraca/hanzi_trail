@@ -8,9 +8,9 @@ module Audio
 
     test "rejects empty, tiny, and nil payloads" do
       # A broken play button is worse than no audio at all.
-      refute SilenceGuard.valid?("")
-      refute SilenceGuard.valid?("x" * 1_999)
-      refute SilenceGuard.valid?(nil)
+      assert_not SilenceGuard.valid?("")
+      assert_not SilenceGuard.valid?("x" * 1_999)
+      assert_not SilenceGuard.valid?(nil)
     end
   end
 end

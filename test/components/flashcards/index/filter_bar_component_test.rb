@@ -27,7 +27,7 @@ module Flashcards
 
         assert_selector "select[name='hsk_level'] option[value='']"
         assert_selector "select[name='hsk_level'] option[value='old-1']",
-          text: "HSK 2.0 (1)"
+                        text: "HSK 2.0 (1)"
         assert_selector "select[name='hsk_level'] option", count: 3
       end
     end

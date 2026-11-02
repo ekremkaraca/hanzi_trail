@@ -11,7 +11,7 @@ module Reviews
       {
         index: 1,
         label: "Breakdown",
-        visible: ->(flashcard) {
+        visible: lambda { |flashcard|
           flashcard.components.present? ||
             flashcard.literal_meaning.present? ||
             flashcard.mnemonic.present?
@@ -21,9 +21,9 @@ module Reviews
       {
         index: 2,
         label: "Context",
-        visible: ->(flashcard) {
+        visible: lambda { |flashcard|
           flashcard.usage_note.present? ||
-            flashcard.has_character_links?
+            flashcard.character_links?
         },
         component: Reviews::TabPanels::ContextTabComponent
       }

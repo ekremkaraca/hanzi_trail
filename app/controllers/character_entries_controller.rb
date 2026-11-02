@@ -20,7 +20,7 @@ class CharacterEntriesController < ApplicationController
     if @character_entry.update(character_entry_params)
       redirect_to @character_entry, notice: "Character was successfully updated."
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
@@ -39,9 +39,9 @@ class CharacterEntriesController < ApplicationController
     required = @character_entry.required_by_cards.to_a
     if required.any?
       return redirect_to @character_entry,
-        alert: "#{@character_entry.character} is still part of " \
-               "#{required.size} card(s); " \
-               "delete or edit those cards first."
+                         alert: "#{@character_entry.character} is still part of " \
+                                "#{required.size} card(s); " \
+                                "delete or edit those cards first."
     end
 
     @character_entry.destroy
@@ -54,12 +54,11 @@ class CharacterEntriesController < ApplicationController
     # QueryParam.scalar keeps an Array/Hash id from reaching find.
     @character_entry = CharacterEntry
                        .includes(flashcard_characters: :flashcard)
-                       .find(QueryParam.scalar(params[:id]))
+                       .find(QueryParam.scalar(params.expect(:id)))
   end
 
   def character_entry_params
     params
-      .require(:character_entry)
-      .permit(:pinyin, :meaning, :radical, :notes)
+      .expect(character_entry: %i[pinyin meaning radical notes])
   end
 end
