@@ -70,13 +70,14 @@ class HskImporter
     data = parse_json
     raise ImportError, "HSK data must be an array" unless data.is_a?(Array)
 
-    indexed = data.each_with_index.to_a
     imported = 0
     processed = 0
 
-    indexed.each_slice(CHUNK_SIZE) do |slice|
+    data.each_slice(CHUNK_SIZE) do |slice|
       Flashcard.transaction do
-        slice.each { |entry, index| imported += 1 if import_entry(entry, index: index) }
+        # index: dropped — the import stagger it fed was removed, and
+        # import_entry only takes the entry now.
+        slice.each { |entry| imported += 1 if import_entry(entry) }
       end
       processed += slice.size
       say_progress(processed, imported, data.size)
