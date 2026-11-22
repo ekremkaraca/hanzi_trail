@@ -13,7 +13,7 @@ gem 'kamal', '~> 2.11', require: false
 gem 'lograge', '>= 0.15.1'
 gem 'pg', '~> 1.6', '>= 1.6.3'
 gem 'propshaft', '~> 1.3', '>= 1.3.2'
-gem 'puma', '~> 8.0', '>= 8.0.2'
+gem 'puma', '~> 8.1'
 gem 'rails', '~> 8.1.3'
 gem 'solid_cable', '~> 4.0'
 gem 'solid_cache', '~> 1.0', '>= 1.0.10'
